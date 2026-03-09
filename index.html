@@ -9,42 +9,41 @@
 body{
 font-family:Arial;
 background:#0f172a;
-margin:0;
 color:white;
+text-align:center;
+margin:0;
 }
 
-header{
-background:#020617;
-padding:20px;
-text-align:center;
-font-size:30px;
+.header{
+padding:30px;
+font-size:32px;
 font-weight:bold;
 }
 
-.container{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:25px;
-padding:40px;
+.sub{
+opacity:0.7;
+margin-bottom:20px;
 }
 
-.card{
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:30px;
+padding:40px;
+max-width:900px;
+margin:auto;
+}
+
+.app{
 background:#1e293b;
-padding:30px;
-border-radius:12px;
-text-align:center;
+border-radius:20px;
+padding:25px;
 transition:0.3s;
 }
 
-.card:hover{
+.app:hover{
 background:#334155;
 transform:scale(1.05);
-}
-
-a{
-text-decoration:none;
-color:white;
-font-weight:bold;
 }
 
 .icon{
@@ -52,49 +51,64 @@ font-size:45px;
 margin-bottom:10px;
 }
 
+a{
+text-decoration:none;
+color:white;
+}
+
+.footer{
+margin-top:40px;
+padding:20px;
+opacity:0.6;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>
+<div class="header">
 My Project Amos
-</header>
+</div>
 
-<div class="container">
+<div class="sub">
+Developer Dashboard
+</div>
 
-<div class="card">
-<div class="icon">📅</div>
-<h3>Jadwal Kerja</h3>
+<div class="grid">
+
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-Buka Aplikasi
-</a>
+<div class="app">
+<div class="icon">📅</div>
+Jadwal Kerja
 </div>
+</a>
 
-<div class="card">
-<div class="icon">🗺</div>
-<h3>Fake GPS Map</h3>
 <a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-Buka Map
-</a>
+<div class="app">
+<div class="icon">🗺</div>
+Fake GPS Map
 </div>
+</a>
 
-<div class="card">
-<div class="icon">👨‍💻</div>
-<h3>CV Amos</h3>
 <a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-Lihat CV
-</a>
+<div class="app">
+<div class="icon">👨‍💻</div>
+CV Amos
 </div>
+</a>
 
-<div class="card">
-<div class="icon">🤖</div>
-<h3>Telegram Bot</h3>
 <a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-Buka Bot
+<div class="app">
+<div class="icon">🤖</div>
+Telegram Bot
+</div>
 </a>
+
 </div>
 
+<div class="footer">
+© 2026 Amos Marbun Projects
 </div>
 
 </body>
