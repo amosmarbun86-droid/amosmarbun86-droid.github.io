@@ -18,6 +18,16 @@ background-repeat:no-repeat;
 color:white;
 text-align:center;
 margin:0;
+overflow-x:hidden;
+
+/* FADE-IN */
+animation:fadeIn 1.5s ease;
+}
+
+/* FADE-IN KEYFRAME */
+@keyframes fadeIn{
+from{opacity:0; transform:translateY(20px);}
+to{opacity:1; transform:translateY(0);}
 }
 
 /* OVERLAY */
@@ -30,8 +40,18 @@ width:100%;
 height:100%;
 background:linear-gradient(
 rgba(0,0,0,0.6),
-rgba(0,0,0,0.8)
+rgba(0,0,0,0.85)
 );
+z-index:-2;
+}
+
+/* STAR CANVAS */
+#stars{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
 z-index:-1;
 }
 
@@ -73,26 +93,23 @@ backdrop-filter:blur(8px);
 box-shadow:0 10px 25px rgba(0,0,0,0.4);
 }
 
-/* HOVER EFFECT */
+/* HOVER */
 .app:hover{
 background:rgba(51,65,85,0.9);
 transform:translateY(-8px) scale(1.03);
 box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
-/* ICON */
 .icon{
 font-size:48px;
 margin-bottom:12px;
 }
 
-/* LINK */
 a{
 text-decoration:none;
 color:white;
 }
 
-/* FOOTER */
 .footer{
 margin-top:20px;
 padding:20px;
@@ -102,19 +119,17 @@ font-size:14px;
 
 /* RESPONSIVE */
 @media(max-width:600px){
-.header{
-font-size:28px;
-}
-.grid{
-padding:20px;
-gap:15px;
-}
+.header{font-size:28px;}
+.grid{padding:20px; gap:15px;}
 }
 
 </style>
 </head>
 
 <body>
+
+<!-- CANVAS BINTANG -->
+<canvas id="stars"></canvas>
 
 <div class="header">
 🚀 My Project Amos
@@ -127,49 +142,49 @@ Developer Dashboard
 <div class="grid">
 
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">📅</div>
 Jadwal Kerja
 </div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">🗺</div>
 Fake GPS Map
 </div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">👨‍💻</div>
 CV Amos
 </div>
 </a>
 
 <a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">🤖</div>
 Telegram Bot
 </div>
 </a>
 
 <a href="https://alarm-telegram-24jam-production.up.railway.app" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">🚨</div>
 Alarm Route Web
 </div>
 </a>
 
 <a href="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">📍</div>
 Form Wilayah SPX
 </div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank">
-<div class="app">
+<div class="app" onclick="playSound()">
 <div class="icon">📂</div>
 Data Pribadi
 </div>
@@ -180,6 +195,71 @@ Data Pribadi
 <div class="footer">
 © 2026 Amos Marbun Projects
 </div>
+
+<!-- SOUND -->
+<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+
+<script>
+
+/* SOUND */
+function playSound(){
+document.getElementById("clickSound").play();
+}
+
+/* STAR PARTICLES */
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+for(let i=0;i<120;i++){
+stars.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2,
+d:Math.random()*1
+});
+}
+
+function drawStars(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+ctx.beginPath();
+
+for(let i=0;i<stars.length;i++){
+let s = stars[i];
+ctx.moveTo(s.x,s.y);
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2,true);
+}
+
+ctx.fill();
+moveStars();
+}
+
+function moveStars(){
+for(let i=0;i<stars.length;i++){
+let s = stars[i];
+s.y += s.d;
+
+if(s.y > canvas.height){
+s.y = 0;
+s.x = Math.random()*canvas.width;
+}
+}
+}
+
+setInterval(drawStars,33);
+
+/* RESPONSIVE CANVAS */
+window.addEventListener("resize",()=>{
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+});
+
+</script>
 
 </body>
 </html>
