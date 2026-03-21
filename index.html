@@ -46,9 +46,7 @@ background-size:120%;
 background-position:50% 50%;
 background-repeat:no-repeat;
 background-attachment:fixed;
-
 animation:fadeIn 1.5s ease;
-
 color:white;
 text-align:center;
 margin:0;
@@ -61,7 +59,7 @@ from{opacity:0; transform:translateY(20px);}
 to{opacity:1; transform:translateY(0);}
 }
 
-/* OVERLAY FIX */
+/* OVERLAY */
 body::before{
 content:"";
 position:fixed;
@@ -92,7 +90,6 @@ font-size:36px;
 font-weight:bold;
 }
 
-/* SUB */
 .sub{
 opacity:0.85;
 margin-bottom:20px;
@@ -175,6 +172,14 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 
 <div class="grid">
 
+<!-- CAMERA RCP PRO (BARU) -->
+<a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank">
+<div class="app" onclick="playSound()">
+<div class="icon">📸</div>
+Camera RCP PRO
+</div>
+</a>
+
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
 <div class="app" onclick="playSound()"><div class="icon">📅</div>Jadwal Kerja</div>
 </a>
@@ -219,7 +224,7 @@ document.getElementById("clickSound").play();
 }
 
 /* HACKER LOADER */
-const lines = [
+const lines=[
 "> Initializing system...",
 "> Connecting...",
 "> Access granted ✔",
@@ -231,12 +236,12 @@ let i=0,j=0;
 function type(){
 if(i<lines.length){
 if(j<lines[i].length){
-document.getElementById("text").innerHTML+=lines[i][j];
+text.innerHTML+=lines[i][j];
 j++;
 setTimeout(type,40);
 }else{
-document.getElementById("text").innerHTML+="<br>";
-i++; j=0;
+text.innerHTML+="<br>";
+i++;j=0;
 setTimeout(type,300);
 }
 }else{
@@ -264,31 +269,12 @@ ctx.beginPath();
 ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
 ctx.fill();
 s.y+=s.d;
-if(s.y>canvas.height){s.y=0;}
+if(s.y>canvas.height)s.y=0;
 }
 }
 setInterval(draw,33);
 
-/* PARALLAX PC */
-document.addEventListener("mousemove",(e)=>{
-let x=(window.innerWidth/2-e.clientX)/40;
-let y=(window.innerHeight/2-e.clientY)/40;
-
-document.body.style.backgroundPosition=`${50+x}% ${50+y}%`;
-canvas.style.transform=`translate(${x*2}px,${y*2}px)`;
-document.querySelector(".grid").style.transform=`translate(${x/2}px,${y/2}px)`;
-});
-
-/* PARALLAX HP (GYRO) */
-window.addEventListener("deviceorientation",(e)=>{
-let x=e.gamma/5;
-let y=e.beta/5;
-
-document.body.style.backgroundPosition=`${50+x}% ${50+y}%`;
-canvas.style.transform=`translate(${x*2}px,${y*2}px)`;
-});
-
-/* PWA */
+/* PWA INSTALL */
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt",(e)=>{
@@ -305,7 +291,7 @@ deferredPrompt=null;
 }
 };
 
-/* SW */
+/* SERVICE WORKER */
 if("serviceWorker" in navigator){
 navigator.serviceWorker.register("sw.js");
 }
