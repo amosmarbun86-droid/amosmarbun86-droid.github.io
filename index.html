@@ -42,15 +42,21 @@ animation:blink 1s infinite;
 /* BODY */
 body{
 font-family:Arial;
+
+/* BACKGROUND */
 background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
-background-size:cover;
+background-size:110%;
 background-position:center;
 background-repeat:no-repeat;
+background-attachment:fixed;
+
+/* ANIMASI */
+animation:fadeIn 1.5s ease, bgMove 40s ease-in-out infinite alternate;
+
 color:white;
 text-align:center;
 margin:0;
 overflow-x:hidden;
-animation:fadeIn 1.5s ease;
 }
 
 @keyframes fadeIn{
@@ -58,13 +64,20 @@ from{opacity:0; transform:translateY(20px);}
 to{opacity:1; transform:translateY(0);}
 }
 
-/* OVERLAY */
+/* ANIMASI BACKGROUND */
+@keyframes bgMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+/* OVERLAY (LEBIH TERANG) */
 body::before{
 content:"";
 position:fixed;
 width:100%;
 height:100%;
-background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.85));
+background:linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.5));
 z-index:-2;
 }
 
@@ -83,8 +96,9 @@ font-size:36px;
 font-weight:bold;
 }
 
+/* SUB */
 .sub{
-opacity:0.8;
+opacity:0.85;
 margin-bottom:20px;
 }
 
@@ -100,17 +114,19 @@ margin:auto;
 
 /* CARD */
 .app{
-background:rgba(30,41,59,0.75);
+background:rgba(15,23,42,0.8);
 border-radius:20px;
 padding:25px;
 transition:0.3s;
 cursor:pointer;
-backdrop-filter:blur(8px);
+backdrop-filter:blur(10px);
+box-shadow:0 10px 25px rgba(0,0,0,0.5);
 }
 
 .app:hover{
 transform:translateY(-8px) scale(1.03);
-background:rgba(51,65,85,0.9);
+background:rgba(51,65,85,0.95);
+box-shadow:0 20px 40px rgba(0,0,0,0.7);
 }
 
 .icon{
@@ -143,6 +159,11 @@ font-weight:bold;
 cursor:pointer;
 display:none;
 z-index:999;
+box-shadow:0 5px 15px rgba(0,0,0,0.4);
+}
+
+#installBtn:hover{
+transform:scale(1.05);
 }
 
 </style>
