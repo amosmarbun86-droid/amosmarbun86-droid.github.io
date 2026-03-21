@@ -4,9 +4,14 @@
 <meta charset="UTF-8">
 <title>My Project Amos</title>
 
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f172a">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 <style>
 
-/* ================= LOADER HACKER ================= */
+/* LOADER */
 #loader{
 position:fixed;
 top:0;
@@ -22,16 +27,10 @@ z-index:9999;
 font-family:monospace;
 }
 
-#terminal{
-text-align:left;
-font-size:16px;
-}
-
 .cursor{
 display:inline-block;
 width:10px;
 background:#00ff9f;
-margin-left:5px;
 animation:blink 1s infinite;
 }
 
@@ -40,7 +39,7 @@ animation:blink 1s infinite;
 25%,75%{opacity:0;}
 }
 
-/* ================= MAIN ================= */
+/* BODY */
 body{
 font-family:Arial;
 background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
@@ -59,31 +58,27 @@ from{opacity:0; transform:translateY(20px);}
 to{opacity:1; transform:translateY(0);}
 }
 
-/* overlay */
+/* OVERLAY */
 body::before{
 content:"";
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.85));
 z-index:-2;
 }
 
-/* stars */
+/* STARS */
 #stars{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 z-index:-1;
 }
 
-/* header */
+/* HEADER */
 .header{
-padding:40px 20px 10px;
+padding:40px;
 font-size:36px;
 font-weight:bold;
 }
@@ -93,7 +88,7 @@ opacity:0.8;
 margin-bottom:20px;
 }
 
-/* grid */
+/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -103,7 +98,7 @@ max-width:1100px;
 margin:auto;
 }
 
-/* card */
+/* CARD */
 .app{
 background:rgba(30,41,59,0.75);
 border-radius:20px;
@@ -111,7 +106,6 @@ padding:25px;
 transition:0.3s;
 cursor:pointer;
 backdrop-filter:blur(8px);
-box-shadow:0 10px 25px rgba(0,0,0,0.4);
 }
 
 .app:hover{
@@ -121,7 +115,7 @@ background:rgba(51,65,85,0.9);
 
 .icon{
 font-size:48px;
-margin-bottom:12px;
+margin-bottom:10px;
 }
 
 a{
@@ -135,6 +129,22 @@ padding:20px;
 opacity:0.7;
 }
 
+/* INSTALL BUTTON */
+#installBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+padding:12px 20px;
+border:none;
+border-radius:10px;
+background:#22c55e;
+color:white;
+font-weight:bold;
+cursor:pointer;
+display:none;
+z-index:999;
+}
+
 </style>
 </head>
 
@@ -142,12 +152,10 @@ opacity:0.7;
 
 <!-- LOADER -->
 <div id="loader">
-  <div id="terminal">
-    <div id="text"></div><span class="cursor"></span>
-  </div>
+<div id="text"></div><span class="cursor"></span>
 </div>
 
-<!-- STAR CANVAS -->
+<!-- STARS -->
 <canvas id="stars"></canvas>
 
 <div class="header">🚀 My Project Amos</div>
@@ -187,95 +195,91 @@ opacity:0.7;
 
 <div class="footer">© 2026 Amos Marbun Projects</div>
 
+<!-- INSTALL BUTTON -->
+<button id="installBtn">⬇ Install App</button>
+
 <!-- SOUND -->
 <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
 <script>
 
-/* ================= SOUND ================= */
+/* SOUND */
 function playSound(){
 document.getElementById("clickSound").play();
 }
 
-/* ================= HACKER TYPING ================= */
+/* HACKER TYPING */
 const lines = [
 "> Initializing system...",
 "> Connecting to server...",
-"> Bypassing firewall...",
 "> Access granted ✔",
 "> Loading Amos Dashboard..."
 ];
 
-let i = 0;
-let j = 0;
-let currentLine = "";
-let speed = 40;
+let i=0,j=0;
 
 function type(){
-if(i < lines.length){
-if(j < lines[i].length){
-currentLine += lines[i][j];
-document.getElementById("text").innerHTML += lines[i][j];
+if(i<lines.length){
+if(j<lines[i].length){
+document.getElementById("text").innerHTML+=lines[i][j];
 j++;
-setTimeout(type, speed);
+setTimeout(type,40);
 }else{
-document.getElementById("text").innerHTML += "<br>";
-i++;
-j = 0;
-currentLine = "";
-setTimeout(type, 400);
+document.getElementById("text").innerHTML+="<br>";
+i++; j=0;
+setTimeout(type,300);
 }
 }else{
-setTimeout(()=>{
-document.getElementById("loader").style.display="none";
-},800);
+setTimeout(()=>{document.getElementById("loader").style.display="none";},800);
 }
 }
-
 type();
 
-/* ================= STARS ================= */
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
+/* STARS */
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let stars = [];
+let stars=[];
 for(let i=0;i<120;i++){
-stars.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-r:Math.random()*2,
-d:Math.random()*1
-});
+stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,d:Math.random()});
 }
 
-function drawStars(){
+function draw(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="white";
+for(let s of stars){
 ctx.beginPath();
-for(let s of stars){
-ctx.moveTo(s.x,s.y);
-ctx.arc(s.x,s.y,s.r,0,Math.PI*2,true);
-}
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
 ctx.fill();
-
-for(let s of stars){
-s.y += s.d;
-if(s.y > canvas.height){
-s.y = 0;
-s.x = Math.random()*canvas.width;
+s.y+=s.d;
+if(s.y>canvas.height){s.y=0;}
 }
 }
-}
+setInterval(draw,33);
 
-setInterval(drawStars,33);
+/* PWA INSTALL */
+let deferredPrompt;
 
-window.addEventListener("resize",()=>{
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+window.addEventListener("beforeinstallprompt",(e)=>{
+e.preventDefault();
+deferredPrompt=e;
+document.getElementById("installBtn").style.display="block";
 });
+
+document.getElementById("installBtn").onclick=async()=>{
+if(deferredPrompt){
+deferredPrompt.prompt();
+await deferredPrompt.userChoice;
+deferredPrompt=null;
+}
+};
+
+/* SERVICE WORKER */
+if("serviceWorker" in navigator){
+navigator.serviceWorker.register("sw.js");
+}
 
 </script>
 
