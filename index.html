@@ -6,31 +6,60 @@
 
 <style>
 
+/* ================= LOADER HACKER ================= */
+#loader{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:#00ff9f;
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:9999;
+font-family:monospace;
+}
+
+#terminal{
+text-align:left;
+font-size:16px;
+}
+
+.cursor{
+display:inline-block;
+width:10px;
+background:#00ff9f;
+margin-left:5px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%,50%,100%{opacity:1;}
+25%,75%{opacity:0;}
+}
+
+/* ================= MAIN ================= */
 body{
 font-family:Arial;
-
-/* BACKGROUND */
 background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
 background-size:cover;
 background-position:center;
 background-repeat:no-repeat;
-
 color:white;
 text-align:center;
 margin:0;
 overflow-x:hidden;
-
-/* FADE-IN */
 animation:fadeIn 1.5s ease;
 }
 
-/* FADE-IN KEYFRAME */
 @keyframes fadeIn{
 from{opacity:0; transform:translateY(20px);}
 to{opacity:1; transform:translateY(0);}
 }
 
-/* OVERLAY */
+/* overlay */
 body::before{
 content:"";
 position:fixed;
@@ -38,14 +67,11 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-background:linear-gradient(
-rgba(0,0,0,0.6),
-rgba(0,0,0,0.85)
-);
+background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.85));
 z-index:-2;
 }
 
-/* STAR CANVAS */
+/* stars */
 #stars{
 position:fixed;
 top:0;
@@ -55,21 +81,19 @@ height:100%;
 z-index:-1;
 }
 
-/* HEADER */
+/* header */
 .header{
 padding:40px 20px 10px;
 font-size:36px;
 font-weight:bold;
-letter-spacing:1px;
 }
 
 .sub{
 opacity:0.8;
 margin-bottom:20px;
-font-size:16px;
 }
 
-/* GRID */
+/* grid */
 .grid{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
@@ -79,25 +103,20 @@ max-width:1100px;
 margin:auto;
 }
 
-/* CARD */
+/* card */
 .app{
 background:rgba(30,41,59,0.75);
 border-radius:20px;
 padding:25px;
-transition:all 0.3s ease;
+transition:0.3s;
 cursor:pointer;
-
 backdrop-filter:blur(8px);
--webkit-backdrop-filter:blur(8px);
-
 box-shadow:0 10px 25px rgba(0,0,0,0.4);
 }
 
-/* HOVER */
 .app:hover{
-background:rgba(51,65,85,0.9);
 transform:translateY(-8px) scale(1.03);
-box-shadow:0 20px 40px rgba(0,0,0,0.6);
+background:rgba(51,65,85,0.9);
 }
 
 .icon{
@@ -114,13 +133,6 @@ color:white;
 margin-top:20px;
 padding:20px;
 opacity:0.7;
-font-size:14px;
-}
-
-/* RESPONSIVE */
-@media(max-width:600px){
-.header{font-size:28px;}
-.grid{padding:20px; gap:15px;}
 }
 
 </style>
@@ -128,85 +140,101 @@ font-size:14px;
 
 <body>
 
-<!-- CANVAS BINTANG -->
+<!-- LOADER -->
+<div id="loader">
+  <div id="terminal">
+    <div id="text"></div><span class="cursor"></span>
+  </div>
+</div>
+
+<!-- STAR CANVAS -->
 <canvas id="stars"></canvas>
 
-<div class="header">
-🚀 My Project Amos
-</div>
-
-<div class="sub">
-Developer Dashboard
-</div>
+<div class="header">🚀 My Project Amos</div>
+<div class="sub">Developer Dashboard</div>
 
 <div class="grid">
 
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📅</div>
-Jadwal Kerja
-</div>
+<div class="app" onclick="playSound()"><div class="icon">📅</div>Jadwal Kerja</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🗺</div>
-Fake GPS Map
-</div>
+<div class="app" onclick="playSound()"><div class="icon">🗺</div>Fake GPS Map</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">👨‍💻</div>
-CV Amos
-</div>
+<div class="app" onclick="playSound()"><div class="icon">👨‍💻</div>CV Amos</div>
 </a>
 
 <a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🤖</div>
-Telegram Bot
-</div>
+<div class="app" onclick="playSound()"><div class="icon">🤖</div>Telegram Bot</div>
 </a>
 
 <a href="https://alarm-telegram-24jam-production.up.railway.app" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🚨</div>
-Alarm Route Web
-</div>
+<div class="app" onclick="playSound()"><div class="icon">🚨</div>Alarm Route Web</div>
 </a>
 
 <a href="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📍</div>
-Form Wilayah SPX
-</div>
+<div class="app" onclick="playSound()"><div class="icon">📍</div>Form Wilayah SPX</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📂</div>
-Data Pribadi
-</div>
+<div class="app" onclick="playSound()"><div class="icon">📂</div>Data Pribadi</div>
 </a>
 
 </div>
 
-<div class="footer">
-© 2026 Amos Marbun Projects
-</div>
+<div class="footer">© 2026 Amos Marbun Projects</div>
 
 <!-- SOUND -->
 <audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
 
 <script>
 
-/* SOUND */
+/* ================= SOUND ================= */
 function playSound(){
 document.getElementById("clickSound").play();
 }
 
-/* STAR PARTICLES */
+/* ================= HACKER TYPING ================= */
+const lines = [
+"> Initializing system...",
+"> Connecting to server...",
+"> Bypassing firewall...",
+"> Access granted ✔",
+"> Loading Amos Dashboard..."
+];
+
+let i = 0;
+let j = 0;
+let currentLine = "";
+let speed = 40;
+
+function type(){
+if(i < lines.length){
+if(j < lines[i].length){
+currentLine += lines[i][j];
+document.getElementById("text").innerHTML += lines[i][j];
+j++;
+setTimeout(type, speed);
+}else{
+document.getElementById("text").innerHTML += "<br>";
+i++;
+j = 0;
+currentLine = "";
+setTimeout(type, 400);
+}
+}else{
+setTimeout(()=>{
+document.getElementById("loader").style.display="none";
+},800);
+}
+}
+
+type();
+
+/* ================= STARS ================= */
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
 
@@ -214,7 +242,6 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let stars = [];
-
 for(let i=0;i<120;i++){
 stars.push({
 x:Math.random()*canvas.width,
@@ -228,22 +255,14 @@ function drawStars(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="white";
 ctx.beginPath();
-
-for(let i=0;i<stars.length;i++){
-let s = stars[i];
+for(let s of stars){
 ctx.moveTo(s.x,s.y);
 ctx.arc(s.x,s.y,s.r,0,Math.PI*2,true);
 }
-
 ctx.fill();
-moveStars();
-}
 
-function moveStars(){
-for(let i=0;i<stars.length;i++){
-let s = stars[i];
+for(let s of stars){
 s.y += s.d;
-
 if(s.y > canvas.height){
 s.y = 0;
 s.x = Math.random()*canvas.width;
@@ -253,7 +272,6 @@ s.x = Math.random()*canvas.width;
 
 setInterval(drawStars,33);
 
-/* RESPONSIVE CANVAS */
 window.addEventListener("resize",()=>{
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
