@@ -1,5 +1,4 @@
-const CACHE_NAME = "amos-pwa-v1";
-
+const CACHE_NAME = "amos-dashboard-v3";
 const urlsToCache = [
   "./",
   "./index.html",
