@@ -145,15 +145,14 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 
 <div class="grid">
 
-<!-- ✅ TAMBAHAN BARU (CAMERA) -->
+<!-- CAMERA -->
 <a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank">
 <div class="app" onclick="playSound()">
 <div class="icon">📸</div>Camera RCP PRO
 </div>
 </a>
 
-<!-- ===== MENU LAMA (TIDAK DIUBAH) ===== -->
-
+<!-- MENU LAMA -->
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
 <div class="app" onclick="playSound()"><div class="icon">📅</div>Jadwal Kerja</div>
 </a>
@@ -182,6 +181,13 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 <div class="app" onclick="playSound()"><div class="icon">📂</div>Data Pribadi</div>
 </a>
 
+<!-- ✅ ADMIN PANEL DITAMBAHKAN -->
+<a href="https://amosmarbun86-droid.github.io/data-pribadi/admin.html" target="_blank">
+<div class="app" onclick="playSound()">
+<div class="icon">🔐</div>Admin Device Panel
+</div>
+</a>
+
 </div>
 
 <div class="footer">© 2026 Amos Marbun Projects</div>
@@ -192,7 +198,7 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 
 <script>
 
-/* ===== SCRIPT LAMA TETAP ===== */
+/* SCRIPT LAMA TETAP */
 
 function playSound(){
 document.getElementById("clickSound").play();
@@ -260,7 +266,7 @@ await deferredPrompt.userChoice;
 }
 };
 
-/* ✅ AUTO UPDATE BARU (UPGRADE SAJA) */
+/* AUTO UPDATE */
 if("serviceWorker" in navigator){
 navigator.serviceWorker
 .register("sw.js?v="+Date.now())
