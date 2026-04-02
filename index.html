@@ -10,8 +10,7 @@
 
 <style>
 
-/* ===== SEMUA STYLE LAMA TETAP ===== */
-
+/* ===== LOADER ===== */
 #loader{
 position:fixed;
 top:0;
@@ -39,80 +38,108 @@ animation:blink 1s infinite;
 25%,75%{opacity:0;}
 }
 
+/* ===== BODY ===== */
 body{
-font-family:Arial;
+font-family:Consolas, monospace;
 background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
 background-size:120%;
 background-position:50% 50%;
 background-repeat:no-repeat;
 background-attachment:fixed;
-animation:fadeIn 1.5s ease;
 color:white;
 text-align:center;
 margin:0;
 overflow-x:hidden;
 }
 
-@keyframes fadeIn{
-from{opacity:0; transform:translateY(20px);}
-to{opacity:1; transform:translateY(0);}
-}
-
+/* OVERLAY */
 body::before{
 content:"";
 position:fixed;
 top:0;
 left:0;
-width:100vw;
-height:100vh;
-background:linear-gradient(rgba(0,0,0,0.35),rgba(0,0,0,0.65));
+width:100%;
+height:100%;
+background:linear-gradient(rgba(0,0,0,0.4),rgba(0,0,0,0.8));
 z-index:-1;
-pointer-events:none;
 }
 
-#stars{
-position:fixed;
-top:0;
-left:0;
-width:100vw;
-height:100vh;
-z-index:-2;
-transition:0.2s;
+/* ===== HEADER ===== */
+.header{
+padding:20px;
+font-size:26px;
+font-weight:bold;
+background:rgba(0,0,0,0.7);
+border-bottom:1px solid #00ff9f;
+box-shadow:0 0 15px #00ff9f33;
 }
 
-.header{padding:40px;font-size:36px;font-weight:bold;}
-.sub{opacity:0.85;margin-bottom:20px;}
+.sub{
+font-size:13px;
+color:#00ff9f;
+opacity:0.8;
+margin-top:5px;
+}
 
+/* ===== STATUS BAR ===== */
+.statusbar{
+display:flex;
+justify-content:center;
+gap:20px;
+padding:10px;
+font-size:12px;
+background:rgba(0,0,0,0.6);
+border-bottom:1px solid rgba(255,255,255,0.1);
+}
+
+/* ===== GRID ===== */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-gap:25px;
-padding:40px;
-max-width:1100px;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:18px;
+padding:20px;
+max-width:1000px;
 margin:auto;
-transition:0.2s;
 }
 
+/* ===== CARD ===== */
 .app{
 background:rgba(15,23,42,0.85);
-border-radius:20px;
-padding:25px;
-transition:0.3s;
+border-radius:15px;
+padding:18px;
+transition:0.25s;
 cursor:pointer;
-backdrop-filter:blur(10px);
-box-shadow:0 10px 25px rgba(0,0,0,0.5);
+border:1px solid rgba(0,255,159,0.2);
+box-shadow:0 5px 15px rgba(0,0,0,0.5);
 }
 
 .app:hover{
-transform:translateY(-8px) scale(1.03);
-background:rgba(51,65,85,0.95);
-box-shadow:0 20px 40px rgba(0,0,0,0.7);
+transform:translateY(-6px);
+border:1px solid #00ff9f;
+box-shadow:0 0 20px #00ff9f55;
+background:rgba(2,6,23,0.95);
 }
 
-.icon{font-size:48px;margin-bottom:10px;}
-a{text-decoration:none;color:white;}
-.footer{margin-top:20px;padding:20px;opacity:0.7;}
+.icon{
+font-size:38px;
+margin-bottom:10px;
+}
 
+/* TEXT */
+a{
+text-decoration:none;
+color:white;
+}
+
+/* FOOTER */
+.footer{
+margin-top:20px;
+padding:20px;
+opacity:0.6;
+font-size:12px;
+}
+
+/* INSTALL BUTTON */
 #installBtn{
 position:fixed;
 bottom:20px;
@@ -129,59 +156,92 @@ z-index:999;
 box-shadow:0 5px 15px rgba(0,0,0,0.4);
 }
 
+/* STARS */
+#stars{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-2;
+}
+
 </style>
 </head>
 
 <body>
 
+<!-- LOADER -->
 <div id="loader">
 <div id="text"></div><span class="cursor"></span>
 </div>
 
 <canvas id="stars"></canvas>
 
-<div class="header">🚀 My Project Amos</div>
-<div class="sub">Developer Dashboard</div>
+<!-- HEADER -->
+<div class="header">
+🚀 My Project Amos
+<div class="sub">Developer Dashboard Panel</div>
+</div>
 
+<!-- STATUS -->
+<div class="statusbar">
+<div>System: Online</div>
+<div>Server: Active</div>
+<div id="clock">--:--:--</div>
+</div>
+
+<!-- MENU -->
 <div class="grid">
 
-<!-- CAMERA -->
 <a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank">
 <div class="app" onclick="playSound()">
 <div class="icon">📸</div>Camera RCP PRO
 </div>
 </a>
 
-<!-- MENU LAMA -->
 <a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">📅</div>Jadwal Kerja</div>
+<div class="app" onclick="playSound()">
+<div class="icon">📅</div>Jadwal Kerja
+</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">🗺</div>Fake GPS Map</div>
+<div class="app" onclick="playSound()">
+<div class="icon">🗺</div>Fake GPS Map
+</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">👨‍💻</div>CV Amos</div>
+<div class="app" onclick="playSound()">
+<div class="icon">👨‍💻</div>CV Amos
+</div>
 </a>
 
 <a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">🤖</div>Telegram Bot</div>
+<div class="app" onclick="playSound()">
+<div class="icon">🤖</div>Telegram Bot
+</div>
 </a>
 
 <a href="https://alarm-telegram-24jam.onrender.com" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">🚨</div>Alarm Route Web</div>
+<div class="app" onclick="playSound()">
+<div class="icon">🚨</div>Alarm Route Web
+</div>
 </a>
 
 <a href="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">📍</div>Form Wilayah SPX</div>
+<div class="app" onclick="playSound()">
+<div class="icon">📍</div>Form Wilayah SPX
+</div>
 </a>
 
 <a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank">
-<div class="app" onclick="playSound()"><div class="icon">📂</div>Data Pribadi</div>
+<div class="app" onclick="playSound()">
+<div class="icon">📂</div>Data Pribadi
+</div>
 </a>
 
-<!-- ✅ ADMIN PANEL DITAMBAHKAN -->
 <a href="https://amosmarbun86-droid.github.io/data-pribadi/admin.html" target="_blank">
 <div class="app" onclick="playSound()">
 <div class="icon">🔐</div>Admin Device Panel
@@ -192,7 +252,7 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 <div class="app" onclick="playSound()">
 <div class="icon">💰</div>SmartDebt System
 </div>
-</a> 
+</a>
 
 </div>
 
@@ -204,7 +264,7 @@ box-shadow:0 5px 15px rgba(0,0,0,0.4);
 
 <script>
 
-/* SCRIPT LAMA TETAP */
+/* ===== SCRIPT LAMA ===== */
 
 function playSound(){
 document.getElementById("clickSound").play();
@@ -234,7 +294,7 @@ setTimeout(()=>{loader.style.display="none";},800);
 }}
 type();
 
-/* STARS */
+/* ===== STARS ===== */
 const canvas=document.getElementById("stars");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
@@ -257,7 +317,14 @@ if(s.y>canvas.height)s.y=0;
 }}
 setInterval(draw,33);
 
-/* INSTALL */
+/* ===== CLOCK (BARU) ===== */
+setInterval(()=>{
+const now=new Date();
+document.getElementById("clock").innerHTML=
+now.toLocaleTimeString();
+},1000);
+
+/* ===== INSTALL ===== */
 let deferredPrompt;
 window.addEventListener("beforeinstallprompt",(e)=>{
 e.preventDefault();
@@ -272,7 +339,7 @@ await deferredPrompt.userChoice;
 }
 };
 
-/* AUTO UPDATE */
+/* ===== SERVICE WORKER ===== */
 if("serviceWorker" in navigator){
 navigator.serviceWorker
 .register("sw.js?v="+Date.now())
