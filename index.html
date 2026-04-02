@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>AMOS WEB OS V8</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#00ff9f">
+
 <style>
 body{
 margin:0;
@@ -385,6 +390,15 @@ document.getElementById('musicFile').addEventListener('change', function(){
     player.play();
   }
 });
+
+  /* PWA SERVICE WORKER */
+if('serviceWorker' in navigator){
+window.addEventListener('load', ()=>{
+navigator.serviceWorker.register('./sw.js')
+.then(reg=>console.log('Service Worker registered',reg))
+.catch(err=>console.log('SW registration failed',err));
+});
+}
 </script>
 
 </body>
