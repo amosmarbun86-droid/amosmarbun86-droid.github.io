@@ -1,42 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>AMOS WEB OS V7</title>
 <style>
 body{
 margin:0;
 font-family:Consolas, monospace;
+background:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png') no-repeat center center fixed;
+background-size:cover;
 color:#00ff9f;
 overflow:hidden;
-background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475');
-background-size:cover;
-background-position:center;
 }
 
-body::before{
-content:"";
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.75);
-z-index:-1;
-}
-
-/* LOGIN */
+/* LOGIN SCREEN */
 #login{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
+position:fixed;
+width:100vw;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:rgba(0,0,0,0.85);
+z-index:999;
+flex-direction:column;
+}
+#login input, #login button{
+padding:10px;
+margin:5px;
 background:black;
-padding:30px;
 border:1px solid #00ff9f;
-text-align:center;
+color:#0f0;
 }
 
 /* DESKTOP */
@@ -44,15 +38,36 @@ text-align:center;
 display:none;
 width:100vw;
 height:100vh;
+display:flex;
+flex-direction:row;
 }
 
-/* ICON */
-.icon{
-width:90px;
-text-align:center;
+/* SIDEBAR */
+#sidebar{
+width:220px;
+background:rgba(0,2,23,0.9);
+border-right:1px solid #00ff9f55;
+padding:10px;
+overflow:auto;
+}
+#sidebar h2{
+margin-top:0;
+color:#00ff9f;
+}
+.side-item{
+padding:10px;
 cursor:pointer;
-margin:10px;
-display:inline-block;
+border-bottom:1px solid #003322;
+}
+.side-item:hover{
+background:#001a12;
+}
+
+/* WORKSPACE */
+#workspace{
+flex:1;
+position:relative;
+overflow:hidden;
 }
 
 /* WINDOW */
@@ -60,221 +75,294 @@ display:inline-block;
 position:absolute;
 width:600px;
 height:350px;
-background:black;
+background:rgba(0,2,23,0.9);
 border:1px solid #00ff9f;
 display:none;
-box-shadow:0 0 10px #00ff9f55;
+flex-direction:column;
+z-index:10;
 }
-
 .titlebar{
-background:#001a12;
+background:black;
 padding:5px;
+cursor:move;
 display:flex;
 justify-content:space-between;
-cursor:move;
+align-items:center;
 }
-
-.controls button{
-background:black;
-color:#00ff9f;
-border:none;
+.titlebar span{
 cursor:pointer;
-margin-left:5px;
+padding:0 5px;
+}
+iframe{
+width:100%;
+height:calc(100% - 30px);
+border:none;
 }
 
 /* TASKBAR */
 #taskbar{
-position:fixed;
+position:absolute;
 bottom:0;
 width:100%;
 height:35px;
-background:black;
+background:rgba(0,2,23,0.95);
 display:flex;
 justify-content:space-between;
+align-items:center;
+padding:0 10px;
+border-top:1px solid #00ff9f33;
+}
+#startBtn{
+cursor:pointer;
 padding:5px;
-border-top:1px solid #00ff9f;
+border:1px solid #00ff9f;
+}
+#startMenu{
+position:absolute;
+bottom:35px;
+left:0;
+width:200px;
+background:rgba(0,2,23,0.95);
+display:none;
+flex-direction:column;
+border:1px solid #00ff9f33;
+z-index:20;
+}
+.start-item{
+padding:10px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+}
+.start-item:hover{
+background:#001a12;
+}
+
+/* FILE MANAGER */
+#fileManager{
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+overflow:auto;
+color:#0f0;
+padding:10px;
+box-sizing:border-box;
+}
+.file{
+padding:5px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+}
+.file:hover{
+background:#001a12;
+}
+
+/* NOTES / MUSIC / TERMINAL */
+textarea, audio, #terminalOutput{
+width:100%;
+height:calc(100% - 30px);
+background:black;
+color:#0f0;
+border:none;
+resize:none;
+overflow:auto;
+}
+
+#cmdInput{
+width:100%;
+background:black;
+color:#0f0;
+border:none;
 }
 </style>
 </head>
-
 <body>
 
 <!-- LOGIN -->
 <div id="login">
-<h3>AMOS WEB OS LOGIN</h3>
+<h2>AMOS LOGIN</h2>
 <input type="password" id="pass" placeholder="Password">
-<br><br>
-<button onclick="login()">LOGIN</button>
+<button onclick="login()">ENTER</button>
 </div>
 
 <!-- DESKTOP -->
 <div id="desktop">
 
-<!-- PROJECT ICONS -->
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">📸<br>Camera</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">🗺<br>Fake GPS</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">👨‍💻<br>CV Amos</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">📂<br>Data</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">🔐<br>Admin</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">💰<br>SmartDebt</div>
-<div class="icon" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">🚨<br>Alarm</div>
-<div class="icon" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">📅<br>Jadwal</div>
-<div class="icon" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">📍<br>Form</div>
-<div class="icon" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖<br>Telegram</div>
-
-<!-- INTERNAL APPS -->
-<div class="icon" onclick="openApp('notes')">📝<br>Notes</div>
-<div class="icon" onclick="openApp('music')">🎵<br>Music</div>
-<div class="icon" onclick="openApp('terminal')">💻<br>Terminal</div>
-
+<!-- SIDEBAR -->
+<div id="sidebar">
+<h2>PROJECTS</h2>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">📸 Camera RCP</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">🗺 Fake GPS</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">👨‍💻 CV Amos</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">📂 Data Pribadi</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">🔐 Admin Panel</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">💰 SmartDebt</div>
+<div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">🚨 Alarm</div>
+<div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">📅 Jadwal</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">📍 Form</div>
+<div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖 Telegram Bot</div>
+<hr>
+<h2>WEB OS</h2>
+<div class="side-item" onclick="openApp('notes')">📝 Notes</div>
+<div class="side-item" onclick="openApp('music')">🎵 Music</div>
+<div class="side-item" onclick="openApp('terminal')">💻 Terminal</div>
+<div class="side-item" onclick="openApp('fileManager')">📁 File Manager</div>
 </div>
+
+<!-- WORKSPACE -->
+<div id="workspace">
 
 <!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar" onmousedown="dragStart(event,'notes')">
+<div class="titlebar">
 Notes
-<div class="controls">
-<button onclick="minimizeApp('notes')">—</button>
-<button onclick="maximizeApp('notes')">⬜</button>
-<button onclick="closeApp('notes')">✕</button>
+<span onclick="closeApp('notes')">X</span>
+<span onclick="maximizeApp('notes')">⬜</span>
+<span onclick="minimizeApp('notes')">—</span>
 </div>
-</div>
-<textarea id="notesArea" style="width:100%;height:90%;background:black;color:#0f0;"></textarea>
+<textarea id="notesArea" placeholder="Your notes here..."></textarea>
 </div>
 
 <!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar" onmousedown="dragStart(event,'music')">
-Music
-<div class="controls">
-<button onclick="minimizeApp('music')">—</button>
-<button onclick="maximizeApp('music')">⬜</button>
-<button onclick="closeApp('music')">✕</button>
+<div class="titlebar">
+Music Player
+<span onclick="closeApp('music')">X</span>
+<span onclick="maximizeApp('music')">⬜</span>
+<span onclick="minimizeApp('music')">—</span>
 </div>
-</div>
-<select onchange="changeMusic(this.value)" style="width:100%">
-<option value="">Pilih Lagu</option>
-<option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Track 1</option>
-<option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Track 2</option>
-</select>
-<audio id="player" controls style="width:100%"></audio>
+<audio id="player" controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 </div>
 
 <!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar" onmousedown="dragStart(event,'terminal')">
+<div class="titlebar">
 Terminal
-<div class="controls">
-<button onclick="minimizeApp('terminal')">—</button>
-<button onclick="maximizeApp('terminal')">⬜</button>
-<button onclick="closeApp('terminal')">✕</button>
+<span onclick="closeApp('terminal')">X</span>
+<span onclick="maximizeApp('terminal')">⬜</span>
+<span onclick="minimizeApp('terminal')">—</span>
+</div>
+<div id="terminalOutput"></div>
+<input id="cmdInput" onkeydown="runCmd(event)">
+</div>
+
+<!-- FILE MANAGER -->
+<div class="window" id="fileManager">
+<div class="titlebar">
+File Manager
+<span onclick="closeApp('fileManager')">X</span>
+<span onclick="maximizeApp('fileManager')">⬜</span>
+<span onclick="minimizeApp('fileManager')">—</span>
+</div>
+<div id="fileManager">
+<div class="file">Document.txt</div>
+<div class="file">Image.png</div>
+<div class="file">Notes.txt</div>
+<div class="file">Script.js</div>
 </div>
 </div>
-<div id="terminalOutput" style="height:80%;overflow:auto"></div>
-<input id="cmdInput" style="width:100%;background:black;color:#0f0;border:none"
-onkeydown="runCmd(event)">
+
 </div>
 
 <!-- TASKBAR -->
 <div id="taskbar">
-<div>AMOS WEB OS</div>
+<div id="startBtn" onclick="toggleStartMenu()">Start</div>
 <div id="clock"></div>
 </div>
 
+<!-- START MENU -->
+<div id="startMenu">
+<div class="start-item" onclick="openApp('notes')">📝 Notes</div>
+<div class="start-item" onclick="openApp('music')">🎵 Music</div>
+<div class="start-item" onclick="openApp('terminal')">💻 Terminal</div>
+<div class="start-item" onclick="openApp('fileManager')">📁 File Manager</div>
+</div>
+
+</div>
+
 <script>
+window.onload=function(){
+
 /* LOGIN */
-function login(){
+window.login=function(){
 if(document.getElementById("pass").value==="123"){
 document.getElementById("login").style.display="none";
-document.getElementById("desktop").style.display="block";
-}else{
-alert("Password salah");
-}
-}
-
-/* OPEN EXTERNAL */
-function openExternal(url){
-window.open(url,"_blank");
-}
-
-/* WINDOW CONTROL */
-function openApp(id){
-document.getElementById(id).style.display="block";
-}
-
-function closeApp(id){
-document.getElementById(id).style.display="none";
-}
-
-function minimizeApp(id){
-document.getElementById(id).style.display="none";
-}
-
-function maximizeApp(id){
-let win=document.getElementById(id);
-win.style.top="0";
-win.style.left="0";
-win.style.width="100%";
-win.style.height="90%";
-}
-
-/* DRAG WINDOW */
-let dragObj=null;
-let offsetX, offsetY;
-
-function dragStart(e,id){
-dragObj=document.getElementById(id);
-offsetX=e.clientX-dragObj.offsetLeft;
-offsetY=e.clientY-dragObj.offsetTop;
-document.onmousemove=dragMove;
-document.onmouseup=dragStop;
-}
-
-function dragMove(e){
-if(dragObj){
-dragObj.style.left=(e.clientX-offsetX)+"px";
-dragObj.style.top=(e.clientY-offsetY)+"px";
-}
-}
-
-function dragStop(){
-document.onmousemove=null;
-dragObj=null;
+document.getElementById("desktop").style.display="flex";
+}else{alert("Password salah");}
 }
 
 /* NOTES SAVE */
+const notesArea=document.getElementById("notesArea");
+if(notesArea){
 notesArea.value=localStorage.getItem("amos_notes")||"";
-notesArea.addEventListener("input",()=>{
-localStorage.setItem("amos_notes",notesArea.value);
-});
+notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
+}
 
-/* MUSIC */
-function changeMusic(src){
+/* TERMINAL */
+const cmdInput=document.getElementById("cmdInput");
+if(cmdInput){
+cmdInput.addEventListener("keydown",(e)=>{
+if(e.key==="Enter"){
+let cmd=cmdInput.value;
+let out=document.getElementById("terminalOutput");
+if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
+else if(cmd==="time") out.innerHTML+="<br>"+new Date();
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS";
+else if(cmd==="clear") out.innerHTML=""; cmdInput.value=""; return;
+else out.innerHTML+="<br>Command not found";
+cmdInput.value="";
+}
+});
+}
+
+/* CLOCK */
+setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
+};
+
+/* OPEN / CLOSE WINDOW */
+function openApp(id){document.getElementById(id).style.display="block";}
+function closeApp(id){document.getElementById(id).style.display="none";}
+function minimizeApp(id){document.getElementById(id).style.display="none";}
+function maximizeApp(id){
+let win=document.getElementById(id);
+win.style.top="0"; win.style.left="0"; win.style.width="100%"; win.style.height="90%";
+}
+
+/* START MENU */
+function toggleStartMenu(){
+let m=document.getElementById("startMenu");
+m.style.display=(m.style.display==="flex")?"none":"flex";
+m.style.flexDirection="column";
+}
+
+/* OPEN EXTERNAL */
+function openExternal(url){window.open(url,"_blank");}
+
+/* DRAG WINDOWS */
+let dragObj=null,offsetX,offsetY;
+document.querySelectorAll(".window").forEach(win=>{
+let bar=win.querySelector(".titlebar");
+bar.onmousedown=e=>{
+dragObj=win;
+offsetX=e.clientX-win.offsetLeft;
+offsetY=e.clientY-win.offsetTop;
+document.onmousemove=dragMove;
+document.onmouseup=dragStop;
+};
+});
+function dragMove(e){if(dragObj){dragObj.style.left=(e.clientX-offsetX)+"px"; dragObj.style.top=(e.clientY-offsetY)+"px";}}
+function dragStop(){document.onmousemove=null; dragObj=null;}
+
+/* MUSIC CHANGE */
+window.changeMusic=function(src){
 document.getElementById("player").src=src;
 document.getElementById("player").play();
 }
 
-/* TERMINAL */
-function runCmd(e){
-if(e.key==="Enter"){
-let cmd=cmdInput.value;
-let out=document.getElementById("terminalOutput");
+/* FILE MANAGER CLICK */
+document.querySelectorAll("#fileManager .file").forEach(f=>{
+f.onclick=()=>alert("Opening "+f.innerText);
+});
 
-if(cmd==="help") out.innerHTML+="<br>help time clear about";
-else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS";
-else if(cmd==="clear"){ out.innerHTML=""; cmdInput.value=""; return;}
-else out.innerHTML+="<br>Command not found";
-
-cmdInput.value="";
-}
-}
-
-/* CLOCK */
-setInterval(()=>{
-document.getElementById("clock").innerHTML=new Date().toLocaleTimeString();
-},1000);
 </script>
-
 </body>
 </html>
