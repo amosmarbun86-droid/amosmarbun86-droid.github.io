@@ -13,38 +13,25 @@ color:#00ff9f;
 overflow:hidden;
 }
 
-/* BOOT */
-#boot{
+/* LOGIN */
+#login{
 position:fixed;
 width:100vw;
 height:100vh;
-background:black;
-color:#0f0;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:20px;
-z-index:1000;
-}
-
-/* LOCKSCREEN */
-#lockscreen{
-position:fixed;
-width:100vw;
-height:100vh;
-display:none;
-justify-content:center;
-align-items:center;
-background:rgba(0,0,0,0.9);
+background:rgba(0,0,0,0.85);
 z-index:999;
 flex-direction:column;
 }
-#lockscreen input, #lockscreen button{
+#login input, #login button{
 padding:10px;
 margin:5px;
 background:black;
 border:1px solid #00ff9f;
 color:#0f0;
+font-size:16px;
 }
 
 /* DESKTOP */
@@ -54,6 +41,7 @@ width:100vw;
 height:100vh;
 display:flex;
 flex-direction:row;
+overflow:hidden;
 }
 
 /* SIDEBAR */
@@ -64,12 +52,18 @@ border-right:1px solid #00ff9f55;
 padding:10px;
 overflow:auto;
 }
+#sidebar h2{
+margin-top:0;
+color:#00ff9f;
+}
 .side-item{
 padding:10px;
 cursor:pointer;
 border-bottom:1px solid #003322;
 }
-.side-item:hover{background:#001a12;}
+.side-item:hover{
+background:#001a12;
+}
 
 /* WORKSPACE */
 #workspace{
@@ -78,39 +72,21 @@ position:relative;
 overflow:hidden;
 }
 
-/* DESKTOP ICON */
-.icon{
-position:absolute;
-width:70px;
-text-align:center;
-cursor:pointer;
-}
-
 /* WINDOW */
-.window {
-  position: absolute;
-  width: 600px;
-  height: 350px;
-  background: rgba(0,2,23,0.95);
-  border: 1px solid #00ff9f;
-  display: none;
-  flex-direction: column;
-  z-index: 10;
-  font-size: 14px; /* langsung di sini */
-}
-
-/* TITLEBAR FONT UNTUK HP */
-@media screen and (max-width: 768px) {
-  .titlebar span {
-    font-size: 16px;
-  }
-
-  .window {
-    width: 90%;      /* lebih kecil supaya pas layar HP */
-    height: 70%;
-    left: 5%;
-    top: 10%;
-  }
+.window{
+position:absolute;
+width:90%;
+max-width:600px;
+height:70%;
+min-height:250px;
+background:rgba(0,2,23,0.95);
+border:1px solid #00ff9f;
+display:none;
+flex-direction:column;
+z-index:10;
+box-sizing:border-box;
+resize:both;
+overflow:auto;
 }
 .titlebar{
 background:black;
@@ -118,11 +94,12 @@ padding:5px;
 cursor:move;
 display:flex;
 justify-content:space-between;
+align-items:center;
+font-size:14px;
 }
-iframe{
-width:100%;
-height:calc(100% - 30px);
-border:none;
+.titlebar span{
+cursor:pointer;
+padding:0 5px;
 }
 
 /* TASKBAR */
@@ -137,6 +114,7 @@ justify-content:space-between;
 align-items:center;
 padding:0 10px;
 border-top:1px solid #00ff9f33;
+box-sizing:border-box;
 }
 #startBtn{
 cursor:pointer;
@@ -159,40 +137,74 @@ padding:10px;
 border-bottom:1px solid #003322;
 cursor:pointer;
 }
-.start-item:hover{background:#001a12;}
+.start-item:hover{
+background:#001a12;
+}
 
+/* FILE MANAGER */
+#fileManagerContent{
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
+overflow:auto;
+color:#0f0;
+padding:10px;
+box-sizing:border-box;
+}
+.file{
+padding:5px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+}
+.file:hover{
+background:#001a12;
+}
+
+/* NOTES / MUSIC / TERMINAL */
 textarea, audio, #terminalOutput{
 width:100%;
 height:calc(100% - 30px);
 background:black;
 color:#0f0;
 border:none;
+resize:none;
 overflow:auto;
+box-sizing:border-box;
 }
+
 #cmdInput{
 width:100%;
 background:black;
 color:#0f0;
 border:none;
+box-sizing:border-box;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width:768px){
+.window{
+width:95% !important;
+height:60% !important;
+}
+.titlebar span{
+font-size:16px;
+}
 }
 </style>
 </head>
 <body>
 
-<!-- BOOT SCREEN -->
-<div id="boot">Booting AMOS WEB OS...</div>
-
-<!-- LOCKSCREEN -->
-<div id="lockscreen">
-<h2>AMOS WEB OS</h2>
-<input type="password" id="pin" placeholder="Enter PIN" maxlength="4">
-<button onclick="unlock()">UNLOCK</button>
+<!-- LOGIN -->
+<div id="login">
+<h2>AMOS LOGIN</h2>
+<input type="password" id="pass" placeholder="PIN (123)">
+<button onclick="login()">ENTER</button>
 </div>
 
 <!-- DESKTOP -->
 <div id="desktop">
 
-<!-- SIDEBAR PROJECT -->
+<!-- SIDEBAR -->
 <div id="sidebar">
 <h2>PROJECTS</h2>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">📸 Camera RCP</div>
@@ -216,38 +228,51 @@ border:none;
 <!-- WORKSPACE -->
 <div id="workspace">
 
-<!-- DESKTOP ICONS -->
-<div class="icon" style="top:20px; left:20px;" onclick="openApp('notes')">📝 Notes</div>
-<div class="icon" style="top:100px; left:20px;" onclick="openApp('music')">🎵 Music</div>
-<div class="icon" style="top:180px; left:20px;" onclick="openApp('terminal')">💻 Terminal</div>
-<div class="icon" style="top:260px; left:20px;" onclick="openApp('fileManager')">📁 Files</div>
-
 <!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
-<textarea id="notesArea"></textarea>
+<div class="titlebar">
+Notes
+<span onclick="closeApp('notes')">X</span>
+<span onclick="maximizeApp('notes')">⬜</span>
+<span onclick="minimizeApp('notes')">—</span>
+</div>
+<textarea id="notesArea" placeholder="Your notes here..."></textarea>
 </div>
 
 <!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
-<audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<div class="titlebar">
+Music Player
+<span onclick="closeApp('music')">X</span>
+<span onclick="maximizeApp('music')">⬜</span>
+<span onclick="minimizeApp('music')">—</span>
+</div>
+<input type="file" id="musicFile" accept="audio/*">
+<audio id="player" controls></audio>
 </div>
 
 <!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
+<div class="titlebar">
+Terminal
+<span onclick="closeApp('terminal')">X</span>
+<span onclick="maximizeApp('terminal')">⬜</span>
+<span onclick="minimizeApp('terminal')">—</span>
+</div>
 <div id="terminalOutput"></div>
 <input id="cmdInput" onkeydown="runCmd(event)">
 </div>
 
 <!-- FILE MANAGER -->
 <div class="window" id="fileManager">
-<div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
-<div>Document.txt</div>
-<div>Image.png</div>
-<div>Notes.txt</div>
-<div>Script.js</div>
+<div class="titlebar">
+File Manager
+<span onclick="closeApp('fileManager')">X</span>
+<span onclick="maximizeApp('fileManager')">⬜</span>
+<span onclick="minimizeApp('fileManager')">—</span>
+</div>
+<input type="file" id="fileInput" multiple>
+<div id="fileManagerContent"></div>
 </div>
 
 </div>
@@ -260,35 +285,32 @@ border:none;
 
 <!-- START MENU -->
 <div id="startMenu">
-<div class="start-item" onclick="openApp('notes')">Notes</div>
-<div class="start-item" onclick="openApp('music')">Music</div>
-<div class="start-item" onclick="openApp('terminal')">Terminal</div>
-<div class="start-item" onclick="openApp('fileManager')">File Manager</div>
+<div class="start-item" onclick="openApp('notes')">📝 Notes</div>
+<div class="start-item" onclick="openApp('music')">🎵 Music</div>
+<div class="start-item" onclick="openApp('terminal')">💻 Terminal</div>
+<div class="start-item" onclick="openApp('fileManager')">📁 File Manager</div>
 </div>
 
 </div>
 
 <script>
-/* BOOT */
-setTimeout(()=>{
-document.getElementById("boot").style.display="none";
-document.getElementById("lockscreen").style.display="flex";
-},2000);
-
-/* PIN */
-function unlock(){
-if(document.getElementById("pin").value==="1234"){
-document.getElementById("lockscreen").style.display="none";
+/* LOGIN */
+function login(){
+const password=document.getElementById("pass").value;
+if(password==="123"){
+document.getElementById("login").style.display="none";
 document.getElementById("desktop").style.display="flex";
-}else alert("PIN salah");
+}else{alert("PIN salah");}
 }
-document.getElementById("pin").addEventListener("keydown",e=>{
-if(e.key==="Enter") unlock();
-});
 
-/* WINDOW */
+/* OPEN / CLOSE WINDOW */
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
+function minimizeApp(id){document.getElementById(id).style.display="none";}
+function maximizeApp(id){
+let win=document.getElementById(id);
+win.style.top="0"; win.style.left="0"; win.style.width="95%"; win.style.height="85%";
+}
 
 /* START MENU */
 function toggleStartMenu(){
@@ -297,61 +319,71 @@ m.style.display=(m.style.display==="flex")?"none":"flex";
 m.style.flexDirection="column";
 }
 
-/* EXTERNAL */
+/* OPEN EXTERNAL */
 function openExternal(url){window.open(url,"_blank");}
+
+/* DRAG WINDOWS */
+let dragObj=null,offsetX,offsetY;
+document.querySelectorAll(".window").forEach(win=>{
+let bar=win.querySelector(".titlebar");
+bar.onmousedown=e=>{
+dragObj=win;
+offsetX=e.clientX-win.offsetLeft;
+offsetY=e.clientY-win.offsetTop;
+document.onmousemove=dragMove;
+document.onmouseup=dragStop;
+};
+});
+function dragMove(e){if(dragObj){dragObj.style.left=(e.clientX-offsetX)+"px"; dragObj.style.top=(e.clientY-offsetY)+"px";}}
+function dragStop(){document.onmousemove=null; dragObj=null;}
 
 /* CLOCK */
 setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
 
-/* NOTES SAVE */
+/* NOTES AUTO-SAVE */
 const notesArea=document.getElementById("notesArea");
+if(notesArea){
 notesArea.value=localStorage.getItem("amos_notes")||"";
-notesArea.oninput=()=>localStorage.setItem("amos_notes",notesArea.value);
+notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
+}
 
 /* TERMINAL */
 function runCmd(e){
 if(e.key==="Enter"){
 let cmd=document.getElementById("cmdInput").value;
 let out=document.getElementById("terminalOutput");
-if(cmd==="help") out.innerHTML+="<br>help, time, clear";
+if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
 else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="clear") out.innerHTML="";
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V8";
+else if(cmd==="clear"){out.innerHTML=""; cmdInput.value=""; return;}
 else out.innerHTML+="<br>Command not found";
 document.getElementById("cmdInput").value="";
 }
 }
 
-/* DRAG */
-let dragObj=null,offsetX,offsetY;
-document.querySelectorAll(".window").forEach(win=>{
-  let bar = win.querySelector(".titlebar");
-  
-  // desktop drag
-  bar.onmousedown = e => {
-    dragObj = win;
-    offsetX = e.clientX - win.offsetLeft;
-    offsetY = e.clientY - win.offsetTop;
-    document.onmousemove = dragMove;
-    document.onmouseup = dragStop;
-  }
+/* FILE MANAGER LOCAL */
+const fileInput=document.getElementById("fileInput");
+const fileList=document.getElementById("fileManagerContent");
+fileInput.addEventListener("change",()=>{
+fileList.innerHTML="";
+for(const f of fileInput.files){
+let li=document.createElement("div");
+li.className="file";
+li.textContent=f.name;
+li.onclick=()=>alert("Opening "+f.name);
+fileList.appendChild(li);
+}
+});
 
-  // mobile drag
-  bar.ontouchstart = e => {
-    dragObj = win;
-    let touch = e.touches[0];
-    offsetX = touch.clientX - win.offsetLeft;
-    offsetY = touch.clientY - win.offsetTop;
+/* MUSIC PLAYER LOCAL */
+document.getElementById('musicFile').addEventListener('change', function(){
+  const file = this.files[0];
+  if(file){
+    const url = URL.createObjectURL(file);
+    const player = document.getElementById('player');
+    player.src = url;
+    player.play();
   }
-
-  bar.ontouchmove = e => {
-    if(dragObj){
-      let touch = e.touches[0];
-      dragObj.style.left = (touch.clientX - offsetX) + "px";
-      dragObj.style.top = (touch.clientY - offsetY) + "px";
-    }
-  }
-
-  bar.ontouchend = e => { dragObj = null; }
 });
 </script>
 
