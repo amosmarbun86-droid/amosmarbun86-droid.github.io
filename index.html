@@ -2,54 +2,58 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V6</title>
+<title>AMOS WEB OS</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{
 margin:0;
 font-family:Consolas, monospace;
-background:black;
 color:#00ff9f;
 overflow:hidden;
+background-image:url('https://images.unsplash.com/photo-1518770660439-4636190af475');
+background-size:cover;
+background-position:center;
 }
 
-/* BOOT */
-#boot{
+body::before{
+content:"";
 position:fixed;
+top:0;
+left:0;
 width:100%;
 height:100%;
-background:black;
-padding:20px;
-z-index:999;
+background:rgba(0,0,0,0.75);
+z-index:-1;
 }
 
 /* LOGIN */
 #login{
-position:fixed;
-width:100%;
-height:100%;
-display:none;
-justify-content:center;
-align-items:center;
-background:#020617;
-z-index:998;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:black;
+padding:30px;
+border:1px solid #00ff9f;
+text-align:center;
 }
 
 /* DESKTOP */
 #desktop{
 display:none;
-width:100%;
+width:100vw;
 height:100vh;
-position:relative;
 }
 
 /* ICON */
 .icon{
-width:80px;
+width:90px;
 text-align:center;
 cursor:pointer;
+margin:10px;
 display:inline-block;
-margin:15px;
 }
 
 /* WINDOW */
@@ -57,256 +61,268 @@ margin:15px;
 position:absolute;
 width:600px;
 height:350px;
-background:#020617;
+background:black;
 border:1px solid #00ff9f;
 display:none;
+box-shadow:0 0 10px #00ff9f55;
+transition:all 0.3s;
 }
 
 .titlebar{
-background:black;
+background:#001a12;
 padding:5px;
-cursor:move;
 display:flex;
 justify-content:space-between;
+cursor:move;
 }
 
-iframe{
-width:100%;
-height:calc(100% - 25px);
+.controls button{
+background:black;
+color:#00ff9f;
 border:none;
+cursor:pointer;
+margin-left:5px;
 }
 
 /* TASKBAR */
 #taskbar{
-position:absolute;
+position:fixed;
 bottom:0;
 width:100%;
 height:35px;
-background:#020617;
+background:black;
 display:flex;
 justify-content:space-between;
-align-items:center;
-padding:0 10px;
-border-top:1px solid #00ff9f33;
-}
-
-/* TERMINAL */
-#terminalOutput{
-height:85%;
-overflow:auto;
-}
-
-/* MATRIX */
-canvas{
-position:fixed;
-z-index:-1;
+padding:5px;
+border-top:1px solid #00ff9f;
 }
 </style>
 </head>
 
 <body>
 
-<div id="boot"></div>
-
+<!-- LOGIN -->
 <div id="login">
-<div>
-<h3>AMOS LOGIN</h3>
-<input id="pass" type="password">
-<button onclick="login()">ENTER</button>
-</div>
+<h3>AMOS WEB OS LOGIN</h3>
+<input type="password" id="pass" placeholder="Password">
+<br><br>
+<button onclick="login()">LOGIN</button>
 </div>
 
+<!-- DESKTOP -->
 <div id="desktop">
 
-<!-- DESKTOP ICONS -->
+<!-- ICONS -->
 <div class="icon" onclick="openApp('cam')">📸<br>Camera</div>
-<div class="icon" onclick="openApp('jadwal')">📅<br>Jadwal</div>
 <div class="icon" onclick="openApp('gps')">🗺<br>Fake GPS</div>
 <div class="icon" onclick="openApp('cv')">👨‍💻<br>CV</div>
-<div class="icon" onclick="openApp('bot')">🤖<br>Telegram</div>
-<div class="icon" onclick="openApp('alarm')">🚨<br>Alarm</div>
-<div class="icon" onclick="openApp('form')">📍<br>Form</div>
 <div class="icon" onclick="openApp('data')">📂<br>Data</div>
 <div class="icon" onclick="openApp('admin')">🔐<br>Admin</div>
 <div class="icon" onclick="openApp('debt')">💰<br>SmartDebt</div>
+<div class="icon" onclick="openApp('alarm')">🚨<br>Alarm</div>
+
+<div class="icon" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">📅<br>Jadwal</div>
+<div class="icon" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">📍<br>Form</div>
+<div class="icon" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖<br>Telegram</div>
+
 <div class="icon" onclick="openApp('notes')">📝<br>Notes</div>
 <div class="icon" onclick="openApp('music')">🎵<br>Music</div>
 <div class="icon" onclick="openApp('terminal')">💻<br>Terminal</div>
 
-<!-- WINDOWS PROJECT -->
-<div class="window" id="cam">
-<div class="titlebar">Camera <span onclick="closeApp('cam')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/camera-Rcp-pro/"></iframe>
 </div>
 
-<div class="window" id="jadwal">
-<div class="titlebar">Jadwal <span onclick="closeApp('jadwal')">X</span></div>
-<iframe src="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app"></iframe>
+<!-- WINDOWS -->
+<div class="window" id="cam">
+<div class="titlebar">Camera
+<div class="controls">
+<button onclick="minimizeApp('cam')">—</button>
+<button onclick="maximizeApp('cam')">⬜</button>
+<button onclick="closeApp('cam')">✕</button>
+</div>
+</div>
+<iframe src="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" width="100%" height="90%"></iframe>
 </div>
 
 <div class="window" id="gps">
-<div class="titlebar">Fake GPS <span onclick="closeApp('gps')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/fake-gps-map/"></iframe>
+<div class="titlebar">Fake GPS
+<div class="controls">
+<button onclick="minimizeApp('gps')">—</button>
+<button onclick="maximizeApp('gps')">⬜</button>
+<button onclick="closeApp('gps')">✕</button>
+</div>
+</div>
+<iframe src="https://amosmarbun86-droid.github.io/fake-gps-map/" width="100%" height="90%"></iframe>
 </div>
 
 <div class="window" id="cv">
-<div class="titlebar">CV Amos <span onclick="closeApp('cv')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/cv-amos/"></iframe>
+<div class="titlebar">CV Amos
+<div class="controls">
+<button onclick="minimizeApp('cv')">—</button>
+<button onclick="maximizeApp('cv')">⬜</button>
+<button onclick="closeApp('cv')">✕</button>
 </div>
-
-<div class="window" id="bot">
-<div class="titlebar">Telegram Bot <span onclick="closeApp('bot')">X</span></div>
-<iframe src="https://t.me/routealarmsiborong2026_bot"></iframe>
 </div>
-
-<div class="window" id="alarm">
-<div class="titlebar">Alarm Route <span onclick="closeApp('alarm')">X</span></div>
-<iframe src="https://alarm-telegram-24jam.onrender.com"></iframe>
-</div>
-
-<div class="window" id="form">
-<div class="titlebar">Form Wilayah <span onclick="closeApp('form')">X</span></div>
-<iframe src="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/"></iframe>
+<iframe src="https://amosmarbun86-droid.github.io/cv-amos/" width="100%" height="90%"></iframe>
 </div>
 
 <div class="window" id="data">
-<div class="titlebar">Data Pribadi <span onclick="closeApp('data')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/"></iframe>
+<div class="titlebar">Data Pribadi
+<div class="controls">
+<button onclick="minimizeApp('data')">—</button>
+<button onclick="maximizeApp('data')">⬜</button>
+<button onclick="closeApp('data')">✕</button>
+</div>
+</div>
+<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/" width="100%" height="90%"></iframe>
 </div>
 
 <div class="window" id="admin">
-<div class="titlebar">Admin Panel <span onclick="closeApp('admin')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/admin.html"></iframe>
+<div class="titlebar">Admin Panel
+<div class="controls">
+<button onclick="minimizeApp('admin')">—</button>
+<button onclick="maximizeApp('admin')">⬜</button>
+<button onclick="closeApp('admin')">✕</button>
+</div>
+</div>
+<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/admin.html" width="100%" height="90%"></iframe>
 </div>
 
 <div class="window" id="debt">
-<div class="titlebar">SmartDebt <span onclick="closeApp('debt')">X</span></div>
-<iframe src="https://amosmarbun86-droid.github.io/smartdebt-system/"></iframe>
+<div class="titlebar">SmartDebt
+<div class="controls">
+<button onclick="minimizeApp('debt')">—</button>
+<button onclick="maximizeApp('debt')">⬜</button>
+<button onclick="closeApp('debt')">✕</button>
+</div>
+</div>
+<iframe src="https://amosmarbun86-droid.github.io/smartdebt-system/" width="100%" height="90%"></iframe>
+</div>
+
+<div class="window" id="alarm">
+<div class="titlebar">Alarm Web
+<div class="controls">
+<button onclick="minimizeApp('alarm')">—</button>
+<button onclick="maximizeApp('alarm')">⬜</button>
+<button onclick="closeApp('alarm')">✕</button>
+</div>
+</div>
+<iframe src="https://alarm-telegram-24jam.onrender.com" width="100%" height="90%"></iframe>
 </div>
 
 <!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
-<textarea style="width:100%;height:90%;background:black;color:#0f0;"></textarea>
+<div class="titlebar">Notes
+<div class="controls">
+<button onclick="minimizeApp('notes')">—</button>
+<button onclick="maximizeApp('notes')">⬜</button>
+<button onclick="closeApp('notes')">✕</button>
+</div>
+</div>
+<textarea id="notesArea" style="width:100%;height:90%;background:black;color:#0f0;"></textarea>
 </div>
 
 <!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
-<audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+<div class="titlebar">Music
+<div class="controls">
+<button onclick="minimizeApp('music')">—</button>
+<button onclick="maximizeApp('music')">⬜</button>
+<button onclick="closeApp('music')">✕</button>
+</div>
+</div>
+<select onchange="changeMusic(this.value)" style="width:100%">
+<option value="">Pilih Lagu</option>
+<option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">Track 1</option>
+<option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Track 2</option>
+</select>
+<audio id="player" controls style="width:100%"></audio>
 </div>
 
 <!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
-<div id="terminalOutput"></div>
-<input id="cmdInput" style="width:100%;background:black;color:#0f0;" onkeydown="runCmd(event)">
+<div class="titlebar">Terminal
+<div class="controls">
+<button onclick="minimizeApp('terminal')">—</button>
+<button onclick="maximizeApp('terminal')">⬜</button>
+<button onclick="closeApp('terminal')">✕</button>
+</div>
+</div>
+<div id="terminalOutput" style="height:80%;overflow:auto"></div>
+<input id="cmdInput" style="width:100%;background:black;color:#0f0;border:none"
+onkeydown="runCmd(event)">
 </div>
 
+<!-- TASKBAR -->
 <div id="taskbar">
-<div>AMOS WEB OS V6</div>
+<div>AMOS WEB OS</div>
 <div id="clock"></div>
 </div>
 
-</div>
-
-<canvas id="matrix"></canvas>
-
 <script>
-
-/* BOOT */
-let boot=["Booting AMOS OS...","Loading system...","Starting services...","Welcome Amos"];
-let i=0;
-let b=document.getElementById("boot");
-
-let int=setInterval(()=>{
-b.innerHTML+=boot[i]+"<br>";
-i++;
-if(i>=boot.length){
-clearInterval(int);
-setTimeout(()=>{
-b.style.display="none";
-document.getElementById("login").style.display="flex";
-},1000);
-}
-},700);
-
-/* LOGIN */
 function login(){
-  const password = document.getElementById("pass").value;
-  const loginBox = document.getElementById("login");
-  const desktop = document.getElementById("desktop");
-
-  if(password === "123"){
-    loginBox.style.display = "none";
-    desktop.style.display = "block";
-  } else {
-    alert("Password salah");
-  }
+if(document.getElementById("pass").value==="123"){
+document.getElementById("login").style.display="none";
+document.getElementById("desktop").style.display="block";
+}else{
+alert("Password salah");
+}
 }
 
-/* WINDOW */
 function openApp(id){
-let w=document.getElementById(id);
-w.style.display="block";
-w.style.top=Math.random()*200+"px";
-w.style.left=Math.random()*300+"px";
+document.getElementById(id).style.display="block";
 }
 
 function closeApp(id){
 document.getElementById(id).style.display="none";
 }
 
-/* DRAG WINDOW */
-document.querySelectorAll(".window").forEach(win=>{
-let bar=win.querySelector(".titlebar");
-bar.onmousedown=e=>{
-let x=e.clientX-win.offsetLeft;
-let y=e.clientY-win.offsetTop;
-document.onmousemove=e=>{
-win.style.left=e.clientX-x+"px";
-win.style.top=e.clientY-y+"px";
-};
-document.onmouseup=()=>document.onmousemove=null;
-};
-});
+function minimizeApp(id){
+document.getElementById(id).style.display="none";
+}
 
-/* CLOCK */
-setInterval(()=>{
-clock.innerHTML=new Date().toLocaleTimeString();
-},1000);
+function maximizeApp(id){
+let win=document.getElementById(id);
+win.style.top="0";
+win.style.left="0";
+win.style.width="100%";
+win.style.height="90%";
+}
+
+function openExternal(url){
+window.open(url,"_blank");
+}
+
+function changeMusic(src){
+document.getElementById("player").src=src;
+document.getElementById("player").play();
+}
+
+/* NOTES SAVE */
+notesArea.value=localStorage.getItem("amos_notes")||"";
+notesArea.addEventListener("input",()=>{
+localStorage.setItem("amos_notes",notesArea.value);
+});
 
 /* TERMINAL */
 function runCmd(e){
 if(e.key==="Enter"){
 let cmd=cmdInput.value;
-terminalOutput.innerHTML+="<br>> "+cmd;
+let out=document.getElementById("terminalOutput");
+
+if(cmd==="help") out.innerHTML+="<br>help time clear about";
+else if(cmd==="time") out.innerHTML+="<br>"+new Date();
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V6";
+else if(cmd==="clear"){ out.innerHTML=""; cmdInput.value=""; return;}
+else out.innerHTML+="<br>Command not found";
+
 cmdInput.value="";
 }
 }
 
-/* MATRIX */
-let c=document.getElementById("matrix");
-let ctx=c.getContext("2d");
-c.width=window.innerWidth;
-c.height=window.innerHeight;
-let letters="01";
-let drops=[];
-for(let i=0;i<100;i++)drops[i]=1;
-
-function draw(){
-ctx.fillStyle="rgba(0,0,0,0.05)";
-ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="#0f0";
-for(let i=0;i<drops.length;i++){
-let text=letters[Math.floor(Math.random()*letters.length)];
-ctx.fillText(text,i*10,drops[i]*10);
-drops[i]++;
-if(drops[i]*10>c.height) drops[i]=0;
-}
-}
-setInterval(draw,33);
-
+/* CLOCK */
+setInterval(()=>{
+document.getElementById("clock").innerHTML=new Date().toLocaleTimeString();
+},1000);
 </script>
 
 </body>
