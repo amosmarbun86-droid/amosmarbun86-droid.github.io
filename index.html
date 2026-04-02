@@ -87,15 +87,30 @@ cursor:pointer;
 }
 
 /* WINDOW */
-.window{
-position:absolute;
-width:600px;
-height:350px;
-background:rgba(0,2,23,0.95);
-border:1px solid #00ff9f;
-display:none;
-flex-direction:column;
-z-index:10;
+.window {
+  position: absolute;
+  width: 600px;
+  height: 350px;
+  background: rgba(0,2,23,0.95);
+  border: 1px solid #00ff9f;
+  display: none;
+  flex-direction: column;
+  z-index: 10;
+  font-size: 14px; /* langsung di sini */
+}
+
+/* TITLEBAR FONT UNTUK HP */
+@media screen and (max-width: 768px) {
+  .titlebar span {
+    font-size: 16px;
+  }
+
+  .window {
+    width: 90%;      /* lebih kecil supaya pas layar HP */
+    height: 70%;
+    left: 5%;
+    top: 10%;
+  }
 }
 .titlebar{
 background:black;
@@ -309,19 +324,34 @@ document.getElementById("cmdInput").value="";
 /* DRAG */
 let dragObj=null,offsetX,offsetY;
 document.querySelectorAll(".window").forEach(win=>{
-let bar=win.querySelector(".titlebar");
-bar.onmousedown=e=>{
-dragObj=win;
-offsetX=e.clientX-win.offsetLeft;
-offsetY=e.clientY-win.offsetTop;
-document.onmousemove=e=>{
-if(dragObj){
-dragObj.style.left=(e.clientX-offsetX)+"px";
-dragObj.style.top=(e.clientY-offsetY)+"px";
-}
-};
-document.onmouseup=()=>{dragObj=null;}
-};
+  let bar = win.querySelector(".titlebar");
+  
+  // desktop drag
+  bar.onmousedown = e => {
+    dragObj = win;
+    offsetX = e.clientX - win.offsetLeft;
+    offsetY = e.clientY - win.offsetTop;
+    document.onmousemove = dragMove;
+    document.onmouseup = dragStop;
+  }
+
+  // mobile drag
+  bar.ontouchstart = e => {
+    dragObj = win;
+    let touch = e.touches[0];
+    offsetX = touch.clientX - win.offsetLeft;
+    offsetY = touch.clientY - win.offsetTop;
+  }
+
+  bar.ontouchmove = e => {
+    if(dragObj){
+      let touch = e.touches[0];
+      dragObj.style.left = (touch.clientX - offsetX) + "px";
+      dragObj.style.top = (touch.clientY - offsetY) + "px";
+    }
+  }
+
+  bar.ontouchend = e => { dragObj = null; }
 });
 </script>
 
