@@ -6,76 +6,68 @@
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f172a">
-<link rel="apple-touch-icon" href="icon-192.png">
 
 <style>
 
-/* ===== LOADER HACKER ===== */
-#loader{
+body{
+margin:0;
+font-family:Consolas, monospace;
+color:white;
+overflow:hidden;
+background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
+background-size:120%;
+background-position:50% 50%;
+background-attachment:fixed;
+}
+
+/* OVERLAY */
+body::before{
+content:"";
 position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
-background:black;
-color:#00ff9f;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999;
-font-family:monospace;
-font-size:14px;
-text-align:left;
-padding:20px;
+background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.85));
+z-index:-1;
 }
 
-.cursor{
-display:inline-block;
-width:10px;
-background:#00ff9f;
-animation:blink 1s infinite;
+/* STARS */
+#stars{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-2;
 }
 
-@keyframes blink{
-0%,50%,100%{opacity:1;}
-25%,75%{opacity:0;}
-}
-
-/* ===== BODY ===== */
-body{
-font-family:Consolas, monospace;
-background:#020617;
-color:white;
-margin:0;
-overflow:hidden;
-}
-
-/* ===== HEADER ===== */
+/* HEADER */
 .header{
 height:50px;
 display:flex;
 align-items:center;
 padding-left:15px;
-background:#020617;
 border-bottom:1px solid #00ff9f33;
+background:rgba(0,0,0,0.4);
 }
 
-/* ===== LAYOUT ===== */
+/* LAYOUT */
 .container{
 display:flex;
 height:calc(100vh - 50px);
 }
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 .sidebar{
 width:70px;
-background:#020617;
 border-right:1px solid #00ff9f33;
 display:flex;
 flex-direction:column;
 align-items:center;
 padding-top:15px;
 gap:20px;
+background:rgba(0,0,0,0.4);
 }
 
 .sideicon{
@@ -84,85 +76,68 @@ cursor:pointer;
 opacity:0.7;
 transition:0.2s;
 }
-
 .sideicon:hover{
 opacity:1;
 color:#00ff9f;
 transform:scale(1.2);
 }
 
-/* ===== CONTENT ===== */
+/* CONTENT */
 .content{
 flex:1;
+display:grid;
+grid-template-columns:2fr 1fr;
+grid-template-rows:1fr 1fr;
+gap:10px;
+padding:10px;
 overflow:auto;
 }
 
-/* STATUS BAR */
-.statusbar{
-display:flex;
-gap:20px;
-padding:8px;
-font-size:12px;
-border-bottom:1px solid #00ff9f22;
+/* PANEL */
+.panel{
+border:1px solid #00ff9f33;
+padding:10px;
+overflow:auto;
+background:rgba(2,6,23,0.6);
+backdrop-filter:blur(6px);
+}
+
+.panel-title{
+color:#00ff9f;
+margin-bottom:10px;
 }
 
 /* GRID MENU */
 .grid{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-gap:18px;
-padding:20px;
+grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+gap:10px;
 }
 
-/* CARD */
 .app{
-background:rgba(15,23,42,0.9);
-border-radius:12px;
-padding:18px;
-transition:0.25s;
-cursor:pointer;
-border:1px solid rgba(0,255,159,0.2);
+background:#0f172a;
+padding:12px;
+border-radius:8px;
 text-align:center;
+cursor:pointer;
+border:1px solid #00ff9f22;
 }
-
 .app:hover{
-transform:translateY(-5px);
 border:1px solid #00ff9f;
-box-shadow:0 0 15px #00ff9f55;
+box-shadow:0 0 10px #00ff9f55;
 }
 
-.icon{
-font-size:32px;
-margin-bottom:8px;
-}
+a{color:white;text-decoration:none;}
 
-a{
-text-decoration:none;
-color:white;
-}
-
-/* FOOTER */
-.footer{
-text-align:center;
-padding:15px;
-opacity:0.6;
+#terminal{
 font-size:12px;
+line-height:18px;
+color:#00ff9f;
 }
 
-/* INSTALL BUTTON */
-#installBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-padding:12px 20px;
-border:none;
-border-radius:10px;
-background:#22c55e;
-color:white;
-font-weight:bold;
-cursor:pointer;
-display:none;
-z-index:999;
+#monitor{
+font-size:13px;
+line-height:20px;
 }
 
 </style>
@@ -170,16 +145,12 @@ z-index:999;
 
 <body>
 
-<!-- LOADER -->
-<div id="loader">
-<div id="text"></div><span class="cursor"></span>
-</div>
+<canvas id="stars"></canvas>
 
-<div class="header">🚀 My Project Amos</div>
+<div class="header">🚀 My Project Amos – Developer Dashboard</div>
 
 <div class="container">
 
-<!-- SIDEBAR -->
 <div class="sidebar">
 <div class="sideicon">📁</div>
 <div class="sideicon">🌐</div>
@@ -189,152 +160,108 @@ z-index:999;
 <div class="sideicon">👤</div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
-<div class="statusbar">
-<div>System: Online</div>
-<div>Server: Active</div>
-<div id="clock"></div>
-</div>
-
+<!-- PROJECT PANEL -->
+<div class="panel">
+<div class="panel-title">Projects</div>
 <div class="grid">
 
-<a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📸</div>Camera RCP PRO
-</div>
-</a>
-
-<a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📅</div>Jadwal Kerja
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🗺</div>Fake GPS Map
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">👨‍💻</div>CV Amos
-</div>
-</a>
-
-<a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🤖</div>Telegram Bot
-</div>
-</a>
-
-<a href="https://alarm-telegram-24jam.onrender.com" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🚨</div>Alarm Route Web
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📍</div>Form Wilayah SPX
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📂</div>Data Pribadi
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid.github.io/data-pribadi/admin.html" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🔐</div>Admin Device Panel
-</div>
-</a>
-
-<a href="https://amosmarbun86-droid.github.io/smartdebt-system/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">💰</div>SmartDebt System
-</div>
-</a>
-
-</div>
-
-<div class="footer">© 2026 Amos Marbun Projects</div>
+<a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank"><div class="app">📸 Camera</div></a>
+<a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank"><div class="app">🗺 Fake GPS</div></a>
+<a href="https://amosmarbun86-droid.github.io/smartdebt-system/" target="_blank"><div class="app">💰 SmartDebt</div></a>
+<a href="https://alarm-telegram-24jam.onrender.com" target="_blank"><div class="app">🚨 Alarm</div></a>
+<a href="https://t.me/routealarmsiborong2026_bot" target="_blank"><div class="app">🤖 Bot</div></a>
+<a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank"><div class="app">📂 Data</div></a>
 
 </div>
 </div>
 
-<button id="installBtn">⬇ Install App</button>
-<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+<!-- TERMINAL -->
+<div class="panel">
+<div class="panel-title">Terminal Log</div>
+<div id="terminal"></div>
+</div>
+
+<!-- SYSTEM MONITOR -->
+<div class="panel">
+<div class="panel-title">System Monitor</div>
+<div id="monitor"></div>
+</div>
+
+<!-- STATUS -->
+<div class="panel">
+<div class="panel-title">Server Status</div>
+<div id="status"></div>
+</div>
+
+</div>
+</div>
 
 <script>
 
-/* SOUND */
-function playSound(){
-document.getElementById("clickSound").play();
+/* STARS */
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
+for(let i=0;i<120;i++){
+stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,d:Math.random()});
 }
 
-/* HACKER BOOT LOADER */
-const lines=[
-"Booting Amos OS...",
-"Loading modules...",
-"Connecting server...",
-"Authorizing access...",
-"Access Granted ✔",
-"Launching Dashboard..."
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="white";
+for(let s of stars){
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+ctx.fill();
+s.y+=s.d;
+if(s.y>canvas.height)s.y=0;
+}}
+setInterval(draw,33);
+
+/* TERMINAL LOG */
+const logs=[
+"Server connected",
+"Loading modules",
+"Camera RCP Ready",
+"Fake GPS Ready",
+"SmartDebt System Online",
+"Alarm Route Running",
+"Telegram Bot Connected",
+"All Systems Normal"
 ];
 
-let i=0,j=0;
-function type(){
-if(i<lines.length){
-if(j<lines[i].length){
-document.getElementById("text").innerHTML+=lines[i][j];
-j++;
-setTimeout(type,30);
-}else{
-document.getElementById("text").innerHTML+="<br>";
-i++;j=0;
-setTimeout(type,200);
-}
-}else{
-setTimeout(()=>{loader.style.display="none";},600);
-}}
-type();
-
-/* CLOCK */
+let logIndex=0;
 setInterval(()=>{
-const now=new Date();
-document.getElementById("clock").innerHTML=
-now.toLocaleTimeString();
+if(logIndex<logs.length){
+document.getElementById("terminal").innerHTML+=
+"[ "+new Date().toLocaleTimeString()+" ] "+logs[logIndex]+"<br>";
+logIndex++;
+}
+},1500);
+
+/* SYSTEM MONITOR */
+setInterval(()=>{
+document.getElementById("monitor").innerHTML=
+"CPU Usage : "+Math.floor(Math.random()*60+20)+"%<br>"+
+"RAM Usage : "+Math.floor(Math.random()*60+20)+"%<br>"+
+"Network   : Stable<br>"+
+"Server    : Online<br>"+
+"Time      : "+new Date().toLocaleTimeString();
 },1000);
 
-/* INSTALL PWA */
-let deferredPrompt;
-window.addEventListener("beforeinstallprompt",(e)=>{
-e.preventDefault();
-deferredPrompt=e;
-installBtn.style.display="block";
-});
-
-installBtn.onclick=async()=>{
-if(deferredPrompt){
-deferredPrompt.prompt();
-await deferredPrompt.userChoice;
-}
-};
-
-/* SERVICE WORKER */
-if("serviceWorker" in navigator){
-navigator.serviceWorker
-.register("sw.js?v="+Date.now())
-.then(reg=>{
-reg.update();
-setInterval(()=>reg.update(),60000);
-});
-}
+/* STATUS PANEL */
+setInterval(()=>{
+document.getElementById("status").innerHTML=
+"Status : Running<br>"+
+"Projects : Active<br>"+
+"Version : Dashboard V3<br>"+
+"User : Amos Marbun";
+},2000);
 
 </script>
 
