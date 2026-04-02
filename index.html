@@ -289,6 +289,11 @@ document.getElementById("desktop").style.display="flex";
 }else{alert("Password salah");}
 }
 
+// Submit password dengan Enter key
+document.getElementById("pass").addEventListener("keydown", function(e){
+if(e.key==="Enter") login();
+});
+
 /* OPEN / CLOSE WINDOW */
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
