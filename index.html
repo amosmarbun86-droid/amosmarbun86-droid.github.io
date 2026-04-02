@@ -2,319 +2,304 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>My Project Amos</title>
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0f172a">
+<title>AMOS WEB OS V6</title>
 
 <style>
-
 body{
 margin:0;
 font-family:Consolas, monospace;
-color:white;
+background:black;
+color:#00ff9f;
 overflow:hidden;
-background-image:url('https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png');
-background-size:120%;
-background-position:50% 50%;
-background-attachment:fixed;
 }
 
-/* OVERLAY */
-body::before{
-content:"";
+/* BOOT */
+#boot{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
-background:linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.85));
-z-index:-1;
+background:black;
+padding:20px;
+z-index:999;
 }
 
-/* STARS */
-#stars{
+/* LOGIN */
+#login{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
-z-index:-2;
-}
-
-/* HEADER */
-.header{
-height:50px;
-display:flex;
+display:none;
+justify-content:center;
 align-items:center;
-padding-left:15px;
-border-bottom:1px solid #00ff9f33;
-background:rgba(0,0,0,0.4);
+background:#020617;
+z-index:998;
 }
 
-/* LAYOUT */
-.container{
-display:flex;
-height:calc(100vh - 50px);
+/* DESKTOP */
+#desktop{
+display:none;
+width:100%;
+height:100vh;
+position:relative;
 }
 
-/* SIDEBAR */
-.sidebar{
-width:70px;
-border-right:1px solid #00ff9f33;
-display:flex;
-flex-direction:column;
-align-items:center;
-padding-top:15px;
-gap:20px;
-background:rgba(0,0,0,0.4);
-}
-
-.sideicon{
-font-size:22px;
-cursor:pointer;
-opacity:0.7;
-transition:0.2s;
-}
-.sideicon:hover{
-opacity:1;
-color:#00ff9f;
-transform:scale(1.2);
-}
-
-/* CONTENT */
-.content{
-flex:1;
-display:grid;
-grid-template-columns:2fr 1fr;
-grid-template-rows:1fr 1fr;
-gap:10px;
-padding:10px;
-overflow:auto;
-}
-
-/* PANEL */
-.panel{
-border:1px solid #00ff9f33;
-padding:10px;
-overflow:auto;
-background:rgba(2,6,23,0.6);
-backdrop-filter:blur(6px);
-}
-
-.panel-title{
-color:#00ff9f;
-margin-bottom:10px;
-}
-
-/* GRID MENU */
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-gap:10px;
-}
-
-.app{
-background:#0f172a;
-padding:12px;
-border-radius:8px;
+/* ICON */
+.icon{
+width:80px;
 text-align:center;
 cursor:pointer;
-border:1px solid #00ff9f22;
+display:inline-block;
+margin:15px;
 }
-.app:hover{
+
+/* WINDOW */
+.window{
+position:absolute;
+width:600px;
+height:350px;
+background:#020617;
 border:1px solid #00ff9f;
-box-shadow:0 0 10px #00ff9f55;
+display:none;
 }
 
-a{color:white;text-decoration:none;}
-
-#terminal{
-font-size:12px;
-line-height:18px;
-color:#00ff9f;
+.titlebar{
+background:black;
+padding:5px;
+cursor:move;
+display:flex;
+justify-content:space-between;
 }
 
-#monitor{
-font-size:13px;
-line-height:20px;
+iframe{
+width:100%;
+height:calc(100% - 25px);
+border:none;
 }
 
+/* TASKBAR */
+#taskbar{
+position:absolute;
+bottom:0;
+width:100%;
+height:35px;
+background:#020617;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 10px;
+border-top:1px solid #00ff9f33;
+}
+
+/* TERMINAL */
+#terminalOutput{
+height:85%;
+overflow:auto;
+}
+
+/* MATRIX */
+canvas{
+position:fixed;
+z-index:-1;
+}
 </style>
 </head>
 
 <body>
 
-<canvas id="stars"></canvas>
+<div id="boot"></div>
 
-<div class="header">🚀 My Project Amos – Developer Dashboard</div>
-
-<div class="container">
-
-<div class="sidebar">
-<div class="sideicon">📁</div>
-<div class="sideicon">🌐</div>
-<div class="sideicon">🤖</div>
-<div class="sideicon">📊</div>
-<div class="sideicon">⚙️</div>
-<div class="sideicon">👤</div>
+<div id="login">
+<div>
+<h3>AMOS LOGIN</h3>
+<input id="pass" type="password">
+<button onclick="login()">ENTER</button>
+</div>
 </div>
 
-<div class="content">
+<div id="desktop">
 
-<!-- PROJECT PANEL -->
-<div class="panel">
-<div class="panel-title">Projects</div>
-<div class="grid">
+<!-- DESKTOP ICONS -->
+<div class="icon" onclick="openApp('cam')">📸<br>Camera</div>
+<div class="icon" onclick="openApp('jadwal')">📅<br>Jadwal</div>
+<div class="icon" onclick="openApp('gps')">🗺<br>Fake GPS</div>
+<div class="icon" onclick="openApp('cv')">👨‍💻<br>CV</div>
+<div class="icon" onclick="openApp('bot')">🤖<br>Telegram</div>
+<div class="icon" onclick="openApp('alarm')">🚨<br>Alarm</div>
+<div class="icon" onclick="openApp('form')">📍<br>Form</div>
+<div class="icon" onclick="openApp('data')">📂<br>Data</div>
+<div class="icon" onclick="openApp('admin')">🔐<br>Admin</div>
+<div class="icon" onclick="openApp('debt')">💰<br>SmartDebt</div>
+<div class="icon" onclick="openApp('notes')">📝<br>Notes</div>
+<div class="icon" onclick="openApp('music')">🎵<br>Music</div>
+<div class="icon" onclick="openApp('terminal')">💻<br>Terminal</div>
 
-<a href="https://amosmarbun86-droid.github.io/camera-Rcp-pro/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📸</div>Camera RCP PRO
+<!-- WINDOWS PROJECT -->
+<div class="window" id="cam">
+<div class="titlebar">Camera <span onclick="closeApp('cam')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/camera-Rcp-pro/"></iframe>
 </div>
-</a>
 
-<a href="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📅</div>Jadwal Kerja
+<div class="window" id="jadwal">
+<div class="titlebar">Jadwal <span onclick="closeApp('jadwal')">X</span></div>
+<iframe src="https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid.github.io/fake-gps-map/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🗺</div>Fake GPS Map
+<div class="window" id="gps">
+<div class="titlebar">Fake GPS <span onclick="closeApp('gps')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/fake-gps-map/"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid.github.io/cv-amos/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">👨‍💻</div>CV Amos
+<div class="window" id="cv">
+<div class="titlebar">CV Amos <span onclick="closeApp('cv')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/cv-amos/"></iframe>
 </div>
-</a>
 
-<a href="https://t.me/routealarmsiborong2026_bot" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🤖</div>Telegram Bot
+<div class="window" id="bot">
+<div class="titlebar">Telegram Bot <span onclick="closeApp('bot')">X</span></div>
+<iframe src="https://t.me/routealarmsiborong2026_bot"></iframe>
 </div>
-</a>
 
-<a href="https://alarm-telegram-24jam.onrender.com" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🚨</div>Alarm Route Web
+<div class="window" id="alarm">
+<div class="titlebar">Alarm Route <span onclick="closeApp('alarm')">X</span></div>
+<iframe src="https://alarm-telegram-24jam.onrender.com"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📍</div>Form Wilayah SPX
+<div class="window" id="form">
+<div class="titlebar">Form Wilayah <span onclick="closeApp('form')">X</span></div>
+<iframe src="https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid.github.io/data-pribadi/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">📂</div>Data Pribadi
+<div class="window" id="data">
+<div class="titlebar">Data Pribadi <span onclick="closeApp('data')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid.github.io/data-pribadi/admin.html" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">🔐</div>Admin Device Panel
+<div class="window" id="admin">
+<div class="titlebar">Admin Panel <span onclick="closeApp('admin')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/data-pribadi/admin.html"></iframe>
 </div>
-</a>
 
-<a href="https://amosmarbun86-droid.github.io/smartdebt-system/" target="_blank">
-<div class="app" onclick="playSound()">
-<div class="icon">💰</div>SmartDebt System
+<div class="window" id="debt">
+<div class="titlebar">SmartDebt <span onclick="closeApp('debt')">X</span></div>
+<iframe src="https://amosmarbun86-droid.github.io/smartdebt-system/"></iframe>
 </div>
-</a>
 
+<!-- NOTES -->
+<div class="window" id="notes">
+<div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
+<textarea style="width:100%;height:90%;background:black;color:#0f0;"></textarea>
 </div>
+
+<!-- MUSIC -->
+<div class="window" id="music">
+<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+<audio controls src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
 </div>
 
 <!-- TERMINAL -->
-<div class="panel">
-<div class="panel-title">Terminal Log</div>
-<div id="terminal"></div>
+<div class="window" id="terminal">
+<div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
+<div id="terminalOutput"></div>
+<input id="cmdInput" style="width:100%;background:black;color:#0f0;" onkeydown="runCmd(event)">
 </div>
 
-<!-- SYSTEM MONITOR -->
-<div class="panel">
-<div class="panel-title">System Monitor</div>
-<div id="monitor"></div>
-</div>
-
-<!-- STATUS -->
-<div class="panel">
-<div class="panel-title">Server Status</div>
-<div id="status"></div>
+<div id="taskbar">
+<div>AMOS WEB OS V6</div>
+<div id="clock"></div>
 </div>
 
 </div>
-</div>
+
+<canvas id="matrix"></canvas>
 
 <script>
 
-/* STARS */
-const canvas=document.getElementById("stars");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
+/* BOOT */
+let boot=["Booting AMOS OS...","Loading system...","Starting services...","Welcome Amos"];
+let i=0;
+let b=document.getElementById("boot");
 
-let stars=[];
-for(let i=0;i<120;i++){
-stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*2,d:Math.random()});
+let int=setInterval(()=>{
+b.innerHTML+=boot[i]+"<br>";
+i++;
+if(i>=boot.length){
+clearInterval(int);
+setTimeout(()=>{
+b.style.display="none";
+document.getElementById("login").style.display="flex";
+},1000);
+}
+},700);
+
+/* LOGIN */
+function login(){
+if(pass.value=="123"){
+login.style.display="none";
+desktop.style.display="block";
+}else alert("Wrong password");
 }
 
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="white";
-for(let s of stars){
-ctx.beginPath();
-ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-ctx.fill();
-s.y+=s.d;
-if(s.y>canvas.height)s.y=0;
-}}
-setInterval(draw,33);
-
-/* TERMINAL LOG */
-const logs=[
-"Server connected",
-"Loading modules",
-"Camera RCP Ready",
-"Fake GPS Ready",
-"SmartDebt System Online",
-"Alarm Route Running",
-"Telegram Bot Connected",
-"All Systems Normal"
-];
-
-let logIndex=0;
-setInterval(()=>{
-if(logIndex<logs.length){
-document.getElementById("terminal").innerHTML+=
-"[ "+new Date().toLocaleTimeString()+" ] "+logs[logIndex]+"<br>";
-logIndex++;
+/* WINDOW */
+function openApp(id){
+let w=document.getElementById(id);
+w.style.display="block";
+w.style.top=Math.random()*200+"px";
+w.style.left=Math.random()*300+"px";
 }
-},1500);
 
-/* SYSTEM MONITOR */
+function closeApp(id){
+document.getElementById(id).style.display="none";
+}
+
+/* DRAG WINDOW */
+document.querySelectorAll(".window").forEach(win=>{
+let bar=win.querySelector(".titlebar");
+bar.onmousedown=e=>{
+let x=e.clientX-win.offsetLeft;
+let y=e.clientY-win.offsetTop;
+document.onmousemove=e=>{
+win.style.left=e.clientX-x+"px";
+win.style.top=e.clientY-y+"px";
+};
+document.onmouseup=()=>document.onmousemove=null;
+};
+});
+
+/* CLOCK */
 setInterval(()=>{
-document.getElementById("monitor").innerHTML=
-"CPU Usage : "+Math.floor(Math.random()*60+20)+"%<br>"+
-"RAM Usage : "+Math.floor(Math.random()*60+20)+"%<br>"+
-"Network   : Stable<br>"+
-"Server    : Online<br>"+
-"Time      : "+new Date().toLocaleTimeString();
+clock.innerHTML=new Date().toLocaleTimeString();
 },1000);
 
-/* STATUS PANEL */
-setInterval(()=>{
-document.getElementById("status").innerHTML=
-"Status : Running<br>"+
-"Projects : Active<br>"+
-"Version : Dashboard V3<br>"+
-"User : Amos Marbun";
-},2000);
+/* TERMINAL */
+function runCmd(e){
+if(e.key==="Enter"){
+let cmd=cmdInput.value;
+terminalOutput.innerHTML+="<br>> "+cmd;
+cmdInput.value="";
+}
+}
+
+/* MATRIX */
+let c=document.getElementById("matrix");
+let ctx=c.getContext("2d");
+c.width=window.innerWidth;
+c.height=window.innerHeight;
+let letters="01";
+let drops=[];
+for(let i=0;i<100;i++)drops[i]=1;
+
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="#0f0";
+for(let i=0;i<drops.length;i++){
+let text=letters[Math.floor(Math.random()*letters.length)];
+ctx.fillText(text,i*10,drops[i]*10);
+drops[i]++;
+if(drops[i]*10>c.height) drops[i]=0;
+}
+}
+setInterval(draw,33);
 
 </script>
 
