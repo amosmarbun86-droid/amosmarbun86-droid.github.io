@@ -253,7 +253,7 @@ File Manager
 <span onclick="maximizeApp('fileManager')">⬜</span>
 <span onclick="minimizeApp('fileManager')">—</span>
 </div>
-<div id="fileManager">
+<div id="fileManagerContent">
 <div class="file">Document.txt</div>
 <div class="file">Image.png</div>
 <div class="file">Notes.txt</div>
@@ -280,43 +280,14 @@ File Manager
 </div>
 
 <script>
-window.onload=function(){
-
 /* LOGIN */
-window.login=function(){
-if(document.getElementById("pass").value==="123"){
+function login(){
+const password=document.getElementById("pass").value;
+if(password==="123"){
 document.getElementById("login").style.display="none";
 document.getElementById("desktop").style.display="flex";
 }else{alert("Password salah");}
 }
-
-/* NOTES SAVE */
-const notesArea=document.getElementById("notesArea");
-if(notesArea){
-notesArea.value=localStorage.getItem("amos_notes")||"";
-notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
-}
-
-/* TERMINAL */
-const cmdInput=document.getElementById("cmdInput");
-if(cmdInput){
-cmdInput.addEventListener("keydown",(e)=>{
-if(e.key==="Enter"){
-let cmd=cmdInput.value;
-let out=document.getElementById("terminalOutput");
-if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
-else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS";
-else if(cmd==="clear") out.innerHTML=""; cmdInput.value=""; return;
-else out.innerHTML+="<br>Command not found";
-cmdInput.value="";
-}
-});
-}
-
-/* CLOCK */
-setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
-};
 
 /* OPEN / CLOSE WINDOW */
 function openApp(id){document.getElementById(id).style.display="block";}
@@ -352,17 +323,34 @@ document.onmouseup=dragStop;
 function dragMove(e){if(dragObj){dragObj.style.left=(e.clientX-offsetX)+"px"; dragObj.style.top=(e.clientY-offsetY)+"px";}}
 function dragStop(){document.onmousemove=null; dragObj=null;}
 
-/* MUSIC CHANGE */
-window.changeMusic=function(src){
-document.getElementById("player").src=src;
-document.getElementById("player").play();
+/* CLOCK */
+setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
+
+/* NOTES AUTO-SAVE */
+const notesArea=document.getElementById("notesArea");
+if(notesArea){
+notesArea.value=localStorage.getItem("amos_notes")||"";
+notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
+}
+
+/* TERMINAL */
+function runCmd(e){
+if(e.key==="Enter"){
+let cmd=document.getElementById("cmdInput").value;
+let out=document.getElementById("terminalOutput");
+if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
+else if(cmd==="time") out.innerHTML+="<br>"+new Date();
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V7";
+else if(cmd==="clear") out.innerHTML=""; cmdInput.value=""; return;
+else out.innerHTML+="<br>Command not found";
+document.getElementById("cmdInput").value="";
+}
 }
 
 /* FILE MANAGER CLICK */
-document.querySelectorAll("#fileManager .file").forEach(f=>{
+document.querySelectorAll("#fileManagerContent .file").forEach(f=>{
 f.onclick=()=>alert("Opening "+f.innerText);
 });
-
 </script>
 </body>
 </html>
