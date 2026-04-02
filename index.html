@@ -233,10 +233,16 @@ document.getElementById("login").style.display="flex";
 
 /* LOGIN */
 function login(){
-if(pass.value=="123"){
-login.style.display="none";
-desktop.style.display="block";
-}else alert("Wrong password");
+  const password = document.getElementById("pass").value;
+  const loginBox = document.getElementById("login");
+  const desktop = document.getElementById("desktop");
+
+  if(password === "123"){
+    loginBox.style.display = "none";
+    desktop.style.display = "block";
+  } else {
+    alert("Password salah");
+  }
 }
 
 /* WINDOW */
