@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V8</title>
+<title>AMOS WEB OS V10</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
@@ -195,9 +195,24 @@ height:60% !important;
 font-size:16px;
 }
 }
+
+/* MATRIX / STARS OVERLAY */
+#matrix, #stars{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+pointer-events:none;
+z-index:0;
+}
 </style>
 </head>
 <body>
+
+<!-- MATRIX & STARS -->
+<canvas id="matrix"></canvas>
+<canvas id="stars"></canvas>
 
 <!-- LOGIN -->
 <div id="login">
@@ -359,7 +374,7 @@ let cmd=document.getElementById("cmdInput").value;
 let out=document.getElementById("terminalOutput");
 if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
 else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V8";
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V10";
 else if(cmd==="clear"){out.innerHTML=""; cmdInput.value=""; return;}
 else out.innerHTML+="<br>Command not found";
 document.getElementById("cmdInput").value="";
@@ -391,14 +406,57 @@ document.getElementById('musicFile').addEventListener('change', function(){
   }
 });
 
-  /* PWA SERVICE WORKER */
+/* PWA SERVICE WORKER */
 if('serviceWorker' in navigator){
 window.addEventListener('load', ()=>{
 navigator.serviceWorker.register('./sw.js')
 .then(reg=>console.log('Service Worker registered',reg))
 .catch(err=>console.log('SW registration failed',err));
 });
+
+/* MATRIX EFFECT */
+let c=document.getElementById("matrix");
+let ctx=c.getContext("2d");
+c.width=window.innerWidth;
+c.height=window.innerHeight;
+let letters="01";
+let drops=[];
+for(let i=0;i<200;i++)drops[i]=1;
+function drawMatrix(){
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="#0f0";
+for(let i=0;i<drops.length;i++){
+let text=letters[Math.floor(Math.random()*letters.length)];
+ctx.fillText(text,i*10,drops[i]*10);
+drops[i]++;
+if(drops[i]*10>c.height) drops[i]=0;
 }
+requestAnimationFrame(drawMatrix);
+}
+drawMatrix();
+
+/* STARS EFFECT */
+let s=document.getElementById("stars");
+let sctx=s.getContext("2d");
+s.width=window.innerWidth;
+s.height=window.innerHeight;
+let starsArr=[];
+for(let i=0;i<100;i++){
+starsArr.push({x:Math.random()*s.width,y:Math.random()*s.height,r:Math.random()*2});
+}
+function drawStars(){
+sctx.clearRect(0,0,s.width,s.height);
+sctx.fillStyle="white";
+for(let st of starsArr){
+sctx.beginPath();
+sctx.arc(st.x,st.y,st.r,0,Math.PI*2);
+sctx.fill();
+}
+requestAnimationFrame(drawStars);
+}
+drawStars();
+});
 </script>
 
 </body>
