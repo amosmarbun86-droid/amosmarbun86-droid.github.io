@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V10</title>
+<title>AMOS WEB OS V11</title>
 
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
@@ -47,6 +47,7 @@ height:100vh;
 display:flex;
 flex-direction:row;
 overflow:hidden;
+z-index:1;
 }
 
 /* SIDEBAR */
@@ -56,6 +57,7 @@ background:rgba(0,2,23,0.9);
 border-right:1px solid #00ff9f55;
 padding:10px;
 overflow:auto;
+z-index:2;
 }
 #sidebar h2{
 margin-top:0;
@@ -120,6 +122,7 @@ align-items:center;
 padding:0 10px;
 border-top:1px solid #00ff9f33;
 box-sizing:border-box;
+z-index:3;
 }
 #startBtn{
 cursor:pointer;
@@ -176,13 +179,32 @@ resize:none;
 overflow:auto;
 box-sizing:border-box;
 }
-
 #cmdInput{
 width:100%;
 background:black;
 color:#0f0;
 border:none;
 box-sizing:border-box;
+}
+
+/* MATRIX / STARS CANVAS */
+#bgCanvas{
+position:fixed;
+top:0; left:0;
+width:100vw;
+height:100vh;
+z-index:0;
+pointer-events:none;
+}
+
+/* THEME CONTROL */
+#themeControl{
+position:absolute;top:10px;right:10px;
+background:rgba(0,0,0,0.7);
+padding:5px;
+border:1px solid #0f0;
+z-index:999;
+color:#0f0;
 }
 
 /* RESPONSIVE */
@@ -195,24 +217,19 @@ height:60% !important;
 font-size:16px;
 }
 }
-
-/* MATRIX / STARS OVERLAY */
-#matrix, #stars{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-pointer-events:none;
-z-index:0;
-}
 </style>
 </head>
 <body>
 
-<!-- MATRIX & STARS -->
-<canvas id="matrix"></canvas>
-<canvas id="stars"></canvas>
+<!-- MATRIX / STARS CANVAS -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- THEME CONTROL -->
+<div id="themeControl">
+<label>Window Color:</label>
+<input type="color" id="windowColorPicker" value="#00ff9f">
+<button onclick="toggleBgEffect()">Toggle BG Effect</button>
+</div>
 
 <!-- LOGIN -->
 <div id="login">
@@ -311,8 +328,6 @@ File Manager
 <div class="start-item" onclick="openApp('fileManager')">📁 File Manager</div>
 </div>
 
-</div>
-
 <script>
 /* LOGIN */
 function login(){
@@ -374,7 +389,7 @@ let cmd=document.getElementById("cmdInput").value;
 let out=document.getElementById("terminalOutput");
 if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
 else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V10";
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V11";
 else if(cmd==="clear"){out.innerHTML=""; cmdInput.value=""; return;}
 else out.innerHTML+="<br>Command not found";
 document.getElementById("cmdInput").value="";
@@ -413,49 +428,58 @@ navigator.serviceWorker.register('./sw.js')
 .then(reg=>console.log('Service Worker registered',reg))
 .catch(err=>console.log('SW registration failed',err));
 });
-
-/* MATRIX EFFECT */
-let c=document.getElementById("matrix");
-let ctx=c.getContext("2d");
-c.width=window.innerWidth;
-c.height=window.innerHeight;
-let letters="01";
-let drops=[];
-for(let i=0;i<200;i++)drops[i]=1;
-function drawMatrix(){
-ctx.fillStyle="rgba(0,0,0,0.05)";
-ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="#0f0";
-for(let i=0;i<drops.length;i++){
-let text=letters[Math.floor(Math.random()*letters.length)];
-ctx.fillText(text,i*10,drops[i]*10);
-drops[i]++;
-if(drops[i]*10>c.height) drops[i]=0;
 }
-requestAnimationFrame(drawMatrix);
+
+/* DYNAMIC BACKGROUND */
+const backgrounds = [
+'https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png',
+'https://res.cloudinary.com/dkisbfx29/image/upload/v1774063840/xtlhuxktv9dz1yj65whx.png'
+];
+let bgIndex = 0;
+function changeBackground(){
+  document.body.style.backgroundImage = `url(${backgrounds[bgIndex]})`;
+  bgIndex = (bgIndex + 1) % backgrounds.length;
+}
+setInterval(changeBackground, 10000);
+
+/* MATRIX / STARS EFFECT */
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let columns = canvas.width / 20;
+let drops = [];
+for(let x=0; x<columns; x++) drops[x] = 1;
+let showMatrix = true;
+function toggleBgEffect(){ showMatrix = !showMatrix; }
+function drawMatrix(){
+  if(!showMatrix){ ctx.clearRect(0,0,canvas.width,canvas.height); requestAnimationFrame(drawMatrix); return; }
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = "15px monospace";
+  for(let i=0; i<drops.length; i++){
+    const text = String.fromCharCode(33 + Math.random()*94);
+    ctx.fillText(text,i*20,drops[i]*20);
+    if(drops[i]*20 > canvas.height && Math.random() > 0.975) drops[i]=0;
+    drops[i]++;
+  }
+  requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
+window.addEventListener('resize', ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  columns = canvas.width / 20;
+  drops = [];
+  for(let x=0; x<columns; x++) drops[x]=1;
+});
 
-/* STARS EFFECT */
-let s=document.getElementById("stars");
-let sctx=s.getContext("2d");
-s.width=window.innerWidth;
-s.height=window.innerHeight;
-let starsArr=[];
-for(let i=0;i<100;i++){
-starsArr.push({x:Math.random()*s.width,y:Math.random()*s.height,r:Math.random()*2});
-}
-function drawStars(){
-sctx.clearRect(0,0,s.width,s.height);
-sctx.fillStyle="white";
-for(let st of starsArr){
-sctx.beginPath();
-sctx.arc(st.x,st.y,st.r,0,Math.PI*2);
-sctx.fill();
-}
-requestAnimationFrame(drawStars);
-}
-drawStars();
+/* WINDOW COLOR THEME */
+document.getElementById("windowColorPicker").addEventListener("input",(e)=>{
+  document.querySelectorAll(".window").forEach(w=>{
+    w.style.borderColor = e.target.value;
+  });
 });
 </script>
 
