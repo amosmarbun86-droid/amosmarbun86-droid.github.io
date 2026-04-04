@@ -2,8 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V12 FINAL</title>
+<title>AMOS WEB OS V11</title>
 
+<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
 
@@ -25,7 +26,7 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:rgba(0,0,0,0.9);
+background:rgba(0,0,0,0.85);
 z-index:999;
 flex-direction:column;
 }
@@ -35,6 +36,7 @@ margin:5px;
 background:black;
 border:1px solid #00ff9f;
 color:#0f0;
+font-size:16px;
 }
 
 /* DESKTOP */
@@ -43,38 +45,53 @@ display:none;
 width:100vw;
 height:100vh;
 display:flex;
+flex-direction:row;
+overflow:hidden;
+z-index:1;
 }
 
 /* SIDEBAR */
 #sidebar{
-width:230px;
+width:220px;
 background:rgba(0,2,23,0.9);
 border-right:1px solid #00ff9f55;
 padding:10px;
 overflow:auto;
+z-index:2;
+}
+#sidebar h2{
+margin-top:0;
+color:#00ff9f;
 }
 .side-item{
 padding:10px;
 cursor:pointer;
 border-bottom:1px solid #003322;
 }
-.side-item:hover{background:#001a12;}
+.side-item:hover{
+background:#001a12;
+}
 
 /* WORKSPACE */
 #workspace{
 flex:1;
 position:relative;
+overflow:hidden;
 }
 
 /* WINDOW */
 .window{
 position:absolute;
-width:500px;
-height:300px;
+width:90%;
+max-width:600px;
+height:70%;
+min-height:250px;
 background:rgba(0,2,23,0.95);
 border:1px solid #00ff9f;
 display:none;
 flex-direction:column;
+z-index:10;
+box-sizing:border-box;
 resize:both;
 overflow:auto;
 }
@@ -84,6 +101,12 @@ padding:5px;
 cursor:move;
 display:flex;
 justify-content:space-between;
+align-items:center;
+font-size:14px;
+}
+.titlebar span{
+cursor:pointer;
+padding:0 5px;
 }
 
 /* TASKBAR */
@@ -98,6 +121,8 @@ justify-content:space-between;
 align-items:center;
 padding:0 10px;
 border-top:1px solid #00ff9f33;
+box-sizing:border-box;
+z-index:3;
 }
 #startBtn{
 cursor:pointer;
@@ -108,53 +133,108 @@ border:1px solid #00ff9f;
 position:absolute;
 bottom:35px;
 left:0;
-width:220px;
+width:200px;
 background:rgba(0,2,23,0.95);
 display:none;
 flex-direction:column;
 border:1px solid #00ff9f33;
+z-index:20;
 }
 .start-item{
 padding:10px;
 border-bottom:1px solid #003322;
 cursor:pointer;
 }
-.start-item:hover{background:#001a12;}
+.start-item:hover{
+background:#001a12;
+}
 
-/* TERMINAL */
-#terminalOutput{
-height:200px;
+/* FILE MANAGER */
+#fileManagerContent{
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.95);
 overflow:auto;
+color:#0f0;
+padding:10px;
+box-sizing:border-box;
+}
+.file{
+padding:5px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+}
+.file:hover{
+background:#001a12;
+}
+
+/* NOTES / MUSIC / TERMINAL */
+textarea, audio, #terminalOutput{
+width:100%;
+height:calc(100% - 30px);
 background:black;
 color:#0f0;
+border:none;
+resize:none;
+overflow:auto;
+box-sizing:border-box;
 }
 #cmdInput{
 width:100%;
 background:black;
 color:#0f0;
 border:none;
+box-sizing:border-box;
 }
 
-/* MATRIX */
+/* MATRIX / STARS CANVAS */
 #bgCanvas{
 position:fixed;
-top:0;
-left:0;
+top:0; left:0;
 width:100vw;
 height:100vh;
 z-index:0;
 pointer-events:none;
 }
+
+/* THEME CONTROL */
+#themeControl{
+position:absolute;top:10px;right:10px;
+background:rgba(0,0,0,0.7);
+padding:5px;
+border:1px solid #0f0;
+z-index:999;
+color:#0f0;
+}
+
+/* RESPONSIVE */
+@media screen and (max-width:768px){
+.window{
+width:95% !important;
+height:60% !important;
+}
+.titlebar span{
+font-size:16px;
+}
+}
 </style>
 </head>
 <body>
 
+<!-- MATRIX / STARS CANVAS -->
 <canvas id="bgCanvas"></canvas>
+
+<!-- THEME CONTROL -->
+<div id="themeControl">
+<label>Window Color:</label>
+<input type="color" id="windowColorPicker" value="#00ff9f">
+<button onclick="toggleBgEffect()">Toggle BG Effect</button>
+</div>
 
 <!-- LOGIN -->
 <div id="login">
 <h2>AMOS LOGIN</h2>
-<input type="password" id="pass" placeholder="PIN 123">
+<input type="password" id="pass" placeholder="PIN (123)">
 <button onclick="login()">ENTER</button>
 </div>
 
@@ -163,8 +243,7 @@ pointer-events:none;
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-<h3>PROJECTS</h3>
-
+<h2>PROJECTS</h2>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">📸 Camera RCP</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">🗺 Fake GPS</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">👨‍💻 CV Amos</div>
@@ -175,62 +254,63 @@ pointer-events:none;
 <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">📅 Jadwal</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">📍 Form</div>
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖 Telegram Bot</div>
-
 <hr>
-
-<h3>WEB OS</h3>
+<h2>WEB OS</h2>
 <div class="side-item" onclick="openApp('notes')">📝 Notes</div>
 <div class="side-item" onclick="openApp('music')">🎵 Music</div>
 <div class="side-item" onclick="openApp('terminal')">💻 Terminal</div>
 <div class="side-item" onclick="openApp('fileManager')">📁 File Manager</div>
-
-<hr>
-
-<h3>FOLDERS</h3>
-<div class="side-item" onclick="openApp('app1')">📁 Folder 1</div>
-<div class="side-item" onclick="openApp('app2')">📁 Folder 2</div>
-<div class="side-item" onclick="openApp('app3')">📁 Folder 3</div>
-<div class="side-item" onclick="openApp('app4')">📁 Folder 4</div>
-<div class="side-item" onclick="openApp('app5')">📁 Folder 5</div>
-<div class="side-item" onclick="openApp('app6')">📁 Folder 6</div>
-<div class="side-item" onclick="openApp('app7')">📁 Folder 7</div>
-<div class="side-item" onclick="openApp('app8')">📁 Folder 8</div>
-<div class="side-item" onclick="openApp('app9')">📁 Folder 9</div>
-<div class="side-item" onclick="openApp('app10')">📁 Folder 10</div>
-
 </div>
 
 <!-- WORKSPACE -->
 <div id="workspace">
 
+<!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
-<textarea style="width:100%;height:100%;background:black;color:#0f0;"></textarea>
+<div class="titlebar">
+Notes
+<span onclick="closeApp('notes')">X</span>
+<span onclick="maximizeApp('notes')">⬜</span>
+<span onclick="minimizeApp('notes')">—</span>
+</div>
+<textarea id="notesArea" placeholder="Your notes here..."></textarea>
 </div>
 
+<!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
-<input type="file" accept="audio/*">
-<audio controls></audio>
+<div class="titlebar">
+Music Player
+<span onclick="closeApp('music')">X</span>
+<span onclick="maximizeApp('music')">⬜</span>
+<span onclick="minimizeApp('music')">—</span>
+</div>
+<input type="file" id="musicFile" accept="audio/*">
+<audio id="player" controls></audio>
 </div>
 
+<!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
+<div class="titlebar">
+Terminal
+<span onclick="closeApp('terminal')">X</span>
+<span onclick="maximizeApp('terminal')">⬜</span>
+<span onclick="minimizeApp('terminal')">—</span>
+</div>
 <div id="terminalOutput"></div>
 <input id="cmdInput" onkeydown="runCmd(event)">
 </div>
 
+<!-- FILE MANAGER -->
 <div class="window" id="fileManager">
-<div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
-<input type="file" multiple>
+<div class="titlebar">
+File Manager
+<span onclick="closeApp('fileManager')">X</span>
+<span onclick="maximizeApp('fileManager')">⬜</span>
+<span onclick="minimizeApp('fileManager')">—</span>
 </div>
-
-<!-- Folder iframe -->
-<script>
-for(let i=1;i<=10;i++){
-document.write('<div class="window" id="app'+i+'"><div class="titlebar">Folder '+i+' <span onclick="closeApp(\'app'+i+'\')">X</span></div><iframe src="folder'+i+'/index.html" style="width:100%;height:100%;border:none;"></iframe></div>');
-}
-</script>
+<input type="file" id="fileInput" multiple>
+<div id="fileManagerContent"></div>
+</div>
 
 </div>
 
@@ -242,97 +322,165 @@ document.write('<div class="window" id="app'+i+'"><div class="titlebar">Folder '
 
 <!-- START MENU -->
 <div id="startMenu">
-<div class="start-item" onclick="openApp('notes')">Notes</div>
-<div class="start-item" onclick="openApp('music')">Music</div>
-<div class="start-item" onclick="openApp('terminal')">Terminal</div>
-<div class="start-item" onclick="openApp('fileManager')">File Manager</div>
-<hr>
-<div class="start-item">
-Window Color
-<input type="color" onchange="changeWindowColor(this.value)">
-</div>
-<div class="start-item" onclick="toggleMatrix()">Toggle Matrix</div>
+<div class="start-item" onclick="openApp('notes')">📝 Notes</div>
+<div class="start-item" onclick="openApp('music')">🎵 Music</div>
+<div class="start-item" onclick="openApp('terminal')">💻 Terminal</div>
+<div class="start-item" onclick="openApp('fileManager')">📁 File Manager</div>
 </div>
 
 <script>
+/* LOGIN */
 function login(){
-if(pass.value==="123"){
-login.style.display="none";
-desktop.style.display="flex";
-}else alert("PIN salah");
+const password=document.getElementById("pass").value;
+if(password==="123"){
+document.getElementById("login").style.display="none";
+document.getElementById("desktop").style.display="flex";
+}else{alert("PIN salah");}
 }
 
+/* OPEN / CLOSE WINDOW */
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
+function minimizeApp(id){document.getElementById(id).style.display="none";}
+function maximizeApp(id){
+let win=document.getElementById(id);
+win.style.top="0"; win.style.left="0"; win.style.width="95%"; win.style.height="85%";
+}
+
+/* START MENU */
 function toggleStartMenu(){
 let m=document.getElementById("startMenu");
 m.style.display=(m.style.display==="flex")?"none":"flex";
+m.style.flexDirection="column";
 }
+
+/* OPEN EXTERNAL */
 function openExternal(url){window.open(url,"_blank");}
 
-setInterval(()=>{clock.innerHTML=new Date().toLocaleTimeString()},1000);
-
-function changeWindowColor(color){
-document.querySelectorAll(".window").forEach(w=>{
-w.style.borderColor=color;
+/* DRAG WINDOWS */
+let dragObj=null,offsetX,offsetY;
+document.querySelectorAll(".window").forEach(win=>{
+let bar=win.querySelector(".titlebar");
+bar.onmousedown=e=>{
+dragObj=win;
+offsetX=e.clientX-win.offsetLeft;
+offsetY=e.clientY-win.offsetTop;
+document.onmousemove=dragMove;
+document.onmouseup=dragStop;
+};
 });
-document.body.style.color=color;
+function dragMove(e){if(dragObj){dragObj.style.left=(e.clientX-offsetX)+"px"; dragObj.style.top=(e.clientY-offsetY)+"px";}}
+function dragStop(){document.onmousemove=null; dragObj=null;}
+
+/* CLOCK */
+setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
+
+/* NOTES AUTO-SAVE */
+const notesArea=document.getElementById("notesArea");
+if(notesArea){
+notesArea.value=localStorage.getItem("amos_notes")||"";
+notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
 }
 
 /* TERMINAL */
 function runCmd(e){
 if(e.key==="Enter"){
-terminalOutput.innerHTML+="<div>> "+e.target.value+"</div>";
-e.target.value="";
+let cmd=document.getElementById("cmdInput").value;
+let out=document.getElementById("terminalOutput");
+if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
+else if(cmd==="time") out.innerHTML+="<br>"+new Date();
+else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V11";
+else if(cmd==="clear"){out.innerHTML=""; cmdInput.value=""; return;}
+else out.innerHTML+="<br>Command not found";
+document.getElementById("cmdInput").value="";
 }
 }
 
-/* DRAG WINDOW */
-document.addEventListener("mousedown",function(e){
-if(e.target.classList.contains("titlebar")){
-let win=e.target.parentElement;
-document.onmousemove=function(e2){
-win.style.left=e2.pageX-100+"px";
-win.style.top=e2.pageY-10+"px";
-}
-document.onmouseup=function(){document.onmousemove=null;}
+/* FILE MANAGER LOCAL */
+const fileInput=document.getElementById("fileInput");
+const fileList=document.getElementById("fileManagerContent");
+fileInput.addEventListener("change",()=>{
+fileList.innerHTML="";
+for(const f of fileInput.files){
+let li=document.createElement("div");
+li.className="file";
+li.textContent=f.name;
+li.onclick=()=>alert("Opening "+f.name);
+fileList.appendChild(li);
 }
 });
 
-/* MATRIX */
-let canvas=document.getElementById("bgCanvas");
-let ctx=canvas.getContext("2d");
-canvas.height=window.innerHeight;
-canvas.width=window.innerWidth;
-let letters="01";
-let matrix=letters.split("");
-let font_size=14;
-let columns=canvas.width/font_size;
-let drops=[];
-for(let x=0;x<columns;x++) drops[x]=1;
-function draw(){
-ctx.fillStyle="rgba(0,0,0,0.05)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-ctx.fillStyle="#0F0";
-ctx.font=font_size+"px monospace";
-for(let i=0;i<drops.length;i++){
-let text=matrix[Math.floor(Math.random()*matrix.length)];
-ctx.fillText(text,i*font_size,drops[i]*font_size);
-if(drops[i]*font_size>canvas.height && Math.random()>0.975)
-drops[i]=0;
-drops[i]++;
-}
-}
-let matrixInterval=setInterval(draw,35);
+/* MUSIC PLAYER LOCAL */
+document.getElementById('musicFile').addEventListener('change', function(){
+  const file = this.files[0];
+  if(file){
+    const url = URL.createObjectURL(file);
+    const player = document.getElementById('player');
+    player.src = url;
+    player.play();
+  }
+});
 
-function toggleMatrix(){
-if(matrixInterval){
-clearInterval(matrixInterval);
-matrixInterval=null;
-}else{
-matrixInterval=setInterval(draw,35);
+/* PWA SERVICE WORKER */
+if('serviceWorker' in navigator){
+window.addEventListener('load', ()=>{
+navigator.serviceWorker.register('./sw.js')
+.then(reg=>console.log('Service Worker registered',reg))
+.catch(err=>console.log('SW registration failed',err));
+});
 }
+
+/* DYNAMIC BACKGROUND */
+const backgrounds = [
+'https://res.cloudinary.com/dkisbfx29/image/upload/v1775192201/xvl7e4phlhxz3urcq6xl.png',
+'https://res.cloudinary.com/dkisbfx29/image/upload/v1775192201/xvl7e4phlhxz3urcq6xl.png'
+];
+let bgIndex = 0;
+function changeBackground(){
+  document.body.style.backgroundImage = `url(${backgrounds[bgIndex]})`;
+  bgIndex = (bgIndex + 1) % backgrounds.length;
 }
+setInterval(changeBackground, 10000);
+
+/* MATRIX / STARS EFFECT */
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let columns = canvas.width / 20;
+let drops = [];
+for(let x=0; x<columns; x++) drops[x] = 1;
+let showMatrix = true;
+function toggleBgEffect(){ showMatrix = !showMatrix; }
+function drawMatrix(){
+  if(!showMatrix){ ctx.clearRect(0,0,canvas.width,canvas.height); requestAnimationFrame(drawMatrix); return; }
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = "15px monospace";
+  for(let i=0; i<drops.length; i++){
+    const text = String.fromCharCode(33 + Math.random()*94);
+    ctx.fillText(text,i*20,drops[i]*20);
+    if(drops[i]*20 > canvas.height && Math.random() > 0.975) drops[i]=0;
+    drops[i]++;
+  }
+  requestAnimationFrame(drawMatrix);
+}
+drawMatrix();
+window.addEventListener('resize', ()=>{
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  columns = canvas.width / 20;
+  drops = [];
+  for(let x=0; x<columns; x++) drops[x]=1;
+});
+
+/* WINDOW COLOR THEME */
+document.getElementById("windowColorPicker").addEventListener("input",(e)=>{
+  document.querySelectorAll(".window").forEach(w=>{
+    w.style.borderColor = e.target.value;
+  });
+});
 </script>
 
 </body>
