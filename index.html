@@ -2,9 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V11</title>
+<title>AMOS WEB OS V12 FINAL</title>
 
-<!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
 
@@ -26,7 +25,7 @@ height:100vh;
 display:flex;
 justify-content:center;
 align-items:center;
-background:rgba(0,0,0,0.85);
+background:rgba(0,0,0,0.9);
 z-index:999;
 flex-direction:column;
 }
@@ -36,7 +35,6 @@ margin:5px;
 background:black;
 border:1px solid #00ff9f;
 color:#0f0;
-font-size:16px;
 }
 
 /* DESKTOP */
@@ -45,53 +43,38 @@ display:none;
 width:100vw;
 height:100vh;
 display:flex;
-flex-direction:row;
-overflow:hidden;
-z-index:1;
 }
 
 /* SIDEBAR */
 #sidebar{
-width:220px;
+width:230px;
 background:rgba(0,2,23,0.9);
 border-right:1px solid #00ff9f55;
 padding:10px;
 overflow:auto;
-z-index:2;
-}
-#sidebar h2{
-margin-top:0;
-color:#00ff9f;
 }
 .side-item{
 padding:10px;
 cursor:pointer;
 border-bottom:1px solid #003322;
 }
-.side-item:hover{
-background:#001a12;
-}
+.side-item:hover{background:#001a12;}
 
 /* WORKSPACE */
 #workspace{
 flex:1;
 position:relative;
-overflow:hidden;
 }
 
 /* WINDOW */
 .window{
 position:absolute;
-width:90%;
-max-width:600px;
-height:70%;
-min-height:250px;
+width:500px;
+height:300px;
 background:rgba(0,2,23,0.95);
 border:1px solid #00ff9f;
 display:none;
 flex-direction:column;
-z-index:10;
-box-sizing:border-box;
 resize:both;
 overflow:auto;
 }
@@ -101,12 +84,6 @@ padding:5px;
 cursor:move;
 display:flex;
 justify-content:space-between;
-align-items:center;
-font-size:14px;
-}
-.titlebar span{
-cursor:pointer;
-padding:0 5px;
 }
 
 /* TASKBAR */
@@ -121,8 +98,6 @@ justify-content:space-between;
 align-items:center;
 padding:0 10px;
 border-top:1px solid #00ff9f33;
-box-sizing:border-box;
-z-index:3;
 }
 #startBtn{
 cursor:pointer;
@@ -133,78 +108,42 @@ border:1px solid #00ff9f;
 position:absolute;
 bottom:35px;
 left:0;
-width:200px;
+width:220px;
 background:rgba(0,2,23,0.95);
 display:none;
 flex-direction:column;
 border:1px solid #00ff9f33;
-z-index:20;
 }
 .start-item{
 padding:10px;
 border-bottom:1px solid #003322;
 cursor:pointer;
 }
-.start-item:hover{
-background:#001a12;
-}
+.start-item:hover{background:#001a12;}
 
-/* FILE MANAGER */
-#fileManagerContent{
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.95);
+/* TERMINAL */
+#terminalOutput{
+height:200px;
 overflow:auto;
-color:#0f0;
-padding:10px;
-box-sizing:border-box;
-}
-.file{
-padding:5px;
-border-bottom:1px solid #003322;
-cursor:pointer;
-}
-.file:hover{
-background:#001a12;
-}
-
-/* NOTES / MUSIC / TERMINAL */
-textarea, audio, #terminalOutput{
-width:100%;
-height:calc(100% - 30px);
 background:black;
 color:#0f0;
-border:none;
-resize:none;
-overflow:auto;
-box-sizing:border-box;
 }
 #cmdInput{
 width:100%;
 background:black;
 color:#0f0;
 border:none;
-box-sizing:border-box;
 }
 
 /* MATRIX */
 #bgCanvas{
 position:fixed;
-top:0; left:0;
+top:0;
+left:0;
 width:100vw;
 height:100vh;
 z-index:0;
 pointer-events:none;
-}
-
-/* THEME CONTROL */
-#themeControl{
-position:absolute;top:10px;right:10px;
-background:rgba(0,0,0,0.7);
-padding:5px;
-border:1px solid #0f0;
-z-index:999;
-color:#0f0;
 }
 </style>
 </head>
@@ -212,16 +151,10 @@ color:#0f0;
 
 <canvas id="bgCanvas"></canvas>
 
-<div id="themeControl">
-<label>Window Color:</label>
-<input type="color" id="windowColorPicker" value="#00ff9f">
-<button onclick="toggleBgEffect()">Toggle BG Effect</button>
-</div>
-
 <!-- LOGIN -->
 <div id="login">
 <h2>AMOS LOGIN</h2>
-<input type="password" id="pass" placeholder="PIN (123)">
+<input type="password" id="pass" placeholder="PIN 123">
 <button onclick="login()">ENTER</button>
 </div>
 
@@ -230,7 +163,8 @@ color:#0f0;
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-<h2>PROJECTS</h2>
+<h3>PROJECTS</h3>
+
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">📸 Camera RCP</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">🗺 Fake GPS</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">👨‍💻 CV Amos</div>
@@ -243,14 +177,16 @@ color:#0f0;
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖 Telegram Bot</div>
 
 <hr>
-<h2>WEB OS</h2>
+
+<h3>WEB OS</h3>
 <div class="side-item" onclick="openApp('notes')">📝 Notes</div>
 <div class="side-item" onclick="openApp('music')">🎵 Music</div>
 <div class="side-item" onclick="openApp('terminal')">💻 Terminal</div>
 <div class="side-item" onclick="openApp('fileManager')">📁 File Manager</div>
 
 <hr>
-<h2>FOLDERS</h2>
+
+<h3>FOLDERS</h3>
 <div class="side-item" onclick="openApp('app1')">📁 Folder 1</div>
 <div class="side-item" onclick="openApp('app2')">📁 Folder 2</div>
 <div class="side-item" onclick="openApp('app3')">📁 Folder 3</div>
@@ -261,65 +197,40 @@ color:#0f0;
 <div class="side-item" onclick="openApp('app8')">📁 Folder 8</div>
 <div class="side-item" onclick="openApp('app9')">📁 Folder 9</div>
 <div class="side-item" onclick="openApp('app10')">📁 Folder 10</div>
+
 </div>
 
 <!-- WORKSPACE -->
 <div id="workspace">
 
-<!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar">Notes
-<span onclick="closeApp('notes')">X</span>
-<span onclick="maximizeApp('notes')">⬜</span>
-<span onclick="minimizeApp('notes')">—</span>
-</div>
-<textarea id="notesArea"></textarea>
+<div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
+<textarea style="width:100%;height:100%;background:black;color:#0f0;"></textarea>
 </div>
 
-<!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">Music
-<span onclick="closeApp('music')">X</span>
-<span onclick="maximizeApp('music')">⬜</span>
-<span onclick="minimizeApp('music')">—</span>
-</div>
-<input type="file" id="musicFile" accept="audio/*">
-<audio id="player" controls></audio>
+<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+<input type="file" accept="audio/*">
+<audio controls></audio>
 </div>
 
-<!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar">Terminal
-<span onclick="closeApp('terminal')">X</span>
-<span onclick="maximizeApp('terminal')">⬜</span>
-<span onclick="minimizeApp('terminal')">—</span>
-</div>
+<div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
 <div id="terminalOutput"></div>
 <input id="cmdInput" onkeydown="runCmd(event)">
 </div>
 
-<!-- FILE MANAGER -->
 <div class="window" id="fileManager">
-<div class="titlebar">File Manager
-<span onclick="closeApp('fileManager')">X</span>
-<span onclick="maximizeApp('fileManager')">⬜</span>
-<span onclick="minimizeApp('fileManager')">—</span>
-</div>
-<input type="file" id="fileInput" multiple>
-<div id="fileManagerContent"></div>
+<div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
+<input type="file" multiple>
 </div>
 
-<!-- 10 FOLDER APPS -->
-<div class="window" id="app1"><div class="titlebar">Folder 1 <span onclick="closeApp('app1')">X</span></div><iframe src="folder1/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app2"><div class="titlebar">Folder 2 <span onclick="closeApp('app2')">X</span></div><iframe src="folder2/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app3"><div class="titlebar">Folder 3 <span onclick="closeApp('app3')">X</span></div><iframe src="folder3/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app4"><div class="titlebar">Folder 4 <span onclick="closeApp('app4')">X</span></div><iframe src="folder4/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app5"><div class="titlebar">Folder 5 <span onclick="closeApp('app5')">X</span></div><iframe src="folder5/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app6"><div class="titlebar">Folder 6 <span onclick="closeApp('app6')">X</span></div><iframe src="folder6/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app7"><div class="titlebar">Folder 7 <span onclick="closeApp('app7')">X</span></div><iframe src="folder7/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app8"><div class="titlebar">Folder 8 <span onclick="closeApp('app8')">X</span></div><iframe src="folder8/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app9"><div class="titlebar">Folder 9 <span onclick="closeApp('app9')">X</span></div><iframe src="folder9/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
-<div class="window" id="app10"><div class="titlebar">Folder 10 <span onclick="closeApp('app10')">X</span></div><iframe src="folder10/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<!-- Folder iframe -->
+<script>
+for(let i=1;i<=10;i++){
+document.write('<div class="window" id="app'+i+'"><div class="titlebar">Folder '+i+' <span onclick="closeApp(\'app'+i+'\')">X</span></div><iframe src="folder'+i+'/index.html" style="width:100%;height:100%;border:none;"></iframe></div>');
+}
+</script>
 
 </div>
 
@@ -335,29 +246,93 @@ color:#0f0;
 <div class="start-item" onclick="openApp('music')">Music</div>
 <div class="start-item" onclick="openApp('terminal')">Terminal</div>
 <div class="start-item" onclick="openApp('fileManager')">File Manager</div>
+<hr>
+<div class="start-item">
+Window Color
+<input type="color" onchange="changeWindowColor(this.value)">
+</div>
+<div class="start-item" onclick="toggleMatrix()">Toggle Matrix</div>
 </div>
 
 <script>
 function login(){
-if(document.getElementById("pass").value==="123"){
-document.getElementById("login").style.display="none";
-document.getElementById("desktop").style.display="flex";
+if(pass.value==="123"){
+login.style.display="none";
+desktop.style.display="flex";
 }else alert("PIN salah");
 }
+
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
-function minimizeApp(id){document.getElementById(id).style.display="none";}
-function maximizeApp(id){
-let win=document.getElementById(id);
-win.style.top="0"; win.style.left="0"; win.style.width="95%"; win.style.height="85%";
-}
 function toggleStartMenu(){
 let m=document.getElementById("startMenu");
 m.style.display=(m.style.display==="flex")?"none":"flex";
-m.style.flexDirection="column";
 }
 function openExternal(url){window.open(url,"_blank");}
-setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
+
+setInterval(()=>{clock.innerHTML=new Date().toLocaleTimeString()},1000);
+
+function changeWindowColor(color){
+document.querySelectorAll(".window").forEach(w=>{
+w.style.borderColor=color;
+});
+document.body.style.color=color;
+}
+
+/* TERMINAL */
+function runCmd(e){
+if(e.key==="Enter"){
+terminalOutput.innerHTML+="<div>> "+e.target.value+"</div>";
+e.target.value="";
+}
+}
+
+/* DRAG WINDOW */
+document.addEventListener("mousedown",function(e){
+if(e.target.classList.contains("titlebar")){
+let win=e.target.parentElement;
+document.onmousemove=function(e2){
+win.style.left=e2.pageX-100+"px";
+win.style.top=e2.pageY-10+"px";
+}
+document.onmouseup=function(){document.onmousemove=null;}
+}
+});
+
+/* MATRIX */
+let canvas=document.getElementById("bgCanvas");
+let ctx=canvas.getContext("2d");
+canvas.height=window.innerHeight;
+canvas.width=window.innerWidth;
+let letters="01";
+let matrix=letters.split("");
+let font_size=14;
+let columns=canvas.width/font_size;
+let drops=[];
+for(let x=0;x<columns;x++) drops[x]=1;
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#0F0";
+ctx.font=font_size+"px monospace";
+for(let i=0;i<drops.length;i++){
+let text=matrix[Math.floor(Math.random()*matrix.length)];
+ctx.fillText(text,i*font_size,drops[i]*font_size);
+if(drops[i]*font_size>canvas.height && Math.random()>0.975)
+drops[i]=0;
+drops[i]++;
+}
+}
+let matrixInterval=setInterval(draw,35);
+
+function toggleMatrix(){
+if(matrixInterval){
+clearInterval(matrixInterval);
+matrixInterval=null;
+}else{
+matrixInterval=setInterval(draw,35);
+}
+}
 </script>
 
 </body>
