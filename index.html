@@ -187,7 +187,7 @@ border:none;
 box-sizing:border-box;
 }
 
-/* MATRIX / STARS CANVAS */
+/* MATRIX */
 #bgCanvas{
 position:fixed;
 top:0; left:0;
@@ -206,25 +206,12 @@ border:1px solid #0f0;
 z-index:999;
 color:#0f0;
 }
-
-/* RESPONSIVE */
-@media screen and (max-width:768px){
-.window{
-width:95% !important;
-height:60% !important;
-}
-.titlebar span{
-font-size:16px;
-}
-}
 </style>
 </head>
 <body>
 
-<!-- MATRIX / STARS CANVAS -->
 <canvas id="bgCanvas"></canvas>
 
-<!-- THEME CONTROL -->
 <div id="themeControl">
 <label>Window Color:</label>
 <input type="color" id="windowColorPicker" value="#00ff9f">
@@ -254,12 +241,26 @@ font-size:16px;
 <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">📅 Jadwal</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">📍 Form</div>
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">🤖 Telegram Bot</div>
+
 <hr>
 <h2>WEB OS</h2>
 <div class="side-item" onclick="openApp('notes')">📝 Notes</div>
 <div class="side-item" onclick="openApp('music')">🎵 Music</div>
 <div class="side-item" onclick="openApp('terminal')">💻 Terminal</div>
 <div class="side-item" onclick="openApp('fileManager')">📁 File Manager</div>
+
+<hr>
+<h2>FOLDERS</h2>
+<div class="side-item" onclick="openApp('app1')">📁 Folder 1</div>
+<div class="side-item" onclick="openApp('app2')">📁 Folder 2</div>
+<div class="side-item" onclick="openApp('app3')">📁 Folder 3</div>
+<div class="side-item" onclick="openApp('app4')">📁 Folder 4</div>
+<div class="side-item" onclick="openApp('app5')">📁 Folder 5</div>
+<div class="side-item" onclick="openApp('app6')">📁 Folder 6</div>
+<div class="side-item" onclick="openApp('app7')">📁 Folder 7</div>
+<div class="side-item" onclick="openApp('app8')">📁 Folder 8</div>
+<div class="side-item" onclick="openApp('app9')">📁 Folder 9</div>
+<div class="side-item" onclick="openApp('app10')">📁 Folder 10</div>
 </div>
 
 <!-- WORKSPACE -->
@@ -267,19 +268,17 @@ font-size:16px;
 
 <!-- NOTES -->
 <div class="window" id="notes">
-<div class="titlebar">
-Notes
+<div class="titlebar">Notes
 <span onclick="closeApp('notes')">X</span>
 <span onclick="maximizeApp('notes')">⬜</span>
 <span onclick="minimizeApp('notes')">—</span>
 </div>
-<textarea id="notesArea" placeholder="Your notes here..."></textarea>
+<textarea id="notesArea"></textarea>
 </div>
 
 <!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">
-Music Player
+<div class="titlebar">Music
 <span onclick="closeApp('music')">X</span>
 <span onclick="maximizeApp('music')">⬜</span>
 <span onclick="minimizeApp('music')">—</span>
@@ -290,8 +289,7 @@ Music Player
 
 <!-- TERMINAL -->
 <div class="window" id="terminal">
-<div class="titlebar">
-Terminal
+<div class="titlebar">Terminal
 <span onclick="closeApp('terminal')">X</span>
 <span onclick="maximizeApp('terminal')">⬜</span>
 <span onclick="minimizeApp('terminal')">—</span>
@@ -302,8 +300,7 @@ Terminal
 
 <!-- FILE MANAGER -->
 <div class="window" id="fileManager">
-<div class="titlebar">
-File Manager
+<div class="titlebar">File Manager
 <span onclick="closeApp('fileManager')">X</span>
 <span onclick="maximizeApp('fileManager')">⬜</span>
 <span onclick="minimizeApp('fileManager')">—</span>
@@ -311,6 +308,18 @@ File Manager
 <input type="file" id="fileInput" multiple>
 <div id="fileManagerContent"></div>
 </div>
+
+<!-- 10 FOLDER APPS -->
+<div class="window" id="app1"><div class="titlebar">Folder 1 <span onclick="closeApp('app1')">X</span></div><iframe src="folder1/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app2"><div class="titlebar">Folder 2 <span onclick="closeApp('app2')">X</span></div><iframe src="folder2/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app3"><div class="titlebar">Folder 3 <span onclick="closeApp('app3')">X</span></div><iframe src="folder3/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app4"><div class="titlebar">Folder 4 <span onclick="closeApp('app4')">X</span></div><iframe src="folder4/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app5"><div class="titlebar">Folder 5 <span onclick="closeApp('app5')">X</span></div><iframe src="folder5/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app6"><div class="titlebar">Folder 6 <span onclick="closeApp('app6')">X</span></div><iframe src="folder6/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app7"><div class="titlebar">Folder 7 <span onclick="closeApp('app7')">X</span></div><iframe src="folder7/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app8"><div class="titlebar">Folder 8 <span onclick="closeApp('app8')">X</span></div><iframe src="folder8/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app9"><div class="titlebar">Folder 9 <span onclick="closeApp('app9')">X</span></div><iframe src="folder9/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
+<div class="window" id="app10"><div class="titlebar">Folder 10 <span onclick="closeApp('app10')">X</span></div><iframe src="folder10/index.html" style="width:100%;height:100%;border:none;"></iframe></div>
 
 </div>
 
@@ -322,23 +331,19 @@ File Manager
 
 <!-- START MENU -->
 <div id="startMenu">
-<div class="start-item" onclick="openApp('notes')">📝 Notes</div>
-<div class="start-item" onclick="openApp('music')">🎵 Music</div>
-<div class="start-item" onclick="openApp('terminal')">💻 Terminal</div>
-<div class="start-item" onclick="openApp('fileManager')">📁 File Manager</div>
+<div class="start-item" onclick="openApp('notes')">Notes</div>
+<div class="start-item" onclick="openApp('music')">Music</div>
+<div class="start-item" onclick="openApp('terminal')">Terminal</div>
+<div class="start-item" onclick="openApp('fileManager')">File Manager</div>
 </div>
 
 <script>
-/* LOGIN */
 function login(){
-const password=document.getElementById("pass").value;
-if(password==="123"){
+if(document.getElementById("pass").value==="123"){
 document.getElementById("login").style.display="none";
 document.getElementById("desktop").style.display="flex";
-}else{alert("PIN salah");}
+}else alert("PIN salah");
 }
-
-/* OPEN / CLOSE WINDOW */
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
 function minimizeApp(id){document.getElementById(id).style.display="none";}
@@ -346,141 +351,13 @@ function maximizeApp(id){
 let win=document.getElementById(id);
 win.style.top="0"; win.style.left="0"; win.style.width="95%"; win.style.height="85%";
 }
-
-/* START MENU */
 function toggleStartMenu(){
 let m=document.getElementById("startMenu");
 m.style.display=(m.style.display==="flex")?"none":"flex";
 m.style.flexDirection="column";
 }
-
-/* OPEN EXTERNAL */
 function openExternal(url){window.open(url,"_blank");}
-
-/* DRAG WINDOWS */
-let dragObj=null,offsetX,offsetY;
-document.querySelectorAll(".window").forEach(win=>{
-let bar=win.querySelector(".titlebar");
-bar.onmousedown=e=>{
-dragObj=win;
-offsetX=e.clientX-win.offsetLeft;
-offsetY=e.clientY-win.offsetTop;
-document.onmousemove=dragMove;
-document.onmouseup=dragStop;
-};
-});
-function dragMove(e){if(dragObj){dragObj.style.left=(e.clientX-offsetX)+"px"; dragObj.style.top=(e.clientY-offsetY)+"px";}}
-function dragStop(){document.onmousemove=null; dragObj=null;}
-
-/* CLOCK */
 setInterval(()=>{document.getElementById("clock").innerHTML=new Date().toLocaleTimeString()},1000);
-
-/* NOTES AUTO-SAVE */
-const notesArea=document.getElementById("notesArea");
-if(notesArea){
-notesArea.value=localStorage.getItem("amos_notes")||"";
-notesArea.addEventListener("input",()=>{localStorage.setItem("amos_notes",notesArea.value)});
-}
-
-/* TERMINAL */
-function runCmd(e){
-if(e.key==="Enter"){
-let cmd=document.getElementById("cmdInput").value;
-let out=document.getElementById("terminalOutput");
-if(cmd==="help") out.innerHTML+="<br>help, time, clear, about";
-else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="about") out.innerHTML+="<br>AMOS WEB OS V11";
-else if(cmd==="clear"){out.innerHTML=""; cmdInput.value=""; return;}
-else out.innerHTML+="<br>Command not found";
-document.getElementById("cmdInput").value="";
-}
-}
-
-/* FILE MANAGER LOCAL */
-const fileInput=document.getElementById("fileInput");
-const fileList=document.getElementById("fileManagerContent");
-fileInput.addEventListener("change",()=>{
-fileList.innerHTML="";
-for(const f of fileInput.files){
-let li=document.createElement("div");
-li.className="file";
-li.textContent=f.name;
-li.onclick=()=>alert("Opening "+f.name);
-fileList.appendChild(li);
-}
-});
-
-/* MUSIC PLAYER LOCAL */
-document.getElementById('musicFile').addEventListener('change', function(){
-  const file = this.files[0];
-  if(file){
-    const url = URL.createObjectURL(file);
-    const player = document.getElementById('player');
-    player.src = url;
-    player.play();
-  }
-});
-
-/* PWA SERVICE WORKER */
-if('serviceWorker' in navigator){
-window.addEventListener('load', ()=>{
-navigator.serviceWorker.register('./sw.js')
-.then(reg=>console.log('Service Worker registered',reg))
-.catch(err=>console.log('SW registration failed',err));
-});
-}
-
-/* DYNAMIC BACKGROUND */
-const backgrounds = [
-'https://res.cloudinary.com/dkisbfx29/image/upload/v1775192201/xvl7e4phlhxz3urcq6xl.png',
-'https://res.cloudinary.com/dkisbfx29/image/upload/v1775192201/xvl7e4phlhxz3urcq6xl.png'
-];
-let bgIndex = 0;
-function changeBackground(){
-  document.body.style.backgroundImage = `url(${backgrounds[bgIndex]})`;
-  bgIndex = (bgIndex + 1) % backgrounds.length;
-}
-setInterval(changeBackground, 10000);
-
-/* MATRIX / STARS EFFECT */
-const canvas = document.getElementById("bgCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-let columns = canvas.width / 20;
-let drops = [];
-for(let x=0; x<columns; x++) drops[x] = 1;
-let showMatrix = true;
-function toggleBgEffect(){ showMatrix = !showMatrix; }
-function drawMatrix(){
-  if(!showMatrix){ ctx.clearRect(0,0,canvas.width,canvas.height); requestAnimationFrame(drawMatrix); return; }
-  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle = "#0f0";
-  ctx.font = "15px monospace";
-  for(let i=0; i<drops.length; i++){
-    const text = String.fromCharCode(33 + Math.random()*94);
-    ctx.fillText(text,i*20,drops[i]*20);
-    if(drops[i]*20 > canvas.height && Math.random() > 0.975) drops[i]=0;
-    drops[i]++;
-  }
-  requestAnimationFrame(drawMatrix);
-}
-drawMatrix();
-window.addEventListener('resize', ()=>{
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  columns = canvas.width / 20;
-  drops = [];
-  for(let x=0; x<columns; x++) drops[x]=1;
-});
-
-/* WINDOW COLOR THEME */
-document.getElementById("windowColorPicker").addEventListener("input",(e)=>{
-  document.querySelectorAll(".window").forEach(w=>{
-    w.style.borderColor = e.target.value;
-  });
-});
 </script>
 
 </body>
