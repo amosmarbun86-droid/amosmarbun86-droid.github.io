@@ -149,6 +149,24 @@ height:100vh;
 z-index:0;
 pointer-events:none;
 }
+/* FILE MANAGER */
+#fileManagerContent{
+margin-top:10px;
+max-height:300px;
+overflow:auto;
+font-size:13px;
+}
+
+.file{
+padding:6px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+color:#00ff9f;
+}
+
+.file:hover{
+background:#001a12;
+}
 </style>
 </head>
 
@@ -181,7 +199,9 @@ pointer-events:none;
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">Telegram Bot</div>
 <hr>
 <div class="side-item" onclick="openApp('notes')">Notes</div>
+<div class="side-item" onclick="openApp('music')">Music</div>
 <div class="side-item" onclick="openApp('terminal')">Terminal</div>
+<div class="side-item" onclick="openApp('fileManager')">File Manager</div>="side-item" onclick="openApp('terminal')">Terminal</div>
 </div>
 
 <!-- WORKSPACE -->
@@ -198,6 +218,26 @@ pointer-events:none;
 <input id="cmdInput" onkeydown="runCmd(event)">
 </div>
 
+<!-- MUSIC -->
+<div class="window" id="music">
+<div class="titlebar">
+Music Player
+<span onclick="closeApp('music')">X</span>
+</div>
+<input type="file" id="musicFile" accept="audio/*">
+<audio id="player" controls></audio>
+</div>
+
+<!-- FILE MANAGER -->
+<div class="window" id="fileManager">
+<div class="titlebar">
+File Manager
+<span onclick="closeApp('fileManager')">X</span>
+</div>
+<input type="file" id="fileInput" multiple>
+<div id="fileManagerContent"></div>
+</div>
+
 </div>
 
 <!-- TASKBAR -->
@@ -209,13 +249,16 @@ pointer-events:none;
 <!-- START MENU -->
 <div id="startMenu">
 <div class="start-item" onclick="openApp('notes')">Notes</div>
+<div class="start-item" onclick="openApp('music')">Music</div>
 <div class="start-item" onclick="openApp('terminal')">Terminal</div>
+<div class="start-item" onclick="openApp('fileManager')">File Manager</div>
+
 <div class="start-item">
 Window Color
 <input type="color" id="windowColorPicker">
 </div>
+
 <div class="start-item" onclick="toggleBgEffect()">Toggle Matrix</div>
-</div>
 
 </div>
 
@@ -323,6 +366,31 @@ drops[i]++;
 requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
+
+/* MUSIC PLAYER */
+document.getElementById('musicFile').addEventListener('change', function(){
+  const file = this.files[0];
+  if(file){
+    const url = URL.createObjectURL(file);
+    const player = document.getElementById('player');
+    player.src = url;
+    player.play();
+  }
+});
+
+/* FILE MANAGER */
+const fileInput=document.getElementById("fileInput");
+const fileList=document.getElementById("fileManagerContent");
+
+fileInput.addEventListener("change",()=>{
+fileList.innerHTML="";
+for(const f of fileInput.files){
+let div=document.createElement("div");
+div.className="file";
+div.textContent=f.name;
+fileList.appendChild(div);
+}
+});
 </script>
 
 </body>
