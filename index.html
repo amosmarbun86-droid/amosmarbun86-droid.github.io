@@ -201,7 +201,7 @@ background:#001a12;
 <div class="side-item" onclick="openApp('notes')">Notes</div>
 <div class="side-item" onclick="openApp('music')">Music</div>
 <div class="side-item" onclick="openApp('terminal')">Terminal</div>
-<div class="side-item" onclick="openApp('fileManager')">File Manager</div>="side-item" onclick="openApp('terminal')">Terminal</div>
+<div class="side-item" onclick="openApp('fileManager')">File Manager</div>
 </div>
 
 <!-- WORKSPACE -->
@@ -294,6 +294,9 @@ loadNotes();
 /* WINDOWS */
 function openApp(id){document.getElementById(id).style.display="block";}
 function closeApp(id){document.getElementById(id).style.display="none";}
+function openExternal(url){
+window.open(url, "_blank");
+}
 
 /* START MENU */
 function toggleStartMenu(){
@@ -303,7 +306,10 @@ m.style.flexDirection="column";
 }
 
 /* CLOCK */
-setInterval(()=>{clock.innerHTML=new Date().toLocaleTimeString()},1000);
+setInterval(()=>{
+document.getElementById("clock").innerHTML =
+new Date().toLocaleTimeString();
+},1000);
 
 /* NOTES FIREBASE */
 const notesArea=document.getElementById("notesArea");
