@@ -292,7 +292,13 @@ loadNotes();
 }
 
 /* WINDOWS */
-function openApp(id){document.getElementById(id).style.display="block";}
+function openApp(id){
+let w=document.getElementById(id);
+w.style.display="block";
+w.style.left="150px";
+w.style.top="80px";
+w.style.zIndex=parseInt(Date.now()/1000);
+}
 function closeApp(id){document.getElementById(id).style.display="none";}
 function openExternal(url){
 window.open(url, "_blank");
@@ -396,6 +402,30 @@ div.className="file";
 div.textContent=f.name;
 fileList.appendChild(div);
 }
+});
+/* DRAG WINDOW */
+document.querySelectorAll(".window").forEach(win=>{
+  const title = win.querySelector(".titlebar");
+  let offsetX = 0;
+  let offsetY = 0;
+  let isDown = false;
+
+  title.addEventListener("mousedown", (e)=>{
+    isDown = true;
+    offsetX = e.clientX - win.offsetLeft;
+    offsetY = e.clientY - win.offsetTop;
+    win.style.zIndex = 1000;
+  });
+
+  document.addEventListener("mouseup", ()=>{
+    isDown = false;
+  });
+
+  document.addEventListener("mousemove", (e)=>{
+    if(!isDown) return;
+    win.style.left = (e.clientX - offsetX) + "px";
+    win.style.top = (e.clientY - offsetY) + "px";
+  });
 });
 </script>
 
