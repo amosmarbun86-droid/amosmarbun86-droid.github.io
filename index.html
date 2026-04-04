@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V12 FINAL</title>
+<title>AMOS WEB OS V13 FINAL</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
@@ -43,7 +43,6 @@ font-size:16px;
 display:none;
 width:100vw;
 height:100vh;
-display:flex;
 flex-direction:row;
 overflow:hidden;
 }
@@ -130,7 +129,6 @@ cursor:pointer;
 background:#001a12;
 }
 
-/* TEXTAREA / TERMINAL */
 textarea, #terminalOutput{
 width:100%;
 height:calc(100% - 30px);
@@ -139,7 +137,6 @@ color:#0f0;
 border:none;
 }
 
-/* MATRIX */
 #bgCanvas{
 position:fixed;
 top:0;
@@ -149,21 +146,12 @@ height:100vh;
 z-index:0;
 pointer-events:none;
 }
-/* FILE MANAGER */
-#fileManagerContent{
-margin-top:10px;
-max-height:300px;
-overflow:auto;
-font-size:13px;
-}
 
 .file{
 padding:6px;
 border-bottom:1px solid #003322;
 cursor:pointer;
-color:#00ff9f;
 }
-
 .file:hover{
 background:#001a12;
 }
@@ -174,29 +162,19 @@ background:#001a12;
 
 <canvas id="bgCanvas"></canvas>
 
-<!-- LOGIN -->
 <div id="login">
 <h2>AMOS LOGIN</h2>
 <input type="password" id="pass" placeholder="PIN (123)">
 <button onclick="login()">ENTER</button>
 </div>
 
-<!-- DESKTOP -->
 <div id="desktop">
 
-<!-- SIDEBAR -->
 <div id="sidebar">
 <h3>PROJECTS</h3>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">Camera RCP</div>
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">Fake GPS</div>
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">CV Amos</div>
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">Data Pribadi</div>
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">Admin Panel</div>
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">SmartDebt</div>
-<div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">Alarm</div>
-<div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">Jadwal</div>
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">Form</div>
-<div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">Telegram Bot</div>
+
 <hr>
 <div class="side-item" onclick="openApp('notes')">Notes</div>
 <div class="side-item" onclick="openApp('music')">Music</div>
@@ -204,7 +182,6 @@ background:#001a12;
 <div class="side-item" onclick="openApp('fileManager')">File Manager</div>
 </div>
 
-<!-- WORKSPACE -->
 <div id="workspace">
 
 <div class="window" id="notes">
@@ -215,138 +192,107 @@ background:#001a12;
 <div class="window" id="terminal">
 <div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
 <div id="terminalOutput"></div>
-<input id="cmdInput" onkeydown="runCmd(event)">
+<input id="cmdInput">
 </div>
 
-<!-- MUSIC -->
 <div class="window" id="music">
-<div class="titlebar">
-Music Player
-<span onclick="closeApp('music')">X</span>
-</div>
-<input type="file" id="musicFile" accept="audio/*">
+<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+<input type="file" id="musicFile">
 <audio id="player" controls></audio>
 </div>
 
-<!-- FILE MANAGER -->
 <div class="window" id="fileManager">
-<div class="titlebar">
-File Manager
-<span onclick="closeApp('fileManager')">X</span>
-</div>
+<div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
 <input type="file" id="fileInput" multiple>
 <div id="fileManagerContent"></div>
 </div>
 
 </div>
 
-<!-- TASKBAR -->
 <div id="taskbar">
-<div id="startBtn" onclick="toggleStartMenu()">Start</div>
+<div id="startBtn">Start</div>
 <div id="clock"></div>
 </div>
 
-<!-- START MENU -->
 <div id="startMenu">
 <div class="start-item" onclick="openApp('notes')">Notes</div>
 <div class="start-item" onclick="openApp('music')">Music</div>
 <div class="start-item" onclick="openApp('terminal')">Terminal</div>
 <div class="start-item" onclick="openApp('fileManager')">File Manager</div>
-
 <div class="start-item">
-Window Color
-<input type="color" id="windowColorPicker">
+Color <input type="color" id="windowColorPicker">
+</div>
+<div class="start-item" onclick="toggleBgEffect()">Matrix</div>
 </div>
 
-<div class="start-item" onclick="toggleBgEffect()">Toggle Matrix</div>
-
-</div>
-
-<!-- FIREBASE -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
-  authDomain: "amos-web-os.firebaseapp.com",
-  projectId: "amos-web-os",
-  storageBucket: "amos-web-os.firebasestorage.app",
-  messagingSenderId: "59843745100",
-  appId: "1:59843745100:web:b29e5996052a3bf5672be9",
-  measurementId: "G-Z2F7MXPSCH"
-};
+"use strict";
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-</script>
+/* ELEMENT */
+const cmdInput = document.getElementById("cmdInput");
+const terminalOutput = document.getElementById("terminalOutput");
+const windowColorPicker = document.getElementById("windowColorPicker");
 
-<script>
 /* LOGIN */
 function login(){
-if(document.getElementById("pass").value==="123"){
-document.getElementById("login").style.display="none";
-document.getElementById("desktop").style.display="flex";
-loadNotes();
+if(pass.value==="123"){
+loginBox.style.display="none";
+desktop.style.display="flex";
+cmdInput.focus();
 }else alert("PIN salah");
 }
+const pass=document.getElementById("pass");
+const loginBox=document.getElementById("login");
+const desktop=document.getElementById("desktop");
 
-/* WINDOWS */
+/* WINDOW */
 function openApp(id){
 let w=document.getElementById(id);
 w.style.display="block";
-w.style.left="150px";
-w.style.top="80px";
-w.style.zIndex=parseInt(Date.now()/1000);
+w.style.left = (100 + Math.random()*200)+"px";
+w.style.top = (50 + Math.random()*150)+"px";
+w.style.zIndex=Date.now();
 }
-function closeApp(id){document.getElementById(id).style.display="none";}
+function closeApp(id){
+document.getElementById(id).style.display="none";
+}
 function openExternal(url){
-window.open(url, "_blank");
+window.open(url,"_blank");
 }
 
 /* START MENU */
-function toggleStartMenu(){
-let m=document.getElementById("startMenu");
-m.style.display=(m.style.display==="flex")?"none":"flex";
-m.style.flexDirection="column";
+const startBtn=document.getElementById("startBtn");
+const startMenu=document.getElementById("startMenu");
+
+startBtn.onclick=()=>{
+startMenu.style.display = (startMenu.style.display==="flex")?"none":"flex";
+startMenu.style.flexDirection="column";
+};
+
+document.addEventListener("click",(e)=>{
+if(!startMenu.contains(e.target) && e.target!==startBtn){
+startMenu.style.display="none";
 }
+});
 
 /* CLOCK */
 setInterval(()=>{
-document.getElementById("clock").innerHTML =
-new Date().toLocaleTimeString();
+clock.innerHTML=new Date().toLocaleTimeString();
 },1000);
-
-/* NOTES FIREBASE */
-const notesArea=document.getElementById("notesArea");
-
-function loadNotes(){
-db.collection("notes").doc("main").get().then(doc=>{
-if(doc.exists){notesArea.value=doc.data().isi;}
-});
-}
-
-function saveNotes(){
-db.collection("notes").doc("main").set({
-isi:notesArea.value,
-updated:new Date()
-});
-}
-notesArea.addEventListener("input",saveNotes);
+const clock=document.getElementById("clock");
 
 /* TERMINAL */
-function runCmd(e){
+cmdInput.addEventListener("keydown",(e)=>{
 if(e.key==="Enter"){
 let cmd=cmdInput.value;
-let out=terminalOutput;
-if(cmd==="help") out.innerHTML+="<br>help, time, clear";
-else if(cmd==="time") out.innerHTML+="<br>"+new Date();
-else if(cmd==="clear") out.innerHTML="";
+if(cmd==="help") terminalOutput.innerHTML+="<br>help,time,clear";
+else if(cmd==="time") terminalOutput.innerHTML+="<br>"+new Date();
+else if(cmd==="clear") terminalOutput.innerHTML="";
 cmdInput.value="";
 }
-}
+});
 
-/* WINDOW COLOR */
+/* COLOR */
 windowColorPicker.addEventListener("input",(e)=>{
 document.querySelectorAll(".window").forEach(w=>{
 w.style.borderColor=e.target.value;
@@ -356,77 +302,61 @@ w.style.borderColor=e.target.value;
 /* MATRIX */
 const canvas=document.getElementById("bgCanvas");
 const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
 let columns=canvas.width/20;
 let drops=[];
-for(let x=0;x<columns;x++)drops[x]=1;
+for(let i=0;i<columns;i++)drops[i]=1;
 let showMatrix=true;
+
 function toggleBgEffect(){showMatrix=!showMatrix;}
+
 function drawMatrix(){
-if(!showMatrix){ctx.clearRect(0,0,canvas.width,canvas.height);requestAnimationFrame(drawMatrix);return;}
+if(!showMatrix){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+requestAnimationFrame(drawMatrix);
+return;
+}
 ctx.fillStyle="rgba(0,0,0,0.05)";
 ctx.fillRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="#0f0";
 ctx.font="15px monospace";
+
 for(let i=0;i<drops.length;i++){
-const text=String.fromCharCode(33+Math.random()*94);
+let text=String.fromCharCode(33+Math.random()*94);
 ctx.fillText(text,i*20,drops[i]*20);
-if(drops[i]*20>canvas.height&&Math.random()>0.975)drops[i]=0;
+if(drops[i]*20>canvas.height) drops[i]=0;
 drops[i]++;
 }
 requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
 
-/* MUSIC PLAYER */
-document.getElementById('musicFile').addEventListener('change', function(){
-  const file = this.files[0];
-  if(file){
-    const url = URL.createObjectURL(file);
-    const player = document.getElementById('player');
-    player.src = url;
-    player.play();
-  }
-});
-
-/* FILE MANAGER */
-const fileInput=document.getElementById("fileInput");
-const fileList=document.getElementById("fileManagerContent");
-
-fileInput.addEventListener("change",()=>{
-fileList.innerHTML="";
-for(const f of fileInput.files){
-let div=document.createElement("div");
-div.className="file";
-div.textContent=f.name;
-fileList.appendChild(div);
+/* MUSIC */
+musicFile.onchange=function(){
+const file=this.files[0];
+if(file){
+player.src=URL.createObjectURL(file);
+player.play();
 }
-});
-/* DRAG WINDOW */
-document.querySelectorAll(".window").forEach(win=>{
-  const title = win.querySelector(".titlebar");
-  let offsetX = 0;
-  let offsetY = 0;
-  let isDown = false;
+};
 
-  title.addEventListener("mousedown", (e)=>{
-    isDown = true;
-    offsetX = e.clientX - win.offsetLeft;
-    offsetY = e.clientY - win.offsetTop;
-    win.style.zIndex = 1000;
-  });
-
-  document.addEventListener("mouseup", ()=>{
-    isDown = false;
-  });
-
-  document.addEventListener("mousemove", (e)=>{
-    if(!isDown) return;
-    win.style.left = (e.clientX - offsetX) + "px";
-    win.style.top = (e.clientY - offsetY) + "px";
-  });
-});
+/* FILE */
+fileInput.onchange=function(){
+fileManagerContent.innerHTML="";
+for(const f of this.files){
+let d=document.createElement("div");
+d.className="file";
+d.textContent=f.name;
+fileManagerContent.appendChild(d);
+}
+};
 </script>
 
 </body>
