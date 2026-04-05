@@ -178,7 +178,14 @@ border:none;
 
 <div class="window" id="music">
 <div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+
 <input type="file" id="musicFile">
+
+<br><br>
+
+<input type="text" id="musicUrl" placeholder="Paste URL GitHub di sini">
+<button onclick="addMusicUrl()">Tambah dari URL</button>
+
 <audio id="player" controls></audio>
 <div id="musicList"></div>
 </div>
@@ -359,6 +366,27 @@ drops[i]++;
 requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
+
+function addMusicUrl(){
+  let url = document.getElementById("musicUrl").value;
+
+  if(!url){
+    alert("Masukkan URL dulu!");
+    return;
+  }
+
+  let name = prompt("Nama lagu:");
+  if(!name) return;
+
+  db.collection("files").add({
+    folder: "music",
+    name: name,
+    url: url
+  }).then(()=>{
+    alert("Lagu ditambahkan!");
+    loadMusic();
+  });
+  }
 </script>
 
 </body>
