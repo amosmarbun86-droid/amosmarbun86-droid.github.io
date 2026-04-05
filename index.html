@@ -2,12 +2,12 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V13 FINAL</title>
+<title>AMOS WEB OS V13 FINAL PERFECT</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
 
-<!-- FONT AWESOME -->
+<!-- ICON -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -20,6 +20,18 @@ color:#00ff9f;
 overflow:hidden;
 }
 
+/* MATRIX */
+#bgCanvas{
+position:fixed;
+top:0;
+left:0;
+width:100vw;
+height:100vh;
+z-index:0;
+pointer-events:none;
+}
+
+/* LOGIN */
 #login{
 position:fixed;
 width:100vw;
@@ -30,14 +42,6 @@ align-items:center;
 background:rgba(0,0,0,0.85);
 z-index:999;
 flex-direction:column;
-}
-
-#login input, #login button{
-padding:10px;
-margin:5px;
-background:black;
-border:1px solid #00ff9f;
-color:#0f0;
 }
 
 #desktop{
@@ -66,9 +70,7 @@ border-bottom:1px solid #003322;
 background:#001a12;
 }
 
-.side-item i{
-margin-right:8px;
-}
+.side-item i{margin-right:8px}
 
 /* WINDOW */
 .window{
@@ -116,22 +118,27 @@ flex-direction:column;
 }
 
 /* TERMINAL */
-textarea, #terminalOutput{
+textarea,#terminalOutput{
 width:100%;
 height:calc(100% - 30px);
 background:black;
 color:#0f0;
 border:none;
 }
+
+.file{padding:6px;border-bottom:1px solid #003322;cursor:pointer;}
+.file:hover{background:#001a12;}
 </style>
 </head>
 
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
 <!-- LOGIN -->
 <div id="login">
 <h2>AMOS LOGIN</h2>
-<input type="password" id="pass">
+<input type="password" id="pass" placeholder="PIN 123">
 <button onclick="login()">ENTER</button>
 </div>
 
@@ -141,45 +148,25 @@ border:none;
 <div id="sidebar">
 <h3>PROJECTS</h3>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
-<i class="fa-solid fa-camera"></i> Camera RCP
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> Camera RCP</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
-<i class="fa-solid fa-location-dot"></i> Fake GPS
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> Fake GPS</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
-<i class="fa-solid fa-user"></i> CV Amos
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> CV Amos</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
-<i class="fa-solid fa-folder"></i> Data Pribadi
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> Data Pribadi</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
-<i class="fa-solid fa-gear"></i> Admin Panel
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> Admin Panel</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
-<i class="fa-solid fa-coins"></i> SmartDebt
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> SmartDebt</div>
 
-<div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
-<i class="fa-solid fa-clock"></i> Alarm
-</div>
+<div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> Alarm</div>
 
-<div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
-<i class="fa-solid fa-calendar"></i> Jadwal
-</div>
+<div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> Jadwal</div>
 
-<div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">
-<i class="fa-solid fa-file"></i> Form
-</div>
+<div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')"><i class="fa-solid fa-file"></i> Form</div>
 
-<div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
-<i class="fa-brands fa-telegram"></i> Telegram Bot
-</div>
+<div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> Telegram Bot</div>
 
 <hr>
 
@@ -187,7 +174,6 @@ border:none;
 <div class="side-item" onclick="openApp('music')">Music</div>
 <div class="side-item" onclick="openApp('terminal')">Terminal</div>
 <div class="side-item" onclick="openApp('fileManager')">File Manager</div>
-
 </div>
 
 <div id="workspace">
@@ -207,11 +193,16 @@ border:none;
 <div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
 <input type="file" id="musicFile">
 <audio id="player" controls></audio>
+<div id="musicList"></div>
 </div>
 
 <div class="window" id="fileManager">
 <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
-<input type="file" id="fileInput" multiple>
+
+<button onclick="switchFolder('note')">📁 Note</button>
+<button onclick="switchFolder('webos')">📁 WebOS</button>
+<button onclick="createFile()">➕ New</button>
+
 <div id="fileManagerContent"></div>
 </div>
 
@@ -227,11 +218,24 @@ border:none;
 <div onclick="openApp('music')">Music</div>
 <div onclick="openApp('terminal')">Terminal</div>
 <div onclick="openApp('fileManager')">File Manager</div>
+<div onclick="toggleBgEffect()">Toggle Matrix</div>
 </div>
 
 </div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+apiKey:"AIza...",
+authDomain:"amos-web-os.firebaseapp.com",
+projectId:"amos-web-os"
+};
+firebase.initializeApp(firebaseConfig);
+const db=firebase.firestore();
+
 "use strict";
 
 const pass=document.getElementById("pass");
@@ -242,6 +246,8 @@ function login(){
 if(pass.value==="123"){
 loginBox.style.display="none";
 desktop.style.display="flex";
+loadFiles();
+loadMusic();
 }else alert("PIN salah");
 }
 
@@ -250,6 +256,8 @@ let w=document.getElementById(id);
 w.style.display="block";
 w.style.left=Math.random()*200+"px";
 w.style.top=Math.random()*150+"px";
+if(id==="fileManager") loadFiles();
+if(id==="music") loadMusic();
 }
 
 function closeApp(id){
@@ -260,6 +268,7 @@ function openExternal(url){
 window.open(url,"_blank");
 }
 
+/* TERMINAL */
 const cmdInput=document.getElementById("cmdInput");
 const terminalOutput=document.getElementById("terminalOutput");
 
@@ -273,19 +282,112 @@ cmdInput.value="";
 }
 });
 
-setInterval(()=>{
-clock.innerHTML=new Date().toLocaleTimeString();
-},1000);
+/* CLOCK */
+setInterval(()=>{clock.innerHTML=new Date().toLocaleTimeString();},1000);
 
+/* START */
 function toggleStart(){
-startMenu.style.display = startMenu.style.display==="flex"?"none":"flex";
+startMenu.style.display=startMenu.style.display==="flex"?"none":"flex";
 }
 
-document.addEventListener("click",(e)=>{
-if(!startMenu.contains(e.target)){
-startMenu.style.display="none";
+/* MATRIX */
+const canvas=document.getElementById("bgCanvas");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 }
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+let columns=canvas.width/20;
+let drops=[];
+for(let i=0;i<columns;i++)drops[i]=1;
+let showMatrix=true;
+
+function toggleBgEffect(){showMatrix=!showMatrix;}
+
+function drawMatrix(){
+if(!showMatrix){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+requestAnimationFrame(drawMatrix);
+return;
+}
+ctx.fillStyle="rgba(0,0,0,0.05)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#0f0";
+ctx.font="15px monospace";
+
+for(let i=0;i<drops.length;i++){
+let text=String.fromCharCode(33+Math.random()*94);
+ctx.fillText(text,i*20,drops[i]*20);
+if(drops[i]*20>canvas.height) drops[i]=0;
+drops[i]++;
+}
+requestAnimationFrame(drawMatrix);
+}
+drawMatrix();
+
+/* FILE MANAGER */
+let currentFolder="note";
+function loadFiles(){
+fileManagerContent.innerHTML="Folder: "+currentFolder+"<hr>";
+db.collection("files").where("folder","==",currentFolder).get().then(snap=>{
+snap.forEach(doc=>{
+let d=doc.data();
+let div=document.createElement("div");
+div.className="file";
+div.textContent=d.name;
+div.onclick=()=>{
+let isi=prompt("Edit file:",d.content);
+if(isi!==null){
+db.collection("files").doc(doc.id).update({content:isi});
+}
+};
+fileManagerContent.appendChild(div);
 });
+});
+}
+
+function createFile(){
+let name=prompt("Nama file:");
+let content=prompt("Isi:");
+if(!name)return;
+db.collection("files").add({
+folder:currentFolder,name,content
+}).then(loadFiles);
+}
+
+function switchFolder(f){
+currentFolder=f;
+loadFiles();
+}
+
+/* MUSIC */
+musicFile.onchange=function(){
+const file=this.files[0];
+if(file){
+player.src=URL.createObjectURL(file);
+player.play();
+}
+};
+
+function loadMusic(){
+musicList.innerHTML="";
+db.collection("files").where("folder","==","music").get().then(snap=>{
+snap.forEach(doc=>{
+let d=doc.data();
+let div=document.createElement("div");
+div.textContent="▶ "+d.name;
+div.onclick=()=>{
+player.src=d.url;
+player.play();
+};
+musicList.appendChild(div);
+});
+});
+}
 </script>
 
 </body>
