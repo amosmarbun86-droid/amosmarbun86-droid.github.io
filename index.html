@@ -7,7 +7,6 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
 
-<!-- ICON -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 <style>
@@ -117,7 +116,6 @@ display:none;
 flex-direction:column;
 }
 
-/* TERMINAL */
 textarea,#terminalOutput{
 width:100%;
 height:calc(100% - 30px);
@@ -135,37 +133,26 @@ border:none;
 
 <canvas id="bgCanvas"></canvas>
 
-<!-- LOGIN -->
 <div id="login">
 <h2>AMOS LOGIN</h2>
 <input type="password" id="pass" placeholder="PIN 123">
 <button onclick="login()">ENTER</button>
 </div>
 
-<!-- DESKTOP -->
 <div id="desktop">
 
 <div id="sidebar">
 <h3>PROJECTS</h3>
 
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> Camera RCP</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> Fake GPS</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> CV Amos</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> Data Pribadi</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> Admin Panel</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> SmartDebt</div>
-
 <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> Alarm</div>
-
 <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> Jadwal</div>
-
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')"><i class="fa-solid fa-file"></i> Form</div>
-
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> Telegram Bot</div>
 
 <hr>
@@ -198,11 +185,9 @@ border:none;
 
 <div class="window" id="fileManager">
 <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
-
 <button onclick="switchFolder('note')">📁 Note</button>
 <button onclick="switchFolder('webos')">📁 WebOS</button>
 <button onclick="createFile()">➕ New</button>
-
 <div id="fileManagerContent"></div>
 </div>
 
@@ -223,7 +208,6 @@ border:none;
 
 </div>
 
-<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -236,7 +220,13 @@ projectId:"amos-web-os"
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-"use strict";
+/* FIX VARIABLE (WAJIB) */
+const player = document.getElementById("player");
+const musicList = document.getElementById("musicList");
+const musicFile = document.getElementById("musicFile");
+const fileManagerContent = document.getElementById("fileManagerContent");
+const clock = document.getElementById("clock");
+const startMenu = document.getElementById("startMenu");
 
 const pass=document.getElementById("pass");
 const desktop=document.getElementById("desktop");
@@ -268,19 +258,60 @@ function openExternal(url){
 window.open(url,"_blank");
 }
 
-/* TERMINAL */
-const cmdInput=document.getElementById("cmdInput");
-const terminalOutput=document.getElementById("terminalOutput");
+/* MUSIC FIXED */
+function loadMusic(){
+musicList.innerHTML="";
+db.collection("files").where("folder","==","music").get().then(snap=>{
+snap.forEach(doc=>{
+let d=doc.data();
+let div=document.createElement("div");
+div.textContent="▶ "+d.name;
 
-cmdInput.addEventListener("keydown",(e)=>{
-if(e.key==="Enter"){
-let cmd=cmdInput.value;
-if(cmd==="help") terminalOutput.innerHTML+="<br>help,time,clear";
-else if(cmd==="time") terminalOutput.innerHTML+="<br>"+new Date();
-else if(cmd==="clear") terminalOutput.innerHTML="";
-cmdInput.value="";
-}
+div.onclick=()=>{
+player.src = d.url;
+player.load();
+player.oncanplay = () => player.play();
+};
+
+musicList.appendChild(div);
 });
+});
+}
+
+musicFile.onchange=function(){
+const file=this.files[0];
+if(file){
+player.src=URL.createObjectURL(file);
+player.play();
+}
+};
+
+/* FILE MANAGER */
+let currentFolder="note";
+function loadFiles(){
+fileManagerContent.innerHTML="Folder: "+currentFolder+"<hr>";
+db.collection("files").where("folder","==",currentFolder).get().then(snap=>{
+snap.forEach(doc=>{
+let d=doc.data();
+let div=document.createElement("div");
+div.className="file";
+div.textContent=d.name;
+fileManagerContent.appendChild(div);
+});
+});
+}
+
+function createFile(){
+let name=prompt("Nama file:");
+let content=prompt("Isi:");
+if(!name)return;
+db.collection("files").add({folder:currentFolder,name,content}).then(loadFiles);
+}
+
+function switchFolder(f){
+currentFolder=f;
+loadFiles();
+}
 
 /* CLOCK */
 setInterval(()=>{clock.innerHTML=new Date().toLocaleTimeString();},1000);
@@ -328,68 +359,6 @@ drops[i]++;
 requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
-
-/* FILE MANAGER */
-let currentFolder="note";
-function loadFiles(){
-fileManagerContent.innerHTML="Folder: "+currentFolder+"<hr>";
-db.collection("files").where("folder","==",currentFolder).get().then(snap=>{
-snap.forEach(doc=>{
-let d=doc.data();
-let div=document.createElement("div");
-div.className="file";
-div.textContent=d.name;
-div.onclick=()=>{
-let isi=prompt("Edit file:",d.content);
-if(isi!==null){
-db.collection("files").doc(doc.id).update({content:isi});
-}
-};
-fileManagerContent.appendChild(div);
-});
-});
-}
-
-function createFile(){
-let name=prompt("Nama file:");
-let content=prompt("Isi:");
-if(!name)return;
-db.collection("files").add({
-folder:currentFolder,name,content
-}).then(loadFiles);
-}
-
-function switchFolder(f){
-currentFolder=f;
-loadFiles();
-}
-
-/* MUSIC */
-musicFile.onchange=function(){
-const file=this.files[0];
-if(file){
-player.src=URL.createObjectURL(file);
-player.play();
-}
-};
-
-function loadMusic(){
-musicList.innerHTML="";
-db.collection("files").where("folder","==","music").get().then(snap=>{
-snap.forEach(doc=>{
-let d=doc.data();
-let div=document.createElement("div");
-div.textContent="▶ "+d.name;
-
-div.onclick=()=>{
-player.src = d.url;
-player.load(); // penting!
-};
-
-musicList.appendChild(div);
-});
-});
-}
 </script>
 
 </body>
