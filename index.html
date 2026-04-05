@@ -186,6 +186,10 @@ border:none;
 <input type="text" id="musicUrl" placeholder="Paste URL GitHub di sini">
 <button onclick="addMusicUrl()">Tambah dari URL</button>
 
+<br><br>
+<button onclick="loadMusic()">🎵 Music</button>
+<button onclick="loadTrash()">🗑️ Trash</button>
+
 <audio id="player" controls></audio>
 <div id="musicList"></div>
 </div>
@@ -215,6 +219,15 @@ border:none;
 
 </div>
 
+<!-- POPUP -->
+<div id="confirmBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;justify-content:center;align-items:center;">
+<div style="background:black;padding:20px;border:1px solid #00ff9f">
+<p id="confirmText"></p>
+<button onclick="confirmYes()">YES</button>
+<button onclick="confirmNo()">NO</button>
+</div>
+</div>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
@@ -227,13 +240,12 @@ projectId:"amos-web-os"
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-/* FIX VARIABLE (WAJIB) */
-const player = document.getElementById("player");
-const musicList = document.getElementById("musicList");
-const musicFile = document.getElementById("musicFile");
-const fileManagerContent = document.getElementById("fileManagerContent");
-const clock = document.getElementById("clock");
-const startMenu = document.getElementById("startMenu");
+const player=document.getElementById("player");
+const musicList=document.getElementById("musicList");
+const musicFile=document.getElementById("musicFile");
+const fileManagerContent=document.getElementById("fileManagerContent");
+const clock=document.getElementById("clock");
+const startMenu=document.getElementById("startMenu");
 
 const pass=document.getElementById("pass");
 const desktop=document.getElementById("desktop");
@@ -251,8 +263,6 @@ loadMusic();
 function openApp(id){
 let w=document.getElementById(id);
 w.style.display="block";
-w.style.left=Math.random()*200+"px";
-w.style.top=Math.random()*150+"px";
 if(id==="fileManager") loadFiles();
 if(id==="music") loadMusic();
 }
@@ -265,20 +275,46 @@ function openExternal(url){
 window.open(url,"_blank");
 }
 
-/* MUSIC FIXED */
+/* MUSIC PRO */
 function loadMusic(){
 musicList.innerHTML="";
 db.collection("files").where("folder","==","music").get().then(snap=>{
 snap.forEach(doc=>{
 let d=doc.data();
 let div=document.createElement("div");
-div.textContent="▶ "+d.name;
+
+div.innerHTML=`▶ ${d.name}
+<button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
+<button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>`;
 
 div.onclick=()=>{
-player.src = d.url;
-player.load();
-player.oncanplay = () => player.play();
+player.src=d.url;
+player.play();
 };
+
+/* SWIPE */
+let startX=0;
+div.addEventListener("touchstart",e=>{startX=e.touches[0].clientX});
+div.addEventListener("touchend",e=>{
+let endX=e.changedTouches[0].clientX;
+if(startX-endX>100) deleteMusic(doc.id);
+});
+
+musicList.appendChild(div);
+});
+});
+}
+
+function loadTrash(){
+musicList.innerHTML="";
+db.collection("files").where("folder","==","trash").get().then(snap=>{
+snap.forEach(doc=>{
+let d=doc.data();
+let div=document.createElement("div");
+
+div.innerHTML=`🗑️ ${d.name}
+<button onclick="restoreMusic('${doc.id}')">♻️</button>
+<button onclick="deletePermanent('${doc.id}')">🔥</button>`;
 
 musicList.appendChild(div);
 });
@@ -293,7 +329,37 @@ player.play();
 }
 };
 
-/* FILE MANAGER */
+function addMusicUrl(){
+let url=document.getElementById("musicUrl").value;
+if(!url)return alert("Masukkan URL");
+let name=prompt("Nama lagu:");
+if(!name)return;
+db.collection("files").add({folder:"music",name,url}).then(loadMusic);
+}
+
+function editMusic(id,name){
+let n=prompt("Edit:",name);
+if(!n)return;
+db.collection("files").doc(id).update({name:n}).then(loadMusic);
+}
+
+function deleteMusic(id){
+showConfirm("Ke Trash?",()=>{
+db.collection("files").doc(id).update({folder:"trash"}).then(loadMusic);
+});
+}
+
+function restoreMusic(id){
+db.collection("files").doc(id).update({folder:"music"}).then(loadMusic);
+}
+
+function deletePermanent(id){
+showConfirm("Hapus permanen?",()=>{
+db.collection("files").doc(id).delete().then(loadMusic);
+});
+}
+
+/* FILE MANAGER (tetap) */
 let currentFolder="note";
 function loadFiles(){
 fileManagerContent.innerHTML="Folder: "+currentFolder+"<hr>";
@@ -328,7 +394,7 @@ function toggleStart(){
 startMenu.style.display=startMenu.style.display==="flex"?"none":"flex";
 }
 
-/* MATRIX */
+/* MATRIX (tetap) */
 const canvas=document.getElementById("bgCanvas");
 const ctx=canvas.getContext("2d");
 
@@ -367,26 +433,15 @@ requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
 
-function addMusicUrl(){
-  let url = document.getElementById("musicUrl").value;
-
-  if(!url){
-    alert("Masukkan URL dulu!");
-    return;
-  }
-
-  let name = prompt("Nama lagu:");
-  if(!name) return;
-
-  db.collection("files").add({
-    folder: "music",
-    name: name,
-    url: url
-  }).then(()=>{
-    alert("Lagu ditambahkan!");
-    loadMusic();
-  });
-  }
+/* CONFIRM */
+let confirmCallback=null;
+function showConfirm(text,cb){
+confirmCallback=cb;
+document.getElementById("confirmText").innerText=text;
+document.getElementById("confirmBox").style.display="flex";
+}
+function confirmYes(){if(confirmCallback)confirmCallback();confirmBox.style.display="none";}
+function confirmNo(){confirmBox.style.display="none";}
 </script>
 
 </body>
