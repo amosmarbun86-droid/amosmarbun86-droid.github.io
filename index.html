@@ -380,10 +380,12 @@ snap.forEach(doc=>{
 let d=doc.data();
 let div=document.createElement("div");
 div.textContent="▶ "+d.name;
+
 div.onclick=()=>{
-player.src=d.url;
-player.play();
+player.src = d.url;
+player.load(); // penting!
 };
+
 musicList.appendChild(div);
 });
 });
