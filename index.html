@@ -630,6 +630,11 @@ if(aiBusy) return;
 aiBusy=true;
 
 printTerminal("You: "+question);
+
+/* 🔥 EXECUTE LOCAL INTENT DULU */
+aiBrain(question);
+aiControl(question);
+
 printTerminal("AI thinking...");
 
 try{
