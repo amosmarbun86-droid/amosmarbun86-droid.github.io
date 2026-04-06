@@ -488,7 +488,7 @@ const res = await fetch("https://api.affiliateplus.xyz/api/chatbot?message="
 
 const data = await res.json();
 
-let reply = data.message;
+let reply = data.message || "AI tidak merespon.";
 
 printTerminal("AI: "+reply);
 
