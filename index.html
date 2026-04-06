@@ -484,57 +484,36 @@ function confirmNo(){confirmBox.style.display="none";}
 
 
 
-/* =========================
-   AI TERMINAL ENGINE FIXED
-========================= */
+<script>
+
+/* =====================================
+   AMOS AI OS — FINAL GOD MODE
+   Compatible with V13 PERFECT
+===================================== */
 
 let aiBusy=false;
 
-async function askAI(question){
+let aiMemory={
+name:null
+};
 
-if(aiBusy) return;
-aiBusy=true;
 
-printTerminal("You: "+question);
-printTerminal("AI thinking...");
+/* ========= TERMINAL OUTPUT ========= */
 
-try{
+function printTerminal(text){
 
-const res = await fetch(
-"https://api.affiliateplus.xyz/api/chatbot?message="
-+encodeURIComponent(question)
-);
+const out=document.getElementById("terminalOutput");
 
-if(!res.ok) throw new Error("Server offline");
+const line=document.createElement("div");
+line.innerHTML=text;
 
-const data = await res.json();
-
-let reply = data.message || localAI(question);
-
-printTerminal("AI: "+reply);
-
-aiControl(question);
-aiControl(reply);
-
-}catch(e){
-
-console.log("Public AI failed → Local AI active");
-
-let reply = localAI(question);
-
-printTerminal("AI(Local): "+reply);
-
-aiControl(reply);
+out.appendChild(line);
+out.scrollTop=out.scrollHeight;
 
 }
 
-aiBusy=false;
-}
 
-
-/* =========================
-   LOCAL AI BACKUP
-========================= */
+/* ========= LOCAL AI BACKUP ========= */
 
 function localAI(text){
 
@@ -546,64 +525,165 @@ return "Halo 👋 AMOS AI siap membantu.";
 if(text.includes("siapa kamu"))
 return "Saya AMOS AI Terminal V13.";
 
-if(text.includes("terima kasih"))
-return "Sama-sama.";
-
 if(text.includes("status"))
-return "AMOS WEB OS berjalan normal.";
+return "✅ AMOS WEB OS berjalan normal.";
 
 return "Perintah diterima.";
 }
 
 
-/* PRINT TERMINAL */
+/* ========= STEP 3 — AI BRAIN ========= */
 
-function printTerminal(text){
+function aiBrain(text){
 
-const out=document.getElementById("terminalOutput");
+text=text.toLowerCase();
 
-out.innerHTML += text+"<br>";
-out.scrollTop=out.scrollHeight;
+/* MEMORY SAVE */
+if(text.includes("ingat nama saya")){
 
+let name=text.replace("ingat nama saya","").trim();
+
+if(name){
+aiMemory.name=name;
+printTerminal("AI: Baik, saya ingat nama kamu "+name);
+}
+return true;
+}
+
+/* MEMORY READ */
+if(text.includes("nama saya siapa")){
+if(aiMemory.name)
+printTerminal("AI: Nama kamu "+aiMemory.name);
+else
+printTerminal("AI: Saya belum tahu nama kamu.");
+return true;
+}
+
+/* STATUS */
+if(text.includes("status")){
+printTerminal("AI: ✅ Sistem berjalan normal.");
+return true;
+}
+
+/* MUSIC INTENT */
+if(text.includes("musik") || text.includes("lagu")){
+openApp("music");
+printTerminal("AI: Membuka Music Player 🎵");
+return true;
+}
+
+/* NOTES INTENT */
+if(text.includes("notes") || text.includes("catatan")){
+openApp("notes");
+printTerminal("AI: Membuka Notes 📝");
+return true;
+}
+
+/* TERMINAL */
+if(text.includes("terminal")){
+openApp("terminal");
+return true;
+}
+
+/* MATRIX */
+if(text.includes("matrix off") || text.includes("matikan matrix")){
+toggleBgEffect();
+printTerminal("AI: Matrix dimatikan.");
+return true;
+}
+
+return false;
 }
 
 
-
-
-
-/* =========================
-   AI CONTROL OS
-========================= */
+/* ========= STEP 2 — CONTROL OS ========= */
 
 function aiControl(text){
 
 text=text.toLowerCase();
 
-/* OPEN APP */
 if(text.includes("buka notes"))
 openApp("notes");
 
-else if(text.includes("buka music") || text.includes("musik"))
+else if(text.includes("buka music"))
 openApp("music");
 
 else if(text.includes("buka terminal"))
 openApp("terminal");
 
-else if(text.includes("file"))
+else if(text.includes("buka file"))
 openApp("fileManager");
 
-/* CLOSE APP */
 else if(text.includes("tutup notes"))
 closeApp("notes");
 
 else if(text.includes("tutup terminal"))
 closeApp("terminal");
 
-/* MATRIX CONTROL */
-else if(text.includes("matrix off") || text.includes("matikan matrix"))
-toggleBgEffect();
+}
+
+
+/* ========= AI ENGINE ========= */
+
+async function askAI(question){
+
+if(aiBusy) return;
+aiBusy=true;
+
+printTerminal("You: "+question);
+printTerminal("AI thinking...");
+
+try{
+
+const res=await fetch(
+"https://api.affiliateplus.xyz/api/chatbot?message="
++encodeURIComponent(question)
+);
+
+if(!res.ok) throw new Error("offline");
+
+const data=await res.json();
+
+let reply=data.message || localAI(question);
+
+printTerminal("AI: "+reply);
+
+/* GOD MODE EXECUTION */
+if(!aiBrain(question)) aiControl(question);
+if(!aiBrain(reply)) aiControl(reply);
+
+}catch(e){
+
+let reply=localAI(question);
+
+printTerminal("AI(Local): "+reply);
+
+if(!aiBrain(reply)) aiControl(reply);
 
 }
+
+aiBusy=false;
+
+}
+
+
+/* ========= AUTO TERMINAL AI ========= */
+
+document.getElementById("cmdInput")
+.addEventListener("keydown",function(e){
+
+if(e.key==="Enter"){
+
+let cmd=this.value.trim();
+this.value="";
+
+if(cmd!==""){
+askAI(cmd);
+}
+
+}
+
+});
 
 
 </script>
