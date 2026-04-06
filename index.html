@@ -486,9 +486,10 @@ function confirmNo(){confirmBox.style.display="none";}
 
 
 
+
+
 /* =====================================
-   AMOS AI OS — FINAL GOD MODE
-   Compatible with V13 PERFECT
+   AMOS AI OS — FINAL STABLE BUILD V13
 ===================================== */
 
 let aiBusy=false;
@@ -497,19 +498,18 @@ let aiMemory={
 name:null
 };
 
-
 /* ========= TERMINAL OUTPUT ========= */
 
 function printTerminal(text){
 
 const out=document.getElementById("terminalOutput");
+if(!out) return;
 
 const line=document.createElement("div");
 line.innerHTML=text;
 
 out.appendChild(line);
 out.scrollTop=out.scrollHeight;
-
 }
 
 
@@ -532,7 +532,7 @@ return "Perintah diterima.";
 }
 
 
-/* ========= STEP 3 — AI BRAIN ========= */
+/* ========= AI BRAIN (INTENT SYSTEM) ========= */
 
 function aiBrain(text){
 
@@ -547,7 +547,7 @@ if(name){
 aiMemory.name=name;
 printTerminal("AI: Baik, saya ingat nama kamu "+name);
 }
-return true;
+return;
 }
 
 /* MEMORY READ */
@@ -556,47 +556,46 @@ if(aiMemory.name)
 printTerminal("AI: Nama kamu "+aiMemory.name);
 else
 printTerminal("AI: Saya belum tahu nama kamu.");
-return true;
+return;
 }
 
 /* STATUS */
 if(text.includes("status")){
 printTerminal("AI: ✅ Sistem berjalan normal.");
-return true;
+return;
 }
 
-/* MUSIC INTENT */
+/* MUSIC */
 if(text.includes("musik") || text.includes("lagu")){
 openApp("music");
 printTerminal("AI: Membuka Music Player 🎵");
-return true;
+return;
 }
 
-/* NOTES INTENT */
+/* NOTES */
 if(text.includes("notes") || text.includes("catatan")){
 openApp("notes");
 printTerminal("AI: Membuka Notes 📝");
-return true;
+return;
 }
 
 /* TERMINAL */
 if(text.includes("terminal")){
 openApp("terminal");
-return true;
+return;
 }
 
 /* MATRIX */
 if(text.includes("matrix off") || text.includes("matikan matrix")){
 toggleBgEffect();
 printTerminal("AI: Matrix dimatikan.");
-return true;
+return;
 }
 
-return false;
 }
 
 
-/* ========= STEP 2 — CONTROL OS ========= */
+/* ========= OS CONTROL ========= */
 
 function aiControl(text){
 
@@ -648,29 +647,43 @@ let reply=data.message || localAI(question);
 
 printTerminal("AI: "+reply);
 
-/* GOD MODE EXECUTION */
-if(!aiBrain(question)) aiControl(question);
-if(!aiBrain(reply)) aiControl(reply);
+/* EXECUTION */
+aiBrain(question);
+aiBrain(reply);
+
+aiControl(question);
+aiControl(reply);
 
 }catch(e){
+
+console.log("Public AI gagal → Local aktif");
 
 let reply=localAI(question);
 
 printTerminal("AI(Local): "+reply);
 
-if(!aiBrain(reply)) aiControl(reply);
+aiBrain(reply);
+aiControl(reply);
 
 }
 
 aiBusy=false;
 
+/* AUTO FOCUS */
+document.getElementById("cmdInput").focus();
+
 }
 
 
-/* ========= AUTO TERMINAL AI ========= */
+/* ========= TERMINAL LISTENER (SAFE LOAD) ========= */
 
-document.getElementById("cmdInput")
-.addEventListener("keydown",function(e){
+window.addEventListener("DOMContentLoaded",()=>{
+
+const input=document.getElementById("cmdInput");
+
+if(!input) return;
+
+input.addEventListener("keydown",function(e){
 
 if(e.key==="Enter"){
 
@@ -684,6 +697,8 @@ askAI(cmd);
 }
 
 });
+
+}); // ← PENUTUP DOMContentLoaded
 
 
 </script>
