@@ -482,8 +482,10 @@ function confirmNo(){confirmBox.style.display="none";}
 <script>
 
 
+
+
 /* =========================
-   AI TERMINAL ENGINE V1
+   AI TERMINAL ENGINE FIXED
 ========================= */
 
 let aiBusy=false;
@@ -503,9 +505,11 @@ const res = await fetch(
 +encodeURIComponent(question)
 );
 
+if(!res.ok) throw new Error("Server offline");
+
 const data = await res.json();
 
-let reply = data.message || "AI online.";
+let reply = data.message || localAI(question);
 
 printTerminal("AI: "+reply);
 
@@ -514,11 +518,13 @@ aiControl(reply);
 
 }catch(e){
 
-let fakeReply = localAI(question);
+console.log("Public AI failed → Local AI active");
 
-printTerminal("AI: "+fakeReply);
+let reply = localAI(question);
 
-aiControl(fakeReply);
+printTerminal("AI(Local): "+reply);
+
+aiControl(reply);
 
 }
 
@@ -526,7 +532,11 @@ aiBusy=false;
 }
 
 
- function localAI(text){
+/* =========================
+   LOCAL AI BACKUP
+========================= */
+
+function localAI(text){
 
 text=text.toLowerCase();
 
@@ -534,25 +544,19 @@ if(text.includes("halo"))
 return "Halo 👋 AMOS AI siap membantu.";
 
 if(text.includes("siapa kamu"))
-return "Saya AMOS AI Terminal.";
+return "Saya AMOS AI Terminal V13.";
 
 if(text.includes("terima kasih"))
 return "Sama-sama.";
 
+if(text.includes("status"))
+return "AMOS WEB OS berjalan normal.";
+
 return "Perintah diterima.";
 }
-/* STEP 2 CONTROL */
-aiControl(question);
-aiControl(reply);
-
-}catch(e){
-console.error(e);
-printTerminal("AI ERROR: "+e.message);
-}
-
-}
 
 
+/* PRINT TERMINAL */
 
 function printTerminal(text){
 
@@ -562,6 +566,8 @@ out.innerHTML += text+"<br>";
 out.scrollTop=out.scrollHeight;
 
 }
+
+
 
 
 
