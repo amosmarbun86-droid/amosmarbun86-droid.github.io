@@ -486,32 +486,61 @@ function confirmNo(){confirmBox.style.display="none";}
    AI TERMINAL ENGINE V1
 ========================= */
 
+let aiBusy=false;
+
 async function askAI(question){
 
+if(aiBusy) return;
+aiBusy=true;
+
 printTerminal("You: "+question);
+printTerminal("AI thinking...");
 
 try{
 
 const res = await fetch(
-"https://api.affiliateplus.xyz/api/chatbot",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-message: question,
-name:"AMOS",
-owner:"AMOS"
-})
-});
+"https://api.affiliateplus.xyz/api/chatbot?message="
++encodeURIComponent(question)
+);
 
 const data = await res.json();
 
-let reply = data.message || "AI tidak merespon.";
+let reply = data.message || "AI online.";
 
 printTerminal("AI: "+reply);
 
+aiControl(question);
+aiControl(reply);
+
+}catch(e){
+
+let fakeReply = localAI(question);
+
+printTerminal("AI: "+fakeReply);
+
+aiControl(fakeReply);
+
+}
+
+aiBusy=false;
+}
+
+
+ function localAI(text){
+
+text=text.toLowerCase();
+
+if(text.includes("halo"))
+return "Halo 👋 AMOS AI siap membantu.";
+
+if(text.includes("siapa kamu"))
+return "Saya AMOS AI Terminal.";
+
+if(text.includes("terima kasih"))
+return "Sama-sama.";
+
+return "Perintah diterima.";
+}
 /* STEP 2 CONTROL */
 aiControl(question);
 aiControl(reply);
