@@ -287,10 +287,20 @@ loadMusic();
 }
 
 function openApp(id){
+
 let w=document.getElementById(id);
 w.style.display="block";
+
 if(id==="fileManager") loadFiles();
 if(id==="music") loadMusic();
+
+/* AUTO FOCUS TERMINAL */
+if(id==="terminal"){
+setTimeout(()=>{
+document.getElementById("cmdInput").focus();
+},300);
+}
+
 }
 
 function closeApp(id){
