@@ -492,9 +492,19 @@ printTerminal("You: "+question);
 
 try{
 
-const res = await fetch("https://api.affiliateplus.xyz/api/chatbot?message="
-+encodeURIComponent(question)
-+"&name=AMOS&owner=AMOS");
+const res = await fetch(
+"https://api.affiliateplus.xyz/api/chatbot",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+message: question,
+name:"AMOS",
+owner:"AMOS"
+})
+});
 
 const data = await res.json();
 
@@ -507,7 +517,8 @@ aiControl(question);
 aiControl(reply);
 
 }catch(e){
-printTerminal("AI ERROR");
+console.error(e);
+printTerminal("AI ERROR: "+e.message);
 }
 
 }
