@@ -350,10 +350,12 @@ function loadMusic(){
 musicList.innerHTML="";
 musicData = []; // 🔥 WAJIB;
 db.collection("files").where("folder","==","music").get().then(snap=>{
-snap.forEach((doc, index)=>{
+let i = 0;
+
+snap.forEach(doc=>{
 let d = doc.data();
 
-/* 🔥 SIMPAN KE ARRAY */
+/* simpan ke array */
 musicData.push({
 id: doc.id,
 name: d.name,
@@ -361,7 +363,7 @@ url: d.url,
 cover: d.cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC"
 });
 
-/* 🔥 BUAT UI */
+/* UI */
 let div = document.createElement("div");
 div.className = "music-item";
 
@@ -369,12 +371,16 @@ div.innerHTML = `▶ ${d.name}
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
 <button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>`;
 
-/* 🔥 PLAY VIA INDEX */
+/* 🔥 FIX INDEX */
+let current = i;
+
 div.onclick = ()=>{
-playMusic(index);
+playMusic(current);
 };
 
 musicList.appendChild(div);
+
+i++; // 🔥 naik manual
 });
 });
 }
@@ -441,7 +447,11 @@ db.collection("files").doc(id).delete().then(loadMusic);
 });
 }
 
-   function playMusic(i){
+ function playMusic(i){
+
+alert("INDEX: " + i);
+alert(JSON.stringify(musicData));
+
 currentIndex = i;
 
 let song = musicData[currentIndex];
