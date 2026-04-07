@@ -347,6 +347,7 @@ window.open(url,"_blank");
 /* MUSIC PRO */
 function loadMusic(){
 musicList.innerHTML="";
+musicData = []; // 🔥 WAJIB;
 db.collection("files").where("folder","==","music").get().then(snap=>{
 snap.forEach((doc, index)=>{
 let d = doc.data();
@@ -380,8 +381,16 @@ musicList.appendChild(div);
 function loadTrash(){
 musicList.innerHTML="";
 db.collection("files").where("folder","==","trash").get().then(snap=>{
-snap.forEach(doc=>{
-let d=doc.data();
+snap.forEach((doc, index)=>{
+let d = doc.data();
+
+/* 🔥 SIMPAN DATA */
+musicData.push({
+id: doc.id,
+name: d.name,
+url: d.url,
+cover: d.cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC"
+});
 let div=document.createElement("div");
 
 div.innerHTML=`🗑️ ${d.name}
