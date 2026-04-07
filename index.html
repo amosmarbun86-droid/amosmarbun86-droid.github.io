@@ -202,21 +202,27 @@ printTerminal("> "+cmd);
 </script>
 </div>
 
-<div class="window" id="music">
-<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+<div style="text-align:center">
 
-<input type="file" id="musicFile">
+<img id="cover" src="" 
+style="width:100%;max-height:180px;object-fit:cover;border-radius:10px">
 
-<br><br>
+<h3 id="musicTitle">Tidak ada lagu</h3>
 
-<input type="text" id="musicUrl" placeholder="Paste URL GitHub di sini">
-<button onclick="addMusicUrl()">Tambah dari URL</button>
+<audio id="player" controls style="width:100%"></audio>
 
-<br><br>
-<button onclick="loadMusic()">🎵 Music</button>
-<button onclick="loadTrash()">🗑️ Trash</button>
+<div style="margin-top:10px">
+<button onclick="prevMusic()">⏮</button>
+<button onclick="nextMusic()">⏭</button>
+</div>
 
-<audio id="player" controls></audio>
+<p>🔊 Volume</p>
+<input type="range" id="volumeControl" min="0" max="100" value="80">
+
+</div>
+
+<hr>
+
 <div id="musicList"></div>
 </div>
 
