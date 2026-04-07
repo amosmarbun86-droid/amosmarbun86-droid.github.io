@@ -126,6 +126,26 @@ border:none;
 
 .file{padding:6px;border-bottom:1px solid #003322;cursor:pointer;}
 .file:hover{background:#001a12;}
+
+  /* MUSIC LIST STYLE */
+.music-item{
+padding:8px;
+border-bottom:1px solid #003322;
+cursor:pointer;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.music-item:hover{
+background:#001a12;
+}
+
+.music-item.active{
+background:#00ff9f22;
+color:#00ff9f;
+font-weight:bold;
+}
 </style>
 </head>
 
@@ -322,8 +342,8 @@ function loadMusic(){
 musicList.innerHTML="";
 db.collection("files").where("folder","==","music").get().then(snap=>{
 snap.forEach(doc=>{
-let d=doc.data();
-let div=document.createElement("div");
+let d=doc.data();let div=document.createElement("div");
+div.className="music-item";
 
 div.innerHTML=`▶ ${d.name}
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
@@ -401,6 +421,26 @@ db.collection("files").doc(id).delete().then(loadMusic);
 });
 }
 
+   function playMusic(i){
+currentIndex = i;
+
+let song = musicData[currentIndex];
+
+player.src = song.url;
+player.play();
+
+musicTitle.innerText = song.name;
+cover.src = song.cover;
+
+/* 🔥 HIGHLIGHT DI SINI */
+document.querySelectorAll(".music-item").forEach((el, index)=>{
+if(index === i){
+el.classList.add("active");
+}else{
+el.classList.remove("active");
+}
+});
+}
 /* FILE MANAGER (tetap) */
 let currentFolder="note";
 function loadFiles(){
