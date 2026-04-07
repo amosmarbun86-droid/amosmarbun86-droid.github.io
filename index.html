@@ -222,6 +222,9 @@ printTerminal("> "+cmd);
 </script>
 </div>
 
+<div class="window" id="music">
+<div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+
 <div style="text-align:center">
 
 <img id="cover" src="" 
@@ -293,6 +296,10 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
 const player=document.getElementById("player");
+let musicData = [];
+let currentIndex = 0;
+const musicTitle = document.getElementById("musicTitle");
+const cover = document.getElementById("cover");
 const musicList=document.getElementById("musicList");
 const musicFile=document.getElementById("musicFile");
 const fileManagerContent=document.getElementById("fileManagerContent");
@@ -341,26 +348,29 @@ window.open(url,"_blank");
 function loadMusic(){
 musicList.innerHTML="";
 db.collection("files").where("folder","==","music").get().then(snap=>{
-snap.forEach(doc=>{
-let d=doc.data();let div=document.createElement("div");
-div.className="music-item";
+snap.forEach((doc, index)=>{
+let d = doc.data();
 
-div.innerHTML=`▶ ${d.name}
+/* 🔥 SIMPAN KE ARRAY */
+musicData.push({
+id: doc.id,
+name: d.name,
+url: d.url,
+cover: d.cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC"
+});
+
+/* 🔥 BUAT UI */
+let div = document.createElement("div");
+div.className = "music-item";
+
+div.innerHTML = `▶ ${d.name}
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
 <button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>`;
 
-div.onclick=()=>{
-player.src=d.url;
-player.play();
+/* 🔥 PLAY VIA INDEX */
+div.onclick = ()=>{
+playMusic(index);
 };
-
-/* SWIPE */
-let startX=0;
-div.addEventListener("touchstart",e=>{startX=e.touches[0].clientX});
-div.addEventListener("touchend",e=>{
-let endX=e.changedTouches[0].clientX;
-if(startX-endX>100) deleteMusic(doc.id);
-});
 
 musicList.appendChild(div);
 });
