@@ -237,6 +237,8 @@ style="width:100%;max-height:180px;object-fit:cover;border-radius:10px">
 <div style="margin-top:10px">
 <button onclick="prevMusic()">⏮</button>
 <button onclick="nextMusic()">⏭</button>
+<br><br>
+<button onclick="toggleShuffle()">🔀 Shuffle</button>
 </div>
 
 <p>🔊 Volume</p>
@@ -298,6 +300,7 @@ const db=firebase.firestore();
 const player=document.getElementById("player");
 let musicData = [];
 let currentIndex = 0;
+let isShuffle = false;
 const musicTitle = document.getElementById("musicTitle");
 const cover = document.getElementById("cover");
 const musicList=document.getElementById("musicList");
@@ -447,13 +450,17 @@ db.collection("files").doc(id).delete().then(loadMusic);
 }
 
  function playMusic(i){
+/* =========================
+   🎵 PLAY MUSIC (FINAL SAFE)
+========================= */
+function playMusic(i){
 
 if(!musicData || musicData.length === 0){
 alert("Playlist kosong");
 return;
 }
 
-/* 🔥 batas aman index */
+/* batas aman index */
 if(i < 0 || i >= musicData.length){
 return;
 }
@@ -469,49 +476,75 @@ return;
 
 player.src = song.url;
 
-/* 🔥 autoplay fix (biar tidak error di browser) */
+/* autoplay fix */
 player.play().catch(()=>{
-console.log("Autoplay diblok");
+console.log("Autoplay diblok browser");
 });
 
 musicTitle.innerText = song.name || "Tanpa Judul";
-cover.src = song.cover || "https://via.placeholder.com/300x200";
 
-/* highlight */
+/* cover optional (tidak wajib ada) */
+if(typeof cover !== "undefined" && cover){
+cover.src = song.cover || "https://via.placeholder.com/300x200";
+}
+
+/* highlight lagu aktif */
 document.querySelectorAll(".music-item").forEach((el, index)=>{
 el.classList.toggle("active", index === currentIndex);
 });
 }
 
 
-/* NEXT */
+/* =========================
+   ⏭ NEXT (SUPPORT SHUFFLE)
+========================= */
 function nextMusic(){
 
 if(!musicData || musicData.length === 0) return;
 
-/* 🔥 versi lebih rapi */
+if(isShuffle){
+/* 🔀 RANDOM */
+currentIndex = Math.floor(Math.random() * musicData.length);
+}else{
+/* NORMAL LOOP */
 currentIndex = (currentIndex + 1) % musicData.length;
+}
 
 playMusic(currentIndex);
 }
 
 
-/* PREV */
+/* =========================
+   ⏮ PREV (STABIL)
+========================= */
 function prevMusic(){
 
 if(!musicData || musicData.length === 0) return;
 
-/* 🔥 versi lebih rapi */
+/* loop mundur */
 currentIndex = (currentIndex - 1 + musicData.length) % musicData.length;
 
 playMusic(currentIndex);
 }
 
 
-/* AUTO NEXT */
-player.addEventListener("ended", ()=>{
+/* =========================
+   🔀 SHUFFLE
+========================= */
+function toggleShuffle(){
+
+isShuffle = !isShuffle;
+
+alert("Shuffle: " + (isShuffle ? "ON 🔀" : "OFF"));
+}
+
+
+/* =========================
+   🔥 AUTO NEXT (FINAL)
+========================= */
+player.onended = function(){
 nextMusic();
-});
+};
 /* FILE MANAGER (tetap) */
 let currentFolder="note";
 function loadFiles(){
