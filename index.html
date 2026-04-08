@@ -449,28 +449,70 @@ db.collection("files").doc(id).delete().then(loadMusic);
 
  function playMusic(i){
 
-alert("INDEX: " + i);
-alert(JSON.stringify(musicData));
+if(!musicData || musicData.length === 0){
+alert("Playlist kosong");
+return;
+}
+
+/* 🔥 batas aman index */
+if(i < 0 || i >= musicData.length){
+return;
+}
 
 currentIndex = i;
 
 let song = musicData[currentIndex];
 
-player.src = song.url;
-player.play();
-
-musicTitle.innerText = song.name;
-cover.src = song.cover;
-
-/* 🔥 HIGHLIGHT DI SINI */
-document.querySelectorAll(".music-item").forEach((el, index)=>{
-if(index === i){
-el.classList.add("active");
-}else{
-el.classList.remove("active");
+if(!song){
+alert("Song error");
+return;
 }
+
+player.src = song.url;
+
+/* 🔥 autoplay fix (biar tidak error di browser) */
+player.play().catch(()=>{
+console.log("Autoplay diblok");
+});
+
+musicTitle.innerText = song.name || "Tanpa Judul";
+cover.src = song.cover || "https://via.placeholder.com/300x200";
+
+/* highlight */
+document.querySelectorAll(".music-item").forEach((el, index)=>{
+el.classList.toggle("active", index === currentIndex);
 });
 }
+
+
+/* NEXT */
+function nextMusic(){
+
+if(!musicData || musicData.length === 0) return;
+
+/* 🔥 versi lebih rapi */
+currentIndex = (currentIndex + 1) % musicData.length;
+
+playMusic(currentIndex);
+}
+
+
+/* PREV */
+function prevMusic(){
+
+if(!musicData || musicData.length === 0) return;
+
+/* 🔥 versi lebih rapi */
+currentIndex = (currentIndex - 1 + musicData.length) % musicData.length;
+
+playMusic(currentIndex);
+}
+
+
+/* AUTO NEXT */
+player.addEventListener("ended", ()=>{
+nextMusic();
+});
 /* FILE MANAGER (tetap) */
 let currentFolder="note";
 function loadFiles(){
