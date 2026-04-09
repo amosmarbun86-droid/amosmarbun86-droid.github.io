@@ -300,6 +300,7 @@ font-weight:bold;
 
 
 <hr>
+<hr>
 
 <div class="side-item" onclick="openApp('notes')">
     <i class="fa-solid fa-note-sticky"></i> Notes
@@ -312,9 +313,11 @@ font-weight:bold;
 <div class="side-item" onclick="openApp('music'); loadFavorites();">
     <i class="fa-solid fa-heart"></i> Favorit
 </div>
-<div class="side-item" onclick="loadPlaylists()">
+
+<div class="side-item" onclick="openApp('music'); loadPlaylists();">
     <i class="fa-solid fa-compact-disc"></i> Playlist
 </div>
+
 <div class="side-item" onclick="openApp('terminal')">
     <i class="fa-solid fa-terminal"></i> Terminal
 </div>
@@ -762,6 +765,85 @@ function addToPlaylist(id, name, url, cover) {
             alert("Gagal mengambil data playlist.");
         });
 }
+  /* =========================
+   📀 LOAD PLAYLIST SONGS
+========================= */
+function loadPlaylistSongs(playlistId, playlistName) {
+    musicList.innerHTML = `<h3>📀 Playlist: ${playlistName}</h3>`;
+    musicData = [];
+
+    db.collection("playlists")
+        .doc(playlistId)
+        .collection("songs")
+        .orderBy("addedAt", "desc")
+        .get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                musicList.innerHTML += "<p>Tidak ada lagu dalam playlist.</p>";
+                return;
+            }
+
+            let i = 0;
+
+            snapshot.forEach(doc => {
+                let d = doc.data();
+
+                musicData.push({
+                    id: doc.id,
+                    name: d.name,
+                    url: d.url,
+                    cover: d.cover
+                });
+
+                let div = document.createElement("div");
+                div.className = "music-item";
+
+                div.innerHTML = `
+                    <span class="music-title">▶ ${d.name}</span>
+                    <div class="music-actions">
+                        <button onclick="event.stopPropagation(); playMusic(${i})">▶</button>
+                    </div>
+                `;
+
+                div.onclick = () => playMusic(i);
+
+                musicList.appendChild(div);
+                i++;
+            });
+        })
+        .catch(error => {
+            console.error("Error memuat playlist:", error);
+        });
+  }                                               
+/* =========================
+   📀 LOAD PLAYLISTS
+========================= */
+function loadPlaylists() {
+    musicList.innerHTML = "<h3>📀 Daftar Playlist</h3>";
+
+    db.collection("playlists")
+        .orderBy("createdAt", "desc")
+        .get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                musicList.innerHTML += "<p>Belum ada playlist.</p>";
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                let d = doc.data();
+
+                let div = document.createElement("div");
+                div.className = "music-item";
+                div.innerHTML = `📀 ${d.name}`;
+
+                div.onclick = () =>
+                    loadPlaylistSongs(doc.id, d.name);
+
+                musicList.appendChild(div);
+            });
+        });
+  }
   /* =========================
    ❤️ FAVORITE SYSTEM
 ========================= */
