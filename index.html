@@ -690,39 +690,76 @@ function createPlaylist() {
         alert("Gagal membuat playlist.");
     });
   }
-/* =========================
-   📀 ADD TO PLAYLIST
+
+   /* =========================
+   📀 ADD TO PLAYLIST (DEBUG)
 ========================= */
 function addToPlaylist(id, name, url, cover) {
-    db.collection("playlists").get().then(snapshot => {
+    console.log("=== DEBUG ADD TO PLAYLIST ===");
+    console.log("Song ID:", id);
+    console.log("Song Name:", name);
+    console.log("Song URL:", url);
 
-        if (snapshot.empty) {
-            alert("Belum ada playlist. Buat terlebih dahulu.");
-            createPlaylist();
-            return;
-        }
+    db.collection("playlists")
+        .orderBy("createdAt", "asc")
+        .get()
+        .then(snapshot => {
 
-        let playlistArray = [];
+            console.log("Jumlah Playlist:", snapshot.size);
 
-        snapshot.forEach(doc => {
-            playlistArray.push({
-                id: doc.id,
-                name: doc.data().name
+            // Jika belum ada playlist
+            if (snapshot.empty) {
+                alert("Belum ada playlist. Buat terlebih dahulu.");
+                createPlaylist();
+                return;
+            }
+
+            let playlistArray = [];
+
+            snapshot.forEach(doc => {
+                console.log("Playlist ditemukan:", doc.data());
+
+                playlistArray.push({
+                    id: doc.id,
+                    name: doc.data().name
+                });
             });
-        });
 
-        // Tampilkan daftar playlist
-        let list = "Pilih Playlist:\n";
-        playlistArray.forEach((p, i) => {
-            list += `${i + 1}. ${p.name}\n`;
-        });
+            console.log("Isi playlistArray:", playlistArray);
 
-        let choice = prompt(list);
-        let index = parseInt(choice) - 1;
+            // Menampilkan daftar playlist
+            let listText = "Pilih Playlist:\n";
+            playlistArray.forEach((p, index) => {
+                listText += `${index + 1}. ${p.name}\n`;
+            });
 
-        if (playlistArray[index]) {
+            console.log("Prompt yang ditampilkan:\n" + listText);
+
+            let choice = prompt(listText);
+            console.log("Input pengguna:", choice);
+
+            // Jika pengguna menekan Cancel
+            if (choice === null) {
+                console.log("Pengguna membatalkan pilihan.");
+                return;
+            }
+
+            let index = parseInt(choice.trim(), 10);
+            console.log("Index terkonversi:", index);
+
+            // Validasi input
+            if (isNaN(index) || index < 1 || index > playlistArray.length) {
+                console.error("Pilihan tidak valid!");
+                alert("Pilihan tidak valid!");
+                return;
+            }
+
+            let selectedPlaylist = playlistArray[index - 1];
+            console.log("Playlist dipilih:", selectedPlaylist);
+
+            // Simpan lagu ke playlist
             db.collection("playlists")
-                .doc(playlistArray[index].id)
+                .doc(selectedPlaylist.id)
                 .collection("songs")
                 .add({
                     name: name,
@@ -731,15 +768,20 @@ function addToPlaylist(id, name, url, cover) {
                     addedAt: firebase.firestore.FieldValue.serverTimestamp()
                 })
                 .then(() => {
-                    alert(`Lagu ditambahkan ke playlist "${playlistArray[index].name}" 📀`);
+                    console.log("Lagu berhasil ditambahkan!");
+                    alert(`Lagu berhasil ditambahkan ke playlist "${selectedPlaylist.name}" 📀`);
+                })
+                .catch(error => {
+                    console.error("Error menambahkan lagu:", error);
+                    alert("Gagal menambahkan lagu ke playlist.");
                 });
-        } else {
-            alert("Pilihan tidak valid!");
-        }
-    }).catch(error => {
-        console.error("Error menambahkan ke playlist:", error);
-        alert("Terjadi kesalahan.");
-    });
+
+        })
+        .catch(error => {
+            console.error("Error mengambil playlist:", error);
+            alert("Gagal mengambil data playlist.");
+        });
+
   }
   /* =========================
    ❤️ FAVORITE SYSTEM
