@@ -341,7 +341,60 @@ projectId:"amos-web-os"
 firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
-const player=document.getElementById("player");
+const player = document.getElementById("player");
+
+/* =========================
+   🎼 PROGRESS BAR CONTROL
+========================= */
+const progressBar = document.getElementById("progressBar");
+const currentTimeEl = document.getElementById("currentTime");
+const durationEl = document.getElementById("duration");
+
+/* Format waktu */
+function formatTime(seconds) {
+    if (isNaN(seconds) || seconds === Infinity) return "0:00";
+
+    let minutes = Math.floor(seconds / 60);
+    let secs = Math.floor(seconds % 60);
+
+    return minutes + ":" + (secs < 10 ? "0" + secs : secs);
+}
+
+/* Pastikan elemen tersedia */
+if (player && progressBar && currentTimeEl && durationEl) {
+
+    /* Menampilkan durasi lagu */
+    player.addEventListener("loadedmetadata", () => {
+        durationEl.textContent = formatTime(player.duration);
+    });
+
+    /* Update progress secara real-time */
+    player.addEventListener("timeupdate", () => {
+        if (!isNaN(player.duration)) {
+            const progressPercent =
+                (player.currentTime / player.duration) * 100;
+
+            progressBar.value = progressPercent;
+            currentTimeEl.textContent = formatTime(player.currentTime);
+        }
+    });
+
+    /* Menggeser posisi lagu */
+    progressBar.addEventListener("input", () => {
+        if (!isNaN(player.duration)) {
+            player.currentTime =
+                (progressBar.value / 100) * player.duration;
+        }
+    });
+}
+
+/* Reset progress saat lagu selesai */
+player.addEventListener("ended", () => {
+    if (progressBar) progressBar.value = 0;
+    if (currentTimeEl) currentTimeEl.textContent = "0:00";
+});
+
+/* Variabel Music Player */
 let musicData = [];
 let currentIndex = 0;
 let isShuffle = false;
