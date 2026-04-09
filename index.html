@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>AMOS WEB OS V13 FINAL PERFECT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#00ff9f">
@@ -146,7 +147,26 @@ background:#00ff9f22;
 color:#00ff9f;
 font-weight:bold;
 }
+.music-actions button {
+    background: none;
+    border: none;
+    color: #00ff9f;
+    cursor: pointer;
+    margin-left: 6px;
+    font-size: 14px;
+}
 
+.music-actions button:hover {
+    transform: scale(1.15);
+    color: #ffffff;
+}
+
+.music-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 #progressContainer {
     display: flex;
     align-items: center;
@@ -157,20 +177,97 @@ font-weight:bold;
 
 #progressBar {
     appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
     height: 5px;
     border-radius: 5px;
-    background: #00ff9f;
+    background: #003322;
     outline: none;
     cursor: pointer;
 }
 
+/* Chrome & Edge */
 #progressBar::-webkit-slider-thumb {
-    appearance: none;
+    -webkit-appearance: none;
     width: 12px;
     height: 12px;
     background: #00ff9f;
     border-radius: 50%;
     cursor: pointer;
+}
+
+/* Firefox */
+#progressBar::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background: #00ff9f;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+/* Animasi Halus */
+.music-actions button,
+.music-item,
+#progressBar::-webkit-slider-thumb {
+    transition: all 0.2s ease;}
+
+/* =====================================
+   📱 RESPONSIVE MODE UNTUK ANDROID
+===================================== */
+@media (max-width: 768px) {
+
+    /* Sidebar lebih kecil */
+    #sidebar {
+        width: 170px;
+        font-size: 12px;
+    }
+
+    /* Jendela aplikasi menyesuaikan layar */
+    .window {
+        width: 95%;
+        height: 80%;
+        left: 2.5% !important;
+        top: 5% !important;
+    }
+
+    /* Taskbar lebih ringkas */
+    #taskbar {
+        font-size: 12px;
+        height: 32px;
+    }
+
+    /* Daftar lagu */
+    .music-item {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    /* Tombol aksi lebih besar untuk sentuhan */
+    .music-actions button {
+        font-size: 16px;
+        margin-left: 4px;
+    }
+
+    /* Progress bar ditumpuk vertikal */
+    #progressContainer {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    #progressBar {
+        width: 95%;
+    }
+
+    /* Input dan tombol lebih nyaman di HP */
+    input, button {
+        font-size: 14px;
+    }
+
+    /* Gambar cover musik */
+    #cover {
+        max-height: 150px;
+    }
 }
 </style>
 </head>
@@ -215,7 +312,9 @@ font-weight:bold;
 <div class="side-item" onclick="openApp('music'); loadFavorites();">
     <i class="fa-solid fa-heart"></i> Favorit
 </div>
-
+<div class="side-item" onclick="loadPlaylists()">
+    <i class="fa-solid fa-compact-disc"></i> Playlist
+</div>
 <div class="side-item" onclick="openApp('terminal')">
     <i class="fa-solid fa-terminal"></i> Terminal
 </div>
@@ -486,6 +585,7 @@ div.innerHTML = `
 <span>▶ ${d.name}</span>
 <div>
 <button onclick="event.stopPropagation(); toggleFavorite('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">❤️</button>
+<button onclick="event.stopPropagation(); addToPlaylist('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">📀</button>
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
 <button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>
 </div>
@@ -566,8 +666,82 @@ showConfirm("Hapus permanen?",()=>{
 db.collection("files").doc(id).delete().then(loadMusic);
 });
 }
-
 /* =========================
+   📀 CREATE PLAYLIST
+========================= */
+function createPlaylist() {
+    let name = prompt("Masukkan nama playlist:");
+
+    if (!name || name.trim() === "") {
+        alert("Nama playlist tidak boleh kosong!");
+        return;
+    }
+
+    db.collection("playlists").add({
+        name: name.trim(),
+        createdAt: new Date()
+    })
+    .then(() => {
+        alert("Playlist berhasil dibuat 📀");
+        loadPlaylists(); // Refresh daftar playlist
+    })
+    .catch(error => {
+        console.error("Error membuat playlist:", error);
+        alert("Gagal membuat playlist.");
+    });
+  }
+/* =========================
+   📀 ADD TO PLAYLIST
+========================= */
+function addToPlaylist(id, name, url, cover) {
+    db.collection("playlists").get().then(snapshot => {
+
+        if (snapshot.empty) {
+            alert("Belum ada playlist. Buat terlebih dahulu.");
+            createPlaylist();
+            return;
+        }
+
+        let playlistArray = [];
+
+        snapshot.forEach(doc => {
+            playlistArray.push({
+                id: doc.id,
+                name: doc.data().name
+            });
+        });
+
+        // Tampilkan daftar playlist
+        let list = "Pilih Playlist:\n";
+        playlistArray.forEach((p, i) => {
+            list += `${i + 1}. ${p.name}\n`;
+        });
+
+        let choice = prompt(list);
+        let index = parseInt(choice) - 1;
+
+        if (playlistArray[index]) {
+            db.collection("playlists")
+                .doc(playlistArray[index].id)
+                .collection("songs")
+                .add({
+                    name: name,
+                    url: url,
+                    cover: cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC",
+                    addedAt: firebase.firestore.FieldValue.serverTimestamp()
+                })
+                .then(() => {
+                    alert(`Lagu ditambahkan ke playlist "${playlistArray[index].name}" 📀`);
+                });
+        } else {
+            alert("Pilihan tidak valid!");
+        }
+    }).catch(error => {
+        console.error("Error menambahkan ke playlist:", error);
+        alert("Terjadi kesalahan.");
+    });
+  }
+  /* =========================
    ❤️ FAVORITE SYSTEM
 ========================= */
 function toggleFavorite(id, name, url, cover) {
