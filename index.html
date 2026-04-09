@@ -201,12 +201,28 @@ font-weight:bold;
 <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')"><i class="fa-solid fa-file"></i> Form</div>
 <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> Telegram Bot</div>
 
+
 <hr>
 
-<div class="side-item" onclick="openApp('notes')">Notes</div>
-<div class="side-item" onclick="openApp('music')">Music</div>
-<div class="side-item" onclick="openApp('terminal')">Terminal</div>
-<div class="side-item" onclick="openApp('fileManager')">File Manager</div>
+<div class="side-item" onclick="openApp('notes')">
+    <i class="fa-solid fa-note-sticky"></i> Notes
+</div>
+
+<div class="side-item" onclick="openApp('music')">
+    <i class="fa-solid fa-music"></i> Music
+</div>
+
+<div class="side-item" onclick="openApp('music'); loadFavorites();">
+    <i class="fa-solid fa-heart"></i> Favorit
+</div>
+
+<div class="side-item" onclick="openApp('terminal')">
+    <i class="fa-solid fa-terminal"></i> Terminal
+</div>
+
+<div class="side-item" onclick="openApp('fileManager')">
+    <i class="fa-solid fa-folder"></i> File Manager
+</div>
 </div>
 
 <div id="workspace">
@@ -466,9 +482,14 @@ cover: d.cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC"
 let div = document.createElement("div");
 div.className = "music-item";
 
-div.innerHTML = `▶ ${d.name}
+div.innerHTML = `
+<span>▶ ${d.name}</span>
+<div>
+<button onclick="event.stopPropagation(); toggleFavorite('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">❤️</button>
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
-<button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>`;
+<button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>
+</div>
+`;
 
 /* 🔥 FIX INDEX */
 let current = i;
@@ -546,8 +567,74 @@ db.collection("files").doc(id).delete().then(loadMusic);
 });
 }
 
- 
 /* =========================
+   ❤️ FAVORITE SYSTEM
+========================= */
+function toggleFavorite(id, name, url, cover) {
+    const favRef = db.collection("favorites").doc(id);
+
+    favRef.get().then(doc => {
+        if (doc.exists) {
+            // Hapus dari favorit
+            favRef.delete().then(() => {
+                alert("Dihapus dari Favorit 💔");
+                loadMusic();
+            });
+        } else {
+            // Tambahkan ke favorit
+            favRef.set({
+                name: name,
+                url: url,
+                cover: cover || "https://via.placeholder.com/300x200?text=AMOS+MUSIC",
+                createdAt: new Date()
+            }).then(() => {
+                alert("Ditambahkan ke Favorit ❤️");
+                loadMusic();
+            });
+        }
+    });
+  } 
+
+  function loadFavorites() {
+    musicList.innerHTML = "<h3>❤️ Lagu Favorit</h3>";
+    musicData = [];
+
+    db.collection("favorites").get().then(snap => {
+        let i = 0;
+
+        snap.forEach(doc => {
+            let d = doc.data();
+
+            musicData.push({
+                id: doc.id,
+                name: d.name,
+                url: d.url,
+                cover: d.cover
+            });
+
+            let div = document.createElement("div");
+            div.className = "music-item";
+
+            div.innerHTML = `
+            <span>❤️ ${d.name}</span>
+            <div>
+                <button onclick="event.stopPropagation(); toggleFavorite('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">💔</button>
+            </div>
+            `;
+
+            let current = i;
+            div.onclick = () => playMusic(current);
+
+            musicList.appendChild(div);
+            i++;
+        });
+
+        if (snap.empty) {
+            musicList.innerHTML += "<p>Tidak ada lagu favorit.</p>";
+        }
+    });
+  }
+  /* =========================
    🎵 PLAY MUSIC (FINAL SAFE)
 ========================= */
 function playMusic(i){
