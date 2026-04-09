@@ -585,14 +585,15 @@ let div = document.createElement("div");
 div.className = "music-item";
 
 div.innerHTML = `
-<span>▶ ${d.name}</span>
-<div>
+<span class="music-title">▶ ${d.name}</span>
+<div class="music-actions">
 <button onclick="event.stopPropagation(); toggleFavorite('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">❤️</button>
 <button onclick="event.stopPropagation(); addToPlaylist('${doc.id}','${d.name}','${d.url}','${d.cover || ""}')">📀</button>
 <button onclick="event.stopPropagation(); editMusic('${doc.id}','${d.name}')">✏️</button>
 <button onclick="event.stopPropagation(); deleteMusic('${doc.id}')">❌</button>
 </div>
 `;
+
 
 /* 🔥 FIX INDEX */
 let current = i;
@@ -844,6 +845,74 @@ function loadPlaylists() {
             });
         });
   }
+ 
+  /* =========================
+   🗑️ DELETE SONG FROM PLAYLIST
+========================= */
+function deleteSongFromPlaylist(playlistId, songId) {
+    showConfirm("Hapus lagu dari playlist?", () => {
+        db.collection("playlists")
+            .doc(playlistId)
+            .collection("songs")
+            .doc(songId)
+            .delete()
+            .then(() => {
+                alert("Lagu berhasil dihapus dari playlist.");
+                loadPlaylistSongs(playlistId, "Playlist");
+            })
+            .catch(error => {
+                console.error("Error menghapus lagu:", error);
+                alert("Gagal menghapus lagu.");
+            });
+    });
+}
+  function loadPlaylistSongs(playlistId, playlistName) {
+    musicList.innerHTML = `<h3>📀 Playlist: ${playlistName}</h3>`;
+    musicData = [];
+
+    db.collection("playlists")
+        .doc(playlistId)
+        .collection("songs")
+        .orderBy("addedAt", "desc")
+        .get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                musicList.innerHTML += "<p>Tidak ada lagu dalam playlist.</p>";
+                return;
+            }
+
+            let i = 0;
+
+            snapshot.forEach(doc => {
+                const d = doc.data();
+
+                musicData.push({
+                    id: doc.id,
+                    name: d.name,
+                    url: d.url,
+                    cover: d.cover
+                });
+
+                const div = document.createElement("div");
+                div.className = "music-item";
+
+                div.innerHTML = `
+                    <span class="music-title">▶ ${d.name}</span>
+                    <div class="music-actions">
+                        <button onclick="event.stopPropagation(); playMusic(${i})">▶</button>
+                        <button onclick="event.stopPropagation(); deleteSongFromPlaylist('${playlistId}','${doc.id}')">🗑️</button>
+                    </div>
+                `;
+
+                div.onclick = () => playMusic(i);
+                musicList.appendChild(div);
+                i++;
+            });
+        })
+        .catch(error => {
+            console.error("Error memuat playlist:", error);
+        });
+           }
   /* =========================
    ❤️ FAVORITE SYSTEM
 ========================= */
