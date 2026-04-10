@@ -270,51 +270,45 @@ font-weight:bold;
     }
 }
 /* =========================
-   FLOATING MUSIC PLAYER
-========================= */
+/* FLOATING PRO */
 .floating-player{
 position:fixed;
-bottom:60px;
+bottom:80px;
 right:10px;
 width:220px;
 background:rgba(0,0,0,0.85);
 border:1px solid #00ff9f;
-border-radius:12px;
+border-radius:14px;
 padding:8px;
 display:flex;
 align-items:center;
 gap:8px;
 z-index:99999;
-backdrop-filter: blur(10px);
+backdrop-filter: blur(12px);
 cursor:grab;
 user-select:none;
+
+/* 🔥 ANIMASI HALUS */
+transition: all 0.35s cubic-bezier(.25,.8,.25,1);
 }
 
-.floating-player:active{
-cursor:grabbing;
+/* MINI MODE */
+.floating-player.mini{
+width:60px;
+height:60px;
+padding:5px;
+border-radius:50%;
+justify-content:center;
 }
 
-.floating-player img{
+.floating-player.mini img{
 width:40px;
 height:40px;
-border-radius:6px;
-object-fit:cover;
 }
 
-.floating-info{
-flex:1;
-font-size:12px;
-overflow:hidden;
-white-space:nowrap;
-text-overflow:ellipsis;
-}
-
-.floating-controls button{
-background:none;
-border:none;
-color:#00ff9f;
-cursor:pointer;
-font-size:16px;
+.floating-player.mini .floating-info,
+.floating-player.mini .floating-controls{
+display:none;
 }
 </style>
 </head>
@@ -1072,11 +1066,30 @@ function playMusic(i){
 
     /* ===== FLOATING UPDATE ===== */
     if(floatingPlayer){
-        floatingPlayer.style.display = "flex";
-        floatingTitle.innerText = song.name || "Tanpa Judul";
-        floatingCover.src = song.cover || "https://via.placeholder.com/50";
-        floatingPlay.innerText = "⏸";
-    }
+
+  /* tampilkan dulu */
+  floatingPlayer.style.display = "flex";
+
+  /* update isi */
+  floatingTitle.innerText = song.name || "Tanpa Judul";
+  floatingCover.src = song.cover || "https://via.placeholder.com/50";
+  floatingPlay.innerText = "⏸";
+
+  /* keluar dari mini */
+  floatingPlayer.classList.remove("mini");
+
+  /* reset idle system */
+  if(typeof resetFloating === "function"){
+    resetFloating();
+  }
+
+  /* delay dikit biar smooth */
+  setTimeout(()=>{
+    triggerMini();
+  }, 500);
+
+}
+    
 
     /* ===== HIGHLIGHT AKTIF ===== */
     document.querySelectorAll(".music-item").forEach((el, index)=>{
@@ -1098,19 +1111,7 @@ function togglePlay(){
     }else{
         player.pause();
     }
-}
 
-function nextMusic(){
-    if(!musicData || musicData.length === 0) return;
-
-    let nextIndex = currentIndex + 1;
-
-    if(nextIndex >= musicData.length){
-        nextIndex = 0;
-    }
-
-    playMusic(nextIndex);
-}
 
 function prevMusic(){
     if(!musicData || musicData.length === 0) return;
@@ -1274,16 +1275,51 @@ document.getElementById("confirmBox").style.display="flex";
 }
 function confirmYes(){if(confirmCallback)confirmCallback();confirmBox.style.display="none";}
 function confirmNo(){confirmBox.style.display="none";}
+
+ 
+    if(!floatingPlayer) return;
+
+    floatingPlayer.style.opacity = "1";
+
+    clearTimeout(floatingTimer);
+
+    floatingTimer = setTimeout(()=>{
+        floatingPlayer.style.opacity = "0.3";
+    }, 3000);
+}
+
+["click","touchstart","mousemove"].forEach(evt=>{
+    document.addEventListener(evt, resetFloating);
+});
+/* =========================
+   💾 SIMPAN POSISI FLOATING
+========================= */
+
+function saveFloatingPos(){
+    if(!floatingPlayer) return;
+
+    localStorage.setItem("floatX", floatingPlayer.style.left);
+    localStorage.setItem("floatY", floatingPlayer.style.top);
+}
+
+function loadFloatingPos(){
+    if(!floatingPlayer) return;
+
+    let x = localStorage.getItem("floatX");
+    let y = localStorage.getItem("floatY");
+
+    if(x && y){
+        floatingPlayer.style.left = x;
+        floatingPlayer.style.top = y;
+    }
+}
+
+/* LOAD SAAT WEB DIBUKA */
+window.addEventListener("DOMContentLoaded", loadFloatingPos);
+
 </script>
+
 <script>
-
-
-
-
-
-
-
-
 /* =====================================
    AMOS AI OS — FINAL STABLE BUILD V13
 ===================================== */
@@ -1501,21 +1537,149 @@ askAI(cmd);
 
 }); // ← PENUTUP DOMContentLoaded
 
+let isDragging = false;
+let startX = 0;
+let startY = 0;
+let moveX = 0;
+let moveY = 0;
+let lastTap = 0;
 
+/* START */
+floatingPlayer.addEventListener("mousedown", start);
+floatingPlayer.addEventListener("touchstart", start);
+
+function start(e){
+    isDragging = true;
+
+    let p = getPoint(e);
+
+    startX = p.x - floatingPlayer.offsetLeft;
+    startY = p.y - floatingPlayer.offsetTop;
+
+    moveX = p.x;
+    moveY = p.y;
+}
+
+/* MOVE */
+document.addEventListener("mousemove", move);
+document.addEventListener("touchmove", move);
+
+function move(e){
+    if(!isDragging) return;
+
+    let p = getPoint(e);
+
+    floatingPlayer.style.left = (p.x - startX) + "px";
+    floatingPlayer.style.top = (p.y - startY) + "px";
+
+    moveX = p.x;
+    moveY = p.y;
+}
+
+/* END */
+document.addEventListener("mouseup", end);
+document.addEventListener("touchend", end);
+
+function end(e){
+    if(!isDragging) return;
+    isDragging = false;
+
+    let dx = moveX - startX;
+    let dy = moveY - startY;
+
+    /* 🔥 SWIPE */
+    if(Math.abs(dx) > 80){
+        if(dx > 0) prevMusic();
+        else nextMusic();
+    }
+
+    snapToEdge();
+    saveFloatingPos();
+}
+
+/* =========================
+   🧲 SNAP KE PINGGIR
+========================= */
+function snapToEdge(){
+
+    let rect = floatingPlayer.getBoundingClientRect();
+    let mid = window.innerWidth / 2;
+
+    if(rect.left < mid){
+        floatingPlayer.style.left = "10px";
+    }else{
+        floatingPlayer.style.left = (window.innerWidth - rect.width - 10) + "px";
+    }
+
+    /* batas atas bawah */
+    if(rect.top < 10){
+        floatingPlayer.style.top = "10px";
+    }
+
+    if(rect.bottom > window.innerHeight){
+        floatingPlayer.style.top = (window.innerHeight - rect.height - 10) + "px";
+    }
+}
+
+/* =========================
+   👆 DOUBLE TAP
+========================= */
+floatingPlayer.addEventListener("click", function(){
+    let now = Date.now();
+
+    if(now - lastTap < 300){
+        togglePlay(); // double tap
+    }
+
+    lastTap = now;
+});
+
+/* =========================
+   💤 AUTO MINI MODE
+========================= */
+let miniTimer;
+
+function triggerMini(){
+
+    clearTimeout(miniTimer);
+
+    floatingPlayer.classList.remove("mini");
+
+    miniTimer = setTimeout(()=>{
+        floatingPlayer.classList.add("mini");
+    }, 4000);
+}
+
+["click","touchstart","mousemove"].forEach(evt=>{
+    document.addEventListener(evt, triggerMini);
+});
+
+/* =========================
+   📍 GET TOUCH / MOUSE
+========================= */
+function getPoint(e){
+    if(e.touches){
+        return {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+    }else{
+        return {
+            x: e.clientX,
+            y: e.clientY
+        };
+    }
+}
+window.addEventListener("load", ()=>{
+    loadFloatingPos();
+
+    if(!localStorage.getItem("floatX")){
+        floatingPlayer.style.left = "10px";
+        floatingPlayer.style.bottom = "80px";
+    }
+});
 </script>
-<!-- FLOATING MUSIC -->
-<div id="floatingPlayer" class="floating-player">
-    <img id="floatingCover" src="https://via.placeholder.com/50">
 
-    <div class="floating-info">
-        <span id="floatingTitle">Tidak ada lagu</span>
-    </div>
 
-    <div class="floating-controls">
-        <button onclick="prevMusic()">⏮</button>
-        <button onclick="togglePlay()" id="floatingPlay">▶</button>
-        <button onclick="nextMusic()">⏭</button>
-    </div>
-</div>
 </body>
 </html>
