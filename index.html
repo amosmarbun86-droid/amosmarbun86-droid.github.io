@@ -269,6 +269,53 @@ font-weight:bold;
         max-height: 150px;
     }
 }
+/* =========================
+   FLOATING MUSIC PLAYER
+========================= */
+.floating-player{
+position:fixed;
+bottom:60px;
+right:10px;
+width:220px;
+background:rgba(0,0,0,0.85);
+border:1px solid #00ff9f;
+border-radius:12px;
+padding:8px;
+display:flex;
+align-items:center;
+gap:8px;
+z-index:99999;
+backdrop-filter: blur(10px);
+cursor:grab;
+user-select:none;
+}
+
+.floating-player:active{
+cursor:grabbing;
+}
+
+.floating-player img{
+width:40px;
+height:40px;
+border-radius:6px;
+object-fit:cover;
+}
+
+.floating-info{
+flex:1;
+font-size:12px;
+overflow:hidden;
+white-space:nowrap;
+text-overflow:ellipsis;
+}
+
+.floating-controls button{
+background:none;
+border:none;
+color:#00ff9f;
+cursor:pointer;
+font-size:16px;
+}
 </style>
 </head>
 
@@ -460,7 +507,15 @@ firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 
 const player = document.getElementById("player");
+const floatingTitle = document.getElementById("floatingTitle");
+const floatingCover = document.getElementById("floatingCover");
+const floatingPlay = document.getElementById("floatingPlay");
+const floatingPlayer = document.getElementById("floatingPlayer");
 
+/* default sembunyi dulu */
+if(floatingPlayer){
+    floatingPlayer.style.display = "none";
+}
 /* =========================
    🎼 PROGRESS BAR CONTROL
 ========================= */
@@ -980,49 +1035,110 @@ function toggleFavorite(id, name, url, cover) {
         }
     });
   }
-  /* =========================
+/* =========================
    🎵 PLAY MUSIC (FINAL SAFE)
 ========================= */
 function playMusic(i){
 
-if(!musicData || musicData.length === 0){
-alert("Playlist kosong");
-return;
+    if(!musicData || musicData.length === 0){
+        alert("Playlist kosong");
+        return;
+    }
+
+    if(i < 0 || i >= musicData.length){
+        return;
+    }
+
+    currentIndex = i;
+
+    let song = musicData[currentIndex];
+
+    if(!song){
+        alert("Song error");
+        return;
+    }
+
+    player.src = song.url;
+
+    player.play().catch(()=>{
+        console.log("Autoplay diblok browser");
+    });
+
+    musicTitle.innerText = song.name || "Tanpa Judul";
+
+    if(typeof cover !== "undefined" && cover){
+        cover.src = song.cover || "https://via.placeholder.com/300x200";
+    }
+
+    /* ===== FLOATING UPDATE ===== */
+    if(floatingPlayer){
+        floatingPlayer.style.display = "flex";
+        floatingTitle.innerText = song.name || "Tanpa Judul";
+        floatingCover.src = song.cover || "https://via.placeholder.com/50";
+        floatingPlay.innerText = "⏸";
+    }
+
+    /* ===== HIGHLIGHT AKTIF ===== */
+    document.querySelectorAll(".music-item").forEach((el, index)=>{
+        el.classList.toggle("active", index === currentIndex);
+    });
+
 }
 
-/* batas aman index */
-if(i < 0 || i >= musicData.length){
-return;
+
+/* =========================
+   🎛 CONTROL BUTTON (GLOBAL)
+========================= */
+
+function togglePlay(){
+    if(!player) return;
+
+    if(player.paused){
+        player.play();
+    }else{
+        player.pause();
+    }
 }
 
-currentIndex = i;
+function nextMusic(){
+    if(!musicData || musicData.length === 0) return;
 
-let song = musicData[currentIndex];
+    let nextIndex = currentIndex + 1;
 
-if(!song){
-alert("Song error");
-return;
+    if(nextIndex >= musicData.length){
+        nextIndex = 0;
+    }
+
+    playMusic(nextIndex);
 }
 
-player.src = song.url;
+function prevMusic(){
+    if(!musicData || musicData.length === 0) return;
 
-/* autoplay fix */
-player.play().catch(()=>{
-console.log("Autoplay diblok browser");
-});
+    let prevIndex = currentIndex - 1;
 
-musicTitle.innerText = song.name || "Tanpa Judul";
+    if(prevIndex < 0){
+        prevIndex = musicData.length - 1;
+    }
 
-/* cover optional (tidak wajib ada) */
-if(typeof cover !== "undefined" && cover){
-cover.src = song.cover || "https://via.placeholder.com/300x200";
+    playMusic(prevIndex);
 }
 
-/* highlight lagu aktif */
-document.querySelectorAll(".music-item").forEach((el, index)=>{
-el.classList.toggle("active", index === currentIndex);
-});
+
+/* =========================
+   🔁 SYNC ICON (GLOBAL)
+========================= */
+
+if(player){
+    player.onplay = ()=>{
+        if(floatingPlay) floatingPlay.innerText = "⏸";
+    };
+
+    player.onpause = ()=>{
+        if(floatingPlay) floatingPlay.innerText = "▶";
+    };
 }
+
 
 
 /* =========================
@@ -1387,6 +1503,19 @@ askAI(cmd);
 
 
 </script>
+<!-- FLOATING MUSIC -->
+<div id="floatingPlayer" class="floating-player">
+    <img id="floatingCover" src="https://via.placeholder.com/50">
 
+    <div class="floating-info">
+        <span id="floatingTitle">Tidak ada lagu</span>
+    </div>
+
+    <div class="floating-controls">
+        <button onclick="prevMusic()">⏮</button>
+        <button onclick="togglePlay()" id="floatingPlay">▶</button>
+        <button onclick="nextMusic()">⏭</button>
+    </div>
+</div>
 </body>
 </html>
