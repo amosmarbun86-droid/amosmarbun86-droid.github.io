@@ -1111,20 +1111,7 @@ function togglePlay(){
     }else{
         player.pause();
     }
-
-
-function prevMusic(){
-    if(!musicData || musicData.length === 0) return;
-
-    let prevIndex = currentIndex - 1;
-
-    if(prevIndex < 0){
-        prevIndex = musicData.length - 1;
-    }
-
-    playMusic(prevIndex);
-}
-
+  }
 
 /* =========================
    🔁 SYNC ICON (GLOBAL)
@@ -1277,6 +1264,10 @@ function confirmYes(){if(confirmCallback)confirmCallback();confirmBox.style.disp
 function confirmNo(){confirmBox.style.display="none";}
 
  
+    let floatingTimer;
+
+function resetFloating(){
+
     if(!floatingPlayer) return;
 
     floatingPlayer.style.opacity = "1";
@@ -1287,7 +1278,6 @@ function confirmNo(){confirmBox.style.display="none";}
         floatingPlayer.style.opacity = "0.3";
     }, 3000);
 }
-
 ["click","touchstart","mousemove"].forEach(evt=>{
     document.addEventListener(evt, resetFloating);
 });
@@ -1670,13 +1660,17 @@ function getPoint(e){
         };
     }
 }
-window.addEventListener("load", ()=>{
+window.addEventListener("DOMContentLoaded", ()=>{
+
+    if(!floatingPlayer) return;
+
     loadFloatingPos();
 
     if(!localStorage.getItem("floatX")){
         floatingPlayer.style.left = "10px";
         floatingPlayer.style.bottom = "80px";
     }
+
 });
 </script>
 
