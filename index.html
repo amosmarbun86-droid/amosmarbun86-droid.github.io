@@ -519,26 +519,35 @@ if (floatingPlayer) {
     floatingPlayer.addEventListener("touchstart", (e) => {
         isDragging = true;
 
-        let touch = e.touches[0];
+        const touch = e.touches[0];
+        const rect = floatingPlayer.getBoundingClientRect();
 
-        // 🔥 penting (biar tidak bentrok CSS)
+        // 🔥 WAJIB biar gak ke-scroll
+        e.preventDefault();
+
+        // 🔥 lepas dari posisi awal
         floatingPlayer.style.right = "auto";
         floatingPlayer.style.bottom = "auto";
 
-        offsetX = touch.clientX - floatingPlayer.offsetLeft;
-        offsetY = touch.clientY - floatingPlayer.offsetTop;
+        // 🔥 set posisi awal pakai left/top
+        floatingPlayer.style.left = rect.left + "px";
+        floatingPlayer.style.top = rect.top + "px";
+
+        offsetX = touch.clientX - rect.left;
+        offsetY = touch.clientY - rect.top;
     });
 
     document.addEventListener("touchmove", (e) => {
         if (!isDragging) return;
 
-        let touch = e.touches[0];
+        const touch = e.touches[0];
+
+        // 🔥 WAJIB biar gak scroll halaman
+        e.preventDefault();
 
         floatingPlayer.style.left = (touch.clientX - offsetX) + "px";
         floatingPlayer.style.top = (touch.clientY - offsetY) + "px";
-
-        saveFloatingPos();
-    });
+    }, { passive: false }); // 🔥 PENTING
 
     document.addEventListener("touchend", () => {
         isDragging = false;
