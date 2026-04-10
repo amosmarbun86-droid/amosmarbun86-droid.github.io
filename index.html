@@ -504,56 +504,8 @@ const player = document.getElementById("player");
 const floatingTitle = document.getElementById("floatingTitle");
 const floatingCover = document.getElementById("floatingCover");
 const floatingPlay = document.getElementById("floatingPlay");
-const floatingPlayer = document.getElementById("floatingPlayer");
+const floatingPlayer = document.getElementById("floatingPlayer"); 
 
-/* =========================
-   🔥 DRAG SYSTEM
-========================= */
-
-let isDragging = false;
-let offsetX = 0;
-let offsetY = 0;
-
-if (floatingPlayer) {
-
-    floatingPlayer.addEventListener("touchstart", (e) => {
-        isDragging = true;
-
-        const touch = e.touches[0];
-        const rect = floatingPlayer.getBoundingClientRect();
-
-        // 🔥 WAJIB biar gak ke-scroll
-        e.preventDefault();
-
-        // 🔥 lepas dari posisi awal
-        floatingPlayer.style.right = "auto";
-        floatingPlayer.style.bottom = "auto";
-
-        // 🔥 set posisi awal pakai left/top
-        floatingPlayer.style.left = rect.left + "px";
-        floatingPlayer.style.top = rect.top + "px";
-
-        offsetX = touch.clientX - rect.left;
-        offsetY = touch.clientY - rect.top;
-    });
-
-    document.addEventListener("touchmove", (e) => {
-        if (!isDragging) return;
-
-        const touch = e.touches[0];
-
-        // 🔥 WAJIB biar gak scroll halaman
-        e.preventDefault();
-
-        floatingPlayer.style.left = (touch.clientX - offsetX) + "px";
-        floatingPlayer.style.top = (touch.clientY - offsetY) + "px";
-    }, { passive: false }); // 🔥 PENTING
-
-    document.addEventListener("touchend", () => {
-        isDragging = false;
-    });
-
-} // ✅ INI YANG KAMU LUPA
 
 /* =========================
    🔥 DEFAULT HIDE
@@ -1584,59 +1536,93 @@ let startX = 0;
 let startY = 0;
 let moveX = 0;
 let moveY = 0;
-let lastTap = 0;
 
-/* START */
+/* =========================
+   START
+========================= */
 floatingPlayer.addEventListener("mousedown", start);
-floatingPlayer.addEventListener("touchstart", start);
+floatingPlayer.addEventListener("touchstart", start, { passive:false });
 
 function start(e){
     isDragging = true;
 
-    let p = getPoint(e);
+    const rect = floatingPlayer.getBoundingClientRect();
+    const p = getPoint(e);
 
-    startX = p.x - floatingPlayer.offsetLeft;
-    startY = p.y - floatingPlayer.offsetTop;
+    // 🔥 WAJIB: lepas dari right/bottom
+    floatingPlayer.style.right = "auto";
+    floatingPlayer.style.bottom = "auto";
+
+    // 🔥 set posisi awal biar tidak loncat
+    floatingPlayer.style.left = rect.left + "px";
+    floatingPlayer.style.top = rect.top + "px";
+
+    startX = p.x - rect.left;
+    startY = p.y - rect.top;
 
     moveX = p.x;
     moveY = p.y;
+
+    e.preventDefault(); // 🔥 penting
 }
 
-/* MOVE */
+/* =========================
+   MOVE
+========================= */
 document.addEventListener("mousemove", move);
-document.addEventListener("touchmove", move);
+document.addEventListener("touchmove", move, { passive:false });
 
 function move(e){
     if(!isDragging) return;
 
-    let p = getPoint(e);
+    const p = getPoint(e);
 
     floatingPlayer.style.left = (p.x - startX) + "px";
     floatingPlayer.style.top = (p.y - startY) + "px";
 
     moveX = p.x;
     moveY = p.y;
+
+    e.preventDefault(); // 🔥 biar tidak scroll
 }
 
-/* END */
+/* =========================
+   END
+========================= */
 document.addEventListener("mouseup", end);
 document.addEventListener("touchend", end);
 
-function end(e){
+function end(){
     if(!isDragging) return;
     isDragging = false;
 
-    let dx = moveX - startX;
-    let dy = moveY - startY;
+    let dx = moveX - (startX + floatingPlayer.offsetLeft);
+    let dy = moveY - (startY + floatingPlayer.offsetTop);
 
-    /* 🔥 SWIPE */
+    /* 🔥 SWIPE (lebih akurat) */
     if(Math.abs(dx) > 80){
         if(dx > 0) prevMusic();
         else nextMusic();
     }
 
-    snapToEdge();
-    saveFloatingPos();
+    snapToEdge();      // tetap pakai punyamu
+    saveFloatingPos(); // tetap pakai punyamu
+}
+
+/* =========================
+   HELPER
+========================= */
+function getPoint(e){
+    if(e.touches && e.touches.length > 0){
+        return {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+    }
+    return {
+        x: e.clientX,
+        y: e.clientY
+    };
 }
 
 /* =========================
