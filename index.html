@@ -1671,9 +1671,27 @@ window.addEventListener("DOMContentLoaded", ()=>{
         floatingPlayer.style.bottom = "80px";
     }
 
+    // ✅ TAMBAHKAN DI SINI (UNTUK TEST)
+    floatingPlayer.style.display = "flex";
+
 });
 </script>
 
+<!-- ✅ FLOATING PLAYER -->
+<div id="floatingPlayer" class="floating-player">
+    <img id="floatingCover" src="" style="width:50px;height:50px;border-radius:8px">
+
+    <div class="floating-info">
+        <div id="floatingTitle">Tidak ada lagu</div>
+    </div>
+
+    <div class="floating-controls">
+        <button onclick="togglePlay()" id="floatingPlay">▶</button>
+    </div>
+</div>
 
 </body>
 </html>
+
+
+
