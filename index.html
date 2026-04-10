@@ -1549,21 +1549,16 @@ function start(e){
     const rect = floatingPlayer.getBoundingClientRect();
     const p = getPoint(e);
 
-    // 🔥 WAJIB: lepas dari right/bottom
+    // 🔥 WAJIB: lepas dari right & bottom
     floatingPlayer.style.right = "auto";
     floatingPlayer.style.bottom = "auto";
 
-    // 🔥 set posisi awal biar tidak loncat
+    // 🔥 kunci biar tidak loncat
     floatingPlayer.style.left = rect.left + "px";
     floatingPlayer.style.top = rect.top + "px";
 
     startX = p.x - rect.left;
     startY = p.y - rect.top;
-
-    moveX = p.x;
-    moveY = p.y;
-
-    e.preventDefault(); // 🔥 penting
 }
 
 /* =========================
