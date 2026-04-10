@@ -506,8 +506,51 @@ const floatingCover = document.getElementById("floatingCover");
 const floatingPlay = document.getElementById("floatingPlay");
 const floatingPlayer = document.getElementById("floatingPlayer");
 
-/* default sembunyi dulu */
-if(floatingPlayer){
+/* =========================
+   🔥 DRAG SYSTEM
+========================= */
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+if (floatingPlayer) {
+
+    floatingPlayer.addEventListener("touchstart", (e) => {
+        isDragging = true;
+
+        let touch = e.touches[0];
+
+        // 🔥 penting (biar tidak bentrok CSS)
+        floatingPlayer.style.right = "auto";
+        floatingPlayer.style.bottom = "auto";
+
+        offsetX = touch.clientX - floatingPlayer.offsetLeft;
+        offsetY = touch.clientY - floatingPlayer.offsetTop;
+    });
+
+    document.addEventListener("touchmove", (e) => {
+        if (!isDragging) return;
+
+        let touch = e.touches[0];
+
+        floatingPlayer.style.left = (touch.clientX - offsetX) + "px";
+        floatingPlayer.style.top = (touch.clientY - offsetY) + "px";
+
+        saveFloatingPos();
+    });
+
+    document.addEventListener("touchend", () => {
+        isDragging = false;
+    });
+
+} // ✅ INI YANG KAMU LUPA
+
+/* =========================
+   🔥 DEFAULT HIDE
+========================= */
+
+if (floatingPlayer) {
     floatingPlayer.style.display = "none";
 }
 /* =========================
