@@ -1531,35 +1531,41 @@ askAI(cmd);
 
 }); // ← PENUTUP DOMContentLoaded
 
-let isDragging = false;
-let startX = 0;
-let startY = 0;
-let moveX = 0;
-let moveY = 0;
+document.addEventListener("DOMContentLoaded", function(){
 
-/* =========================
-   START
-========================= */
-floatingPlayer.addEventListener("mousedown", start);
-floatingPlayer.addEventListener("touchstart", start, { passive:false });
+    const floatingPlayer = document.getElementById("floatingPlayer");
 
-function start(e){
-    console.log("DRAG START"); // 🔥 TAMBAHKAN INI
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
 
-    isDragging = true;
+    floatingPlayer.addEventListener("mousedown", start);
+    floatingPlayer.addEventListener("touchstart", start);
 
-    const rect = floatingPlayer.getBoundingClientRect();
-    const p = getPoint(e);
+    function start(e){
+        console.log("DRAG START");
 
-    floatingPlayer.style.right = "auto";
-    floatingPlayer.style.bottom = "auto";
+        isDragging = true;
 
-    floatingPlayer.style.left = rect.left + "px";
-    floatingPlayer.style.top = rect.top + "px";
+        const rect = floatingPlayer.getBoundingClientRect();
+        const p = getPoint(e);
 
-    startX = p.x - rect.left;
-    startY = p.y - rect.top;
-}
+        floatingPlayer.style.right = "auto";
+        floatingPlayer.style.bottom = "auto";
+
+        floatingPlayer.style.left = rect.left + "px";
+        floatingPlayer.style.top = rect.top + "px";
+
+        startX = p.x - rect.left;
+        startY = p.y - rect.top;
+    }
+
+    function getPoint(e){
+        if(e.touches) return {x: e.touches[0].clientX, y: e.touches[0].clientY};
+        return {x: e.clientX, y: e.clientY};
+    }
+
+
 
 /* =========================
    MOVE
