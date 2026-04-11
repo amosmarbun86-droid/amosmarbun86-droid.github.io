@@ -415,12 +415,18 @@ printTerminal("> "+cmd);
 <img id="cover" src="" 
 style="width:100%;max-height:180px;object-fit:cover;border-radius:10px">
 
+
 <h3 id="musicTitle">Tidak ada lagu</h3>
+
 <input type="text" id="musicUrl" placeholder="Paste URL lagu di sini">
 <button onclick="addMusicUrl()">Tambah Lagu</button>
+
 <br><br>
+
 <input type="file" id="musicFile" accept="audio/*">
+
 <audio id="player" controls style="width:100%"></audio>
+
 <!-- 🎼 PROGRESS BAR -->
 <div id="progressContainer" style="margin-top:10px;text-align:center;">
     <span id="currentTime">0:00</span>
@@ -437,22 +443,36 @@ style="width:100%;max-height:180px;object-fit:cover;border-radius:10px">
     
     <span id="duration">0:00</span>
 </div>
+
 <div style="margin-top:10px">
-<button onclick="prevMusic()">⏮</button>
-<button onclick="nextMusic()">⏭</button>
-<br><br>
-<button onclick="toggleShuffle()">🔀 Shuffle</button>
+    <button onclick="prevMusic()">⏮</button>
+    <button onclick="nextMusic()">⏭</button>
+
+    <br><br>
+
+    <button onclick="toggleShuffle()">🔀 Shuffle</button>
 </div>
 
 <p>🔊 Volume</p>
 <input type="range" id="volumeControl" min="0" max="100" value="80">
 
-</div>
-
 <hr>
 
 <div id="musicList"></div>
+
+<!-- ✅ FLOATING PLAYER -->
+<div id="floatingPlayer" class="floating-player">
+    <img id="floatingCover" src="" style="width:50px;height:50px;border-radius:8px">
+
+    <div class="floating-info">
+        <div id="floatingTitle">Tidak ada lagu</div>
+    </div>
+
+    <div class="floating-controls">
+        <button onclick="togglePlay()" id="floatingPlay">▶</button>
+    </div>
 </div>
+
 
 <div class="window" id="fileManager">
 <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
@@ -1506,39 +1526,60 @@ document.getElementById("cmdInput").focus();
 }
 
 
-/* ========= TERMINAL LISTENER (SAFE LOAD) ========= */
-
-window.addEventListener("DOMContentLoaded",()=>{
-
-const input=document.getElementById("cmdInput");
-
-if(!input) return;
-
-input.addEventListener("keydown",function(e){
-
-if(e.key==="Enter"){
-
-let cmd=this.value.trim();
-this.value="";
-
-if(cmd!==""){
-askAI(cmd);
-}
-
-}
-
-});
-
-}); // ← PENUTUP DOMContentLoaded
-
 document.addEventListener("DOMContentLoaded", function(){
 
+    /* =========================
+       TERMINAL LISTENER
+    ========================= */
+    const input = document.getElementById("cmdInput");
+
+    if(input){
+        input.addEventListener("keydown", function(e){
+            if(e.key === "Enter"){
+                let cmd = this.value.trim();
+                this.value = "";
+
+                if(cmd !== ""){
+                    askAI(cmd);
+                }
+            }
+        });
+    }
+
+    /* =========================
+       FLOATING PLAYER INIT
+    ========================= */
     const floatingPlayer = document.getElementById("floatingPlayer");
+
+    if(!floatingPlayer){
+        console.log("❌ floatingPlayer tidak ditemukan");
+        return;
+    }
+
+    console.log("✅ floatingPlayer ketemu");
 
     let isDragging = false;
     let startX = 0;
     let startY = 0;
 
+    function getPoint(e){
+        if(e.touches && e.touches.length > 0){
+            return {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        }
+        return {
+            x: e.clientX,
+            y: e.clientY
+        };
+    }
+
+    /* 👉 nanti lanjut drag di sini */
+
+});
+
+    /* START */
     floatingPlayer.addEventListener("mousedown", start);
     floatingPlayer.addEventListener("touchstart", start);
 
@@ -1560,59 +1601,7 @@ document.addEventListener("DOMContentLoaded", function(){
         startY = p.y - rect.top;
     }
 
-    function getPoint(e){
-        if(e.touches) return {x: e.touches[0].clientX, y: e.touches[0].clientY};
-        return {x: e.clientX, y: e.clientY};
-    }
 
-
-
-/* =========================
-   MOVE
-========================= */
-document.addEventListener("mousemove", move);
-document.addEventListener("touchmove", move, { passive:false });
-
-function move(e){
-    if(!isDragging) return;
-
-    const p = getPoint(e);
-
-    floatingPlayer.style.left = (p.x - startX) + "px";
-    floatingPlayer.style.top = (p.y - startY) + "px";
-
-    moveX = p.x;
-    moveY = p.y;
-
-    e.preventDefault(); // 🔥 biar tidak scroll
-}
-
-/* =========================
-   END
-========================= */
-document.addEventListener("mouseup", end);
-document.addEventListener("touchend", end);
-
-function end(){
-    if(!isDragging) return;
-    isDragging = false;
-
-    let dx = moveX - (startX + floatingPlayer.offsetLeft);
-    let dy = moveY - (startY + floatingPlayer.offsetTop);
-
-    /* 🔥 SWIPE (lebih akurat) */
-    if(Math.abs(dx) > 80){
-        if(dx > 0) prevMusic();
-        else nextMusic();
-    }
-
-    snapToEdge();      // tetap pakai punyamu
-    saveFloatingPos(); // tetap pakai punyamu
-}
-
-/* =========================
-   HELPER
-========================= */
 function getPoint(e){
     if(e.touches && e.touches.length > 0){
         return {
@@ -1626,111 +1615,152 @@ function getPoint(e){
     };
 }
 
-/* =========================
-   🧲 SNAP KE PINGGIR
-========================= */
-function snapToEdge(){
+document.addEventListener("DOMContentLoaded", function(){
+<script>
+document.addEventListener("DOMContentLoaded", function(){
 
-    let rect = floatingPlayer.getBoundingClientRect();
-    let mid = window.innerWidth / 2;
+    const floatingPlayer = document.getElementById("floatingPlayer");
 
-    if(rect.left < mid){
+    if(!floatingPlayer){
+        console.log("❌ floatingPlayer tidak ditemukan");
+        return;
+    }
+
+    console.log("✅ floatingPlayer aktif");
+
+    /* =========================
+       INIT
+    ========================= */
+    floatingPlayer.style.display = "flex";
+
+    if(!localStorage.getItem("floatX")){
         floatingPlayer.style.left = "10px";
-    }else{
-        floatingPlayer.style.left = (window.innerWidth - rect.width - 10) + "px";
+        floatingPlayer.style.bottom = "80px";
+    } else {
+        loadFloatingPos();
     }
 
-    /* batas atas bawah */
-    if(rect.top < 10){
-        floatingPlayer.style.top = "10px";
-    }
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let lastTap = 0;
+    let miniTimer;
 
-    if(rect.bottom > window.innerHeight){
-        floatingPlayer.style.top = (window.innerHeight - rect.height - 10) + "px";
-    }
-}
-
-/* =========================
-   👆 DOUBLE TAP
-========================= */
-floatingPlayer.addEventListener("click", function(){
-    let now = Date.now();
-
-    if(now - lastTap < 300){
-        togglePlay(); // double tap
-    }
-
-    lastTap = now;
-});
-
-/* =========================
-   💤 AUTO MINI MODE
-========================= */
-let miniTimer;
-
-function triggerMini(){
-
-    clearTimeout(miniTimer);
-
-    floatingPlayer.classList.remove("mini");
-
-    miniTimer = setTimeout(()=>{
-        floatingPlayer.classList.add("mini");
-    }, 4000);
-}
-
-["click","touchstart","mousemove"].forEach(evt=>{
-    document.addEventListener(evt, triggerMini);
-});
-
-/* =========================
-   📍 GET TOUCH / MOUSE
-========================= */
-function getPoint(e){
-    if(e.touches){
-        return {
-            x: e.touches[0].clientX,
-            y: e.touches[0].clientY
-        };
-    }else{
+    /* =========================
+       GET POINT
+    ========================= */
+    function getPoint(e){
+        if(e.touches && e.touches.length > 0){
+            return {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+        }
         return {
             x: e.clientX,
             y: e.clientY
         };
     }
-}
-window.addEventListener("DOMContentLoaded", ()=>{
 
-    if(!floatingPlayer) return;
+    /* =========================
+       START DRAG
+    ========================= */
+    floatingPlayer.addEventListener("mousedown", start);
+    floatingPlayer.addEventListener("touchstart", start);
 
-    loadFloatingPos();
+    function start(e){
+        isDragging = true;
 
-    if(!localStorage.getItem("floatX")){
-        floatingPlayer.style.left = "10px";
-        floatingPlayer.style.bottom = "80px";
+        const rect = floatingPlayer.getBoundingClientRect();
+        const p = getPoint(e);
+
+        floatingPlayer.style.right = "auto";
+        floatingPlayer.style.bottom = "auto";
+
+        floatingPlayer.style.left = rect.left + "px";
+        floatingPlayer.style.top = rect.top + "px";
+
+        startX = p.x - rect.left;
+        startY = p.y - rect.top;
     }
 
-    // ✅ TAMBAHKAN DI SINI (UNTUK TEST)
-    floatingPlayer.style.display = "flex";
+    /* =========================
+       MOVE
+    ========================= */
+    document.addEventListener("mousemove", move);
+    document.addEventListener("touchmove", move, { passive:false });
+
+    function move(e){
+        if(!isDragging) return;
+
+        const p = getPoint(e);
+
+        floatingPlayer.style.left = (p.x - startX) + "px";
+        floatingPlayer.style.top = (p.y - startY) + "px";
+
+        e.preventDefault();
+    }
+
+    /* =========================
+       END
+    ========================= */
+    document.addEventListener("mouseup", end);
+    document.addEventListener("touchend", end);
+
+    function end(){
+        if(!isDragging) return;
+        isDragging = false;
+
+        snapToEdge();
+        saveFloatingPos();
+    }
+
+    /* =========================
+       SNAP
+    ========================= */
+    function snapToEdge(){
+        let rect = floatingPlayer.getBoundingClientRect();
+        let mid = window.innerWidth / 2;
+
+        if(rect.left < mid){
+            floatingPlayer.style.left = "10px";
+        }else{
+            floatingPlayer.style.left =
+                (window.innerWidth - rect.width - 10) + "px";
+        }
+    }
+
+    /* =========================
+       DOUBLE TAP
+    ========================= */
+    floatingPlayer.addEventListener("click", function(){
+        let now = Date.now();
+
+        if(now - lastTap < 300){
+            togglePlay();
+        }
+
+        lastTap = now;
+    });
+
+    /* =========================
+       MINI MODE
+    ========================= */
+    function triggerMini(){
+        clearTimeout(miniTimer);
+
+        floatingPlayer.classList.remove("mini");
+
+        miniTimer = setTimeout(()=>{
+            floatingPlayer.classList.add("mini");
+        }, 4000);
+    }
+
+    ["click","touchstart","mousemove"].forEach(evt=>{
+        document.addEventListener(evt, triggerMini);
+    });
 
 });
 </script>
-
-<!-- ✅ FLOATING PLAYER -->
-<div id="floatingPlayer" class="floating-player">
-    <img id="floatingCover" src="" style="width:50px;height:50px;border-radius:8px">
-
-    <div class="floating-info">
-        <div id="floatingTitle">Tidak ada lagu</div>
-    </div>
-
-    <div class="floating-controls">
-        <button onclick="togglePlay()" id="floatingPlay">▶</button>
-    </div>
-</div>
-
 </body>
-</html>
-
-
-
+</html
