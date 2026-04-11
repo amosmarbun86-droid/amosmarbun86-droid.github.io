@@ -1544,16 +1544,16 @@ floatingPlayer.addEventListener("mousedown", start);
 floatingPlayer.addEventListener("touchstart", start, { passive:false });
 
 function start(e){
+    console.log("DRAG START"); // 🔥 TAMBAHKAN INI
+
     isDragging = true;
 
     const rect = floatingPlayer.getBoundingClientRect();
     const p = getPoint(e);
 
-    // 🔥 WAJIB: lepas dari right & bottom
     floatingPlayer.style.right = "auto";
     floatingPlayer.style.bottom = "auto";
 
-    // 🔥 kunci biar tidak loncat
     floatingPlayer.style.left = rect.left + "px";
     floatingPlayer.style.top = rect.top + "px";
 
