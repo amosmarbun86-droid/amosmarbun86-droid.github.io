@@ -473,6 +473,7 @@ style="width:100%;max-height:180px;object-fit:cover;border-radius:10px">
     </div>
 </div>
 
+</div> <!-- ✅ PENUTUP WINDOW MUSIC -->
 
 <div class="window" id="fileManager">
 <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
@@ -1526,7 +1527,6 @@ document.getElementById("cmdInput").focus();
 }
 
 
-document.addEventListener("DOMContentLoaded", function(){
 
     /* =========================
        TERMINAL LISTENER
@@ -1545,7 +1545,8 @@ document.addEventListener("DOMContentLoaded", function(){
             }
         });
     }
-
+<script>
+document.addEventListener("DOMContentLoaded", function(){
     /* =========================
        FLOATING PLAYER INIT
     ========================= */
@@ -1615,9 +1616,7 @@ function getPoint(e){
     };
 }
 
-document.addEventListener("DOMContentLoaded", function(){
-<script>
-document.addEventListener("DOMContentLoaded", function(){
+
 
     const floatingPlayer = document.getElementById("floatingPlayer");
 
