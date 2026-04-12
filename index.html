@@ -278,11 +278,15 @@ input, textarea{
         <i class="fa-solid fa-folder"></i> File Manager
     </div>
 
+    <div class="side-item" onclick="toggleMatrix()">
+    <i class="fa-solid fa-code"></i> Toggle Matrix
+</div>
     <hr>
 
     <div class="side-item" onclick="logout()">
         <i class="fa-solid fa-sign-out-alt"></i> Logout
-    </div>
+   
+   </div>
 </div>
 
     <!-- WORKSPACE -->
@@ -498,35 +502,97 @@ function showFavorites(){renderMusic(favorites);}
 function showPlaylist(){renderMusic(playlist);}
 function showAllMusic(){renderMusic(musicData);}
 
-/* MATRIX EFFECT */
-const canvas=document.getElementById("bgCanvas");
-const ctx=canvas.getContext("2d");
-function resize(){
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
+/* =========================
+   🟢 MATRIX EFFECT TOGGLE
+========================= */
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+
+let matrixEnabled = true;
+let animationId;
+
+// Menyesuaikan ukuran canvas
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 }
 resize();
-window.onresize=resize;
+window.addEventListener("resize", resize);
 
-let letters="AMOSWEBOS123456789";
-let fontSize=16;
-let columns=canvas.width/fontSize;
-let drops=Array(Math.floor(columns)).fill(1);
+// Karakter Matrix
+const letters = "AMOSWEBOS123456789";
+const fontSize = 16;
+let columns = Math.floor(window.innerWidth / fontSize);
+let drops = Array(columns).fill(1);
 
-function draw(){
-    ctx.fillStyle="rgba(0,0,0,0.05)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle="#00ff9f";
-    ctx.font=fontSize+"px monospace";
-    for(let i=0;i<drops.length;i++){
-        let text=letters[Math.floor(Math.random()*letters.length)];
-        ctx.fillText(text,i*fontSize,drops[i]*fontSize);
-        if(drops[i]*fontSize>canvas.height) drops[i]=0;
+// Fungsi menggambar efek Matrix
+function drawMatrix() {
+    if (!matrixEnabled) return;
+
+    ctx.fillStyle = "rgba(0,0,0,0.05)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#00ff9f";
+    ctx.font = fontSize + "px monospace";
+
+    for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height) {
+            drops[i] = 0;
+        }
         drops[i]++;
     }
-    requestAnimationFrame(draw);
+
+    animationId = requestAnimationFrame(drawMatrix);
 }
-draw();
+
+// Memulai Matrix
+function startMatrix() {
+    matrixEnabled = true;
+    canvas.style.display = "block";
+    drawMatrix();
+    localStorage.setItem("matrixEnabled", "true");
+}
+
+// Menghentikan Matrix
+function stopMatrix() {
+    matrixEnabled = false;
+    cancelAnimationFrame(animationId);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas.style.display = "none";
+    localStorage.setItem("matrixEnabled", "false");
+}
+
+// Toggle Matrix
+function toggleMatrix() {
+    if (matrixEnabled) {
+        stopMatrix();
+    } else {
+        startMatrix();
+    }
+}
+    /* =========================
+   🔁 LOAD MATRIX SETTINGS
+========================= */
+document.addEventListener("DOMContentLoaded", function () {
+    // Pastikan canvas menyesuaikan ukuran layar
+    if (typeof resize === "function") {
+        resize();
+    }
+
+    // Ambil status Matrix dari Local Storage
+    const savedMatrixState = localStorage.getItem("matrixEnabled");
+
+    // Jalankan sesuai pengaturan terakhir
+    if (savedMatrixState === "false") {
+        stopMatrix();
+    } else {
+        startMatrix();
+    }
+});
+
 /* =========================
    🌐 OPEN EXTERNAL PROJECT
 ========================= */
@@ -536,14 +602,14 @@ function openExternal(url) {
         return;
     }
 
-    // Membuka dengan cara paling kompatibel
+    // Membuka di tab baru
     const win = window.open(url, "_blank");
-    if (!win) {
-        // Jika diblokir browser
+
+    // Fallback jika diblokir browser
+    if (!win || win.closed || typeof win.closed === "undefined") {
         window.location.href = url;
     }
 }
 </script>
-
 </body>
 </html>
