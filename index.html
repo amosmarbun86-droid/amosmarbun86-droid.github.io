@@ -112,6 +112,9 @@ input, textarea{
 /* WINDOWS */
 .window{
     position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
     width:90%;
     max-width:650px;
     height:75%;
@@ -119,6 +122,7 @@ input, textarea{
     border:1px solid #00ff9f;
     display:none;
     flex-direction:column;
+    z-index:5;
 }
 .titlebar{
     background:black;
