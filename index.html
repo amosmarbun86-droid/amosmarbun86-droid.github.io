@@ -213,58 +213,94 @@ font-weight:bold;
     transition: all 0.2s ease;}
 
 /* =====================================
+/* =====================================
    📱 RESPONSIVE MODE UNTUK ANDROID
 ===================================== */
 @media (max-width: 768px) {
 
-    /* Sidebar lebih kecil */
-    #sidebar {
-        width: 170px;
-        font-size: 12px;
+    /* Desktop menjadi vertikal */
+    #desktop {
+        flex-direction: column;
     }
 
-    /* Jendela aplikasi menyesuaikan layar */
+    /* Sidebar menjadi menu horizontal */
+    #sidebar {
+        width: 100%;
+        height: auto;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        border-right: none;
+        border-bottom: 1px solid #00ff9f55;
+    }
+
+    .side-item {
+        display: inline-block;
+        border-bottom: none;
+        border-right: 1px solid #003322;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+
+    .side-item i {
+        margin-right: 5px;
+    }
+
+    /* Workspace menyesuaikan layar */
+    #workspace {
+        width: 100%;
+        height: calc(100vh - 100px);
+        position: relative;
+    }
+
+    /* Jendela aplikasi fullscreen di HP */
     .window {
-        width: 95%;
-        height: 80%;
-        left: 2.5% !important;
-        top: 5% !important;
+        width: 100% !important;
+        height: calc(100vh - 70px) !important;
+        top: 0 !important;
+        left: 0 !important;
+        border-radius: 0;
     }
 
     /* Taskbar lebih ringkas */
     #taskbar {
-        font-size: 12px;
-        height: 32px;
-    }
-
-    /* Daftar lagu */
-    .music-item {
-        padding: 10px;
+        height: 45px;
         font-size: 14px;
     }
 
-    /* Tombol aksi lebih besar untuk sentuhan */
-    .music-actions button {
-        font-size: 16px;
-        margin-left: 4px;
+    /* Start Menu responsif */
+    #startMenu {
+        width: 100%;
+        left: 0;
+        bottom: 45px;
     }
 
-    /* Progress bar ditumpuk vertikal */
-    #progressContainer {
-        flex-direction: column;
-        gap: 5px;
+    #startMenu div {
+        padding: 12px;
+        border-bottom: 1px solid #003322;
     }
 
+    /* Floating Music Player */
+    .floating-player {
+        width: 180px;
+        bottom: 70px;
+        right: 10px;
+    }
+
+    .floating-player.mini {
+        width: 55px;
+        height: 55px;
+    }
+
+    /* Kontrol musik */
     #progressBar {
         width: 95%;
     }
 
-    /* Input dan tombol lebih nyaman di HP */
     input, button {
         font-size: 14px;
     }
 
-    /* Gambar cover musik */
     #cover {
         max-height: 150px;
     }
@@ -309,6 +345,15 @@ height:40px;
 .floating-player.mini .floating-info,
 .floating-player.mini .floating-controls{
 display:none;
+}
+
+#sidebar::-webkit-scrollbar {
+    height: 4px;
+}
+
+#sidebar::-webkit-scrollbar-thumb {
+    background: #00ff9f;
+    border-radius: 10px;
 }
 </style>
 </head>
