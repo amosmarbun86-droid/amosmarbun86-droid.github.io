@@ -531,9 +531,17 @@ draw();
    🌐 OPEN EXTERNAL PROJECT
 ========================= */
 function openExternal(url) {
-    showConfirm("Buka proyek eksternal ini?", function () {
-        window.open(url, "_blank", "noopener,noreferrer");
-    });
+    if (!url) {
+        alert("URL tidak valid!");
+        return;
+    }
+
+    // Membuka dengan cara paling kompatibel
+    const win = window.open(url, "_blank");
+    if (!win) {
+        // Jika diblokir browser
+        window.location.href = url;
+    }
 }
 </script>
 
