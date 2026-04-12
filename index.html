@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>AMOS WEB OS V13 FINAL PERFECT</title>
+<title>AMOS WEB OS V14 FINAL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="manifest" href="manifest.json">
@@ -212,88 +212,81 @@ font-weight:bold;
 #progressBar::-webkit-slider-thumb {
     transition: all 0.2s ease;}
 
+  #sidebar {
+    z-index: 10000;
+}
+
+#toggleSidebar {
+    z-index: 10001;
+}
 /* =====================================
-   📱 RESPONSIVE FINAL UNTUK ANDROID
-   Sidebar tetap vertikal seperti Desktop
+   🚀 AMOS WEB OS V14 - COLLAPSIBLE SIDEBAR
 ===================================== */
+
+#toggleSidebar {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #00ff9f;
+    border: 1px solid #00ff9f;
+    padding: 6px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    z-index: 10001;
+    border-radius: 6px;
+    display: none;
+}
+
+/* Animasi Sidebar */
+#sidebar {
+    transition: transform 0.3s ease-in-out;
+}
+
+/* Mode Mobile */
 @media (max-width: 768px) {
 
-    /* Layout utama tetap horizontal */
-    #desktop {
-        flex-direction: row;
+    #toggleSidebar {
+        display: block;
     }
 
-    /* Sidebar tetap di sebelah kiri */
     #sidebar {
-        width: 200px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 220px;
         height: 100vh;
-        display: block;
-        overflow-y: auto;
-        overflow-x: hidden;
-        background: rgba(0, 2, 23, 0.95);
-        border-right: 1px solid #00ff9f55;
-        border-bottom: none;
-        padding: 10px;
+        z-index: 10000;
+        transform: translateX(-100%);
+        background: rgba(0, 2, 23, 0.98);
     }
 
-    /* Item sidebar tetap vertikal */
-    .side-item {
-        display: block;
-        border-bottom: 1px solid #003322;
-        border-right: none;
-        font-size: 12px;
-        padding: 10px;
-        white-space: normal;
+    #sidebar.active {
+        transform: translateX(0);
     }
 
-    /* Area kerja menyesuaikan */
     #workspace {
-        width: calc(100% - 200px);
+        width: 100%;
         height: calc(100vh - 45px);
-        position: relative;
     }
 
-    /* Jendela aplikasi fullscreen di HP */
     .window {
         width: 100% !important;
         height: calc(100vh - 45px) !important;
         top: 0 !important;
         left: 0 !important;
         border-radius: 0;
+        resize: none;
     }
 
-    /* Taskbar */
     #taskbar {
         height: 45px;
-        font-size: 14px;
     }
 
-    /* Start Menu */
     #startMenu {
-        width: 200px;
-        bottom: 45px;
+        width: 100%;
         left: 0;
-    }
-
-    /* Floating Music Player */
-    .floating-player {
-        width: 180px;
-        bottom: 70px;
-        right: 10px;
-    }
-
-    .floating-player.mini {
-        width: 55px;
-        height: 55px;
-    }
-
-    /* Optimasi kontrol */
-    input, button {
-        font-size: 14px;
-    }
-
-    #cover {
-        max-height: 150px;
+        bottom: 45px;
     }
 }
 /* =========================
@@ -360,6 +353,7 @@ display:none;
 </div>
 
 <div id="desktop">
+<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 
 <div id="sidebar">
 <h3>PROJECTS</h3>
@@ -1795,7 +1789,33 @@ function getPoint(e){
         document.addEventListener(evt, triggerMini);
     });
 
+  
+/* ===============================
+       ☰ TOGGLE SIDEBAR (V14)
+    =============================== */
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        if (sidebar) {
+            sidebar.classList.toggle("active");
+        }
+    }
+
+    /* Jadikan fungsi global */
+    window.toggleSidebar = toggleSidebar;
+
+    /* Tutup sidebar otomatis saat menu dipilih di HP */
+    document.querySelectorAll(".side-item").forEach(item => {
+        item.addEventListener("click", () => {
+            if (window.innerWidth <= 768) {
+                const sidebar = document.getElementById("sidebar");
+                if (sidebar) {
+                    sidebar.classList.remove("active");
+                }
+            }
+        });
+    });
+
 });
 </script>
 </body>
-</html
+</html>
