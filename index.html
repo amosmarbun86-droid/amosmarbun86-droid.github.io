@@ -1384,6 +1384,52 @@ window.addEventListener("DOMContentLoaded", loadFloatingPos);
 
 <script>
 /* =====================================
+   ☰ TOGGLE SIDEBAR — AMOS WEB OS V14
+===================================== */
+
+// Pastikan fungsi tersedia secara global
+window.toggleSidebar = function () {
+    const sidebar = document.getElementById("sidebar");
+
+    if (!sidebar) {
+        console.error("Sidebar tidak ditemukan!");
+        return;
+    }
+
+    sidebar.classList.toggle("active");
+};
+
+// Jalankan setelah DOM siap
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("sidebar");
+    const toggleBtn = document.getElementById("toggleSidebar");
+
+    if (!sidebar || !toggleBtn) {
+        console.error("Elemen sidebar atau tombol toggle tidak ditemukan!");
+        return;
+    }
+
+    // Tutup sidebar saat menu dipilih di perangkat mobile
+    document.querySelectorAll(".side-item").forEach(item => {
+        item.addEventListener("click", () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove("active");
+            }
+        });
+    });
+
+    // Tutup sidebar saat klik di luar area sidebar (mobile)
+    document.addEventListener("click", function (e) {
+        if (
+            window.innerWidth <= 768 &&
+            !sidebar.contains(e.target) &&
+            !toggleBtn.contains(e.target)
+        ) {
+            sidebar.classList.remove("active");
+        }
+    
+
+/* =====================================
    AMOS AI OS — FINAL STABLE BUILD V13
 ===================================== */
 let aiBusy=false;
@@ -1804,32 +1850,13 @@ function getPoint(e){
 
     ["click","touchstart","mousemove"].forEach(evt=>{
         document.addEventListener(evt, triggerMini);
+    }
     });
 
   
-<script>
-document.addEventListener("DOMContentLoaded", function () {
 
-    /* ===============================
-       ☰ TOGGLE SIDEBAR (V14)
-    =============================== */
-    window.toggleSidebar = function () {
-        const sidebar = document.getElementById("sidebar");
-        if (sidebar) {
-            sidebar.classList.toggle("active");
-        }
-    };
-
-    /* Tutup sidebar otomatis saat menu dipilih di HP */
-    document.querySelectorAll(".side-item").forEach(item => {
-        item.addEventListener("click", () => {
-            if (window.innerWidth <= 768) {
-                document.getElementById("sidebar").classList.remove("active");
-            }
         });
-    });
-
-});
+  }});
 </script>
 </body>
 </html>
