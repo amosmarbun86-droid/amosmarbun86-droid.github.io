@@ -13,11 +13,14 @@
 <style>
 /* ================= GLOBAL ================= */
 body{
+    body{
     margin:0;
     font-family:Consolas, monospace;
-    background:black;
+    background: url('https://res.cloudinary.com/dkisbfx29/image/upload/v1776001576/vo6iv9bdcd86qqt4u193.png') no-repeat center center fixed;
+    background-size: cover;
     color:#00ff9f;
     overflow:hidden;
+
 }
 button{
     cursor:pointer;
@@ -35,13 +38,15 @@ input, textarea{
 }
 
 /* MATRIX BACKGROUND */
-#bgCanvas{
+##bgCanvas{
     position:fixed;
     top:0;
     left:0;
     width:100%;
     height:100%;
     z-index:0;
+    opacity:0.25; /* transparan biar wallpaper kelihatan */
+    pointer-events:none;
 }
 
 /* LOGIN */
@@ -277,7 +282,9 @@ input, textarea{
     <div class="side-item" onclick="openApp('fileManager')">
         <i class="fa-solid fa-folder"></i> File Manager
     </div>
-
+<div class="side-item" onclick="toggleMatrix()">
+    <i class="fa fa-code"></i> Toggle Matrix
+</div>
     <div class="side-item" onclick="toggleMatrix()">
     <i class="fa-solid fa-code"></i> Toggle Matrix
 </div>
