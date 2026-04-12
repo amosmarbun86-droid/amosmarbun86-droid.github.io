@@ -302,13 +302,92 @@ firebase.analytics();
 </script>
 
 <script>
-/* LOGIN */
-function login(){
-    if(pass.value==="123"){
-        login.style.display="none";
-        desktop.style.display="flex";
+/* =========================
+   🔐 LOGIN SYSTEM - FINAL
+========================= */
+function login() {
+    const passInput = document.getElementById("pass");
+    const loginBox = document.getElementById("login");
+    const desktop = document.getElementById("desktop");
+
+    if (!passInput) {
+        alert("Input password tidak ditemukan!");
+        return;
+    }
+
+    const pin = passInput.value.trim();
+
+    if (pin === "123") {
+        // Sembunyikan halaman login
+        loginBox.style.display = "none";
+
+        // Tampilkan desktop
+        desktop.style.display = "flex";
+
+        // Simpan status login
+        localStorage.setItem("amosLoggedIn", "true");
+
+        // Muat data
         loadMusic();
-    }else alert("PIN salah");
+    } else {
+        alert("PIN salah! Gunakan PIN: 123");
+        passInput.focus();
+    }
+}
+
+/* =========================
+   🔁 AUTO LOGIN SESSION
+========================= */
+document.addEventListener("DOMContentLoaded", function () {
+    const loginBox = document.getElementById("login");
+    const desktop = document.getElementById("desktop");
+    const passInput = document.getElementById("pass");
+
+    // Auto login jika sudah tersimpan
+    if (localStorage.getItem("amosLoggedIn") === "true") {
+        loginBox.style.display = "none";
+        desktop.style.display = "flex";
+        loadMusic();
+    }
+
+    // Login dengan tombol Enter
+    if (passInput) {
+        passInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                login();
+            }
+        });
+    }
+});
+
+/* =========================
+   🔐 LOGIN FUNCTION
+========================= */
+function login() {
+    const passInput = document.getElementById("pass");
+    const loginBox = document.getElementById("login");
+    const desktop = document.getElementById("desktop");
+
+    if (passInput.value.trim() === "123") {
+        loginBox.style.display = "none";
+        desktop.style.display = "flex";
+
+        // Simpan status login
+        localStorage.setItem("amosLoggedIn", "true");
+
+        loadMusic();
+    } else {
+        alert("PIN salah! Gunakan PIN: 123");
+        passInput.focus();
+    }
+}
+
+/* =========================
+   🔓 LOGOUT FUNCTION
+========================= */
+function logout() {
+    localStorage.removeItem("amosLoggedIn");
+    location.reload();
 }
 
 /* SIDEBAR */
@@ -426,6 +505,7 @@ function draw(){
     requestAnimationFrame(draw);
 }
 draw();
+
 </script>
 
 </body>
