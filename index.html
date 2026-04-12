@@ -215,15 +215,75 @@ input, textarea{
     <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 
     <!-- SIDEBAR -->
-    <div id="sidebar">
-        <h3>PROJECTS</h3>
-        <div class="side-item" onclick="openApp('notes')"><i class="fa fa-note-sticky"></i> Notes</div>
-        <div class="side-item" onclick="openApp('music')"><i class="fa fa-music"></i> Music</div>
-        <div class="side-item" onclick="openApp('terminal')"><i class="fa fa-terminal"></i> Terminal</div>
-        <div class="side-item" onclick="openApp('fileManager')"><i class="fa fa-folder"></i> File Manager</div>
-        <hr>
-        <div class="side-item" onclick="logout()"><i class="fa fa-sign-out-alt"></i> Logout</div>
+<div id="sidebar">
+    <h3>🚀 MY GITHUB PROJECTS</h3>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
+        <i class="fa-solid fa-camera"></i> Camera RCP
     </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
+        <i class="fa-solid fa-location-dot"></i> Fake GPS
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
+        <i class="fa-solid fa-user"></i> CV Amos
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
+        <i class="fa-solid fa-folder"></i> Data Pribadi
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
+        <i class="fa-solid fa-gear"></i> Admin Panel
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
+        <i class="fa-solid fa-coins"></i> SmartDebt
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
+        <i class="fa-solid fa-clock"></i> Alarm
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
+        <i class="fa-solid fa-calendar"></i> Jadwal
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">
+        <i class="fa-solid fa-file"></i> Form
+    </div>
+
+    <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
+        <i class="fa-brands fa-telegram"></i> Telegram Bot
+    </div>
+
+    <hr>
+
+    <h3>💻 SYSTEM APPS</h3>
+
+    <div class="side-item" onclick="openApp('notes')">
+        <i class="fa-solid fa-note-sticky"></i> Notes
+    </div>
+
+    <div class="side-item" onclick="openApp('music')">
+        <i class="fa-solid fa-music"></i> Music
+    </div>
+
+    <div class="side-item" onclick="openApp('terminal')">
+        <i class="fa-solid fa-terminal"></i> Terminal
+    </div>
+
+    <div class="side-item" onclick="openApp('fileManager')">
+        <i class="fa-solid fa-folder"></i> File Manager
+    </div>
+
+    <hr>
+
+    <div class="side-item" onclick="logout()">
+        <i class="fa-solid fa-sign-out-alt"></i> Logout
+    </div>
+</div>
 
     <!-- WORKSPACE -->
     <div id="workspace">
@@ -467,6 +527,14 @@ function draw(){
     requestAnimationFrame(draw);
 }
 draw();
+/* =========================
+   🌐 OPEN EXTERNAL PROJECT
+========================= */
+function openExternal(url) {
+    showConfirm("Buka proyek eksternal ini?", function () {
+        window.open(url, "_blank", "noopener,noreferrer");
+    });
+}
 </script>
 
 </body>
