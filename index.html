@@ -126,22 +126,73 @@ input, textarea{
     padding:5px;
     display:flex;
     justify-content:space-between;
-    cursor:move;
+/* ================= GLOBAL ================= */
+body{
+    margin:0;
+    font-family:Consolas, monospace;
+    background: url('https://res.cloudinary.com/dkisbfx29/image/upload/v1776001576/vo6iv9bdcd86qqt4u193.png') no-repeat center center fixed;
+    background-size: cover;
+    color:#00ff9f;
+    overflow:hidden;
 }
 
-/* TERMINAL */
-#terminalOutput{
-    flex:1;
-    overflow:auto;
-    padding:10px;
-    background:black;
-}
-#cmdInput{
-    width:100%;
-    border:none;
-    padding:5px;
+/* INPUT DAN BUTTON */
+button{
+    cursor:pointer;
     background:black;
     color:#00ff9f;
+    border:1px solid #00ff9f;
+    padding:5px 10px;
+}
+button:hover{
+    background:#00ff9f;
+    color:black;
+}
+
+input, textarea{
+    background:black;
+    color:#00ff9f;
+    border:1px solid #00ff9f;
+    padding:5px;
+}
+
+/* MATRIX BACKGROUND */
+#bgCanvas{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:0;
+    opacity:0.25; /* Transparan agar wallpaper terlihat */
+    pointer-events:none;
+}
+
+/* DESKTOP LAYER */
+#desktop{
+    position:relative;
+    z-index:1;
+    display:none;
+    width:100%;
+    height:100vh;
+}
+
+/* SIDEBAR */
+#sidebar{
+    width:220px;
+    background:rgba(0,2,23,0.95);
+    border-right:1px solid #00ff9f55;
+    padding:10px;
+    overflow:auto;
+    transition:transform 0.3s;
+    z-index:2;
+}
+
+/* WORKSPACE */
+#workspace{
+    flex:1;
+    position:relative;
+    z-index:1;
 }
 
 /* TASKBAR */
@@ -155,6 +206,7 @@ input, textarea{
     justify-content:space-between;
     align-items:center;
     padding:0 10px;
+    z-index:2;
 }
 
 /* START MENU */
@@ -282,9 +334,7 @@ input, textarea{
     <div class="side-item" onclick="openApp('fileManager')">
         <i class="fa-solid fa-folder"></i> File Manager
     </div>
-<div class="side-item" onclick="toggleMatrix()">
-    <i class="fa fa-code"></i> Toggle Matrix
-</div>
+
     <div class="side-item" onclick="toggleMatrix()">
     <i class="fa-solid fa-code"></i> Toggle Matrix
 </div>
