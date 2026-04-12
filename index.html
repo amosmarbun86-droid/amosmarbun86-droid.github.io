@@ -213,71 +213,66 @@ font-weight:bold;
     transition: all 0.2s ease;}
 
 /* =====================================
-/* =====================================
-   📱 RESPONSIVE MODE UNTUK ANDROID
+   📱 RESPONSIVE FINAL UNTUK ANDROID
+   Sidebar tetap vertikal seperti Desktop
 ===================================== */
 @media (max-width: 768px) {
 
-    /* Desktop menjadi vertikal */
+    /* Layout utama tetap horizontal */
     #desktop {
-        flex-direction: column;
+        flex-direction: row;
     }
 
-    /* Sidebar menjadi menu horizontal */
+    /* Sidebar tetap di sebelah kiri */
     #sidebar {
-        width: 100%;
-        height: auto;
-        display: flex;
-        overflow-x: auto;
-        white-space: nowrap;
-        border-right: none;
-        border-bottom: 1px solid #00ff9f55;
-    }
-
-    .side-item {
-        display: inline-block;
+        width: 200px;
+        height: 100vh;
+        display: block;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: rgba(0, 2, 23, 0.95);
+        border-right: 1px solid #00ff9f55;
         border-bottom: none;
-        border-right: 1px solid #003322;
+        padding: 10px;
+    }
+
+    /* Item sidebar tetap vertikal */
+    .side-item {
+        display: block;
+        border-bottom: 1px solid #003322;
+        border-right: none;
         font-size: 12px;
-        padding: 8px 12px;
+        padding: 10px;
+        white-space: normal;
     }
 
-    .side-item i {
-        margin-right: 5px;
-    }
-
-    /* Workspace menyesuaikan layar */
+    /* Area kerja menyesuaikan */
     #workspace {
-        width: 100%;
-        height: calc(100vh - 100px);
+        width: calc(100% - 200px);
+        height: calc(100vh - 45px);
         position: relative;
     }
 
     /* Jendela aplikasi fullscreen di HP */
     .window {
         width: 100% !important;
-        height: calc(100vh - 70px) !important;
+        height: calc(100vh - 45px) !important;
         top: 0 !important;
         left: 0 !important;
         border-radius: 0;
     }
 
-    /* Taskbar lebih ringkas */
+    /* Taskbar */
     #taskbar {
         height: 45px;
         font-size: 14px;
     }
 
-    /* Start Menu responsif */
+    /* Start Menu */
     #startMenu {
-        width: 100%;
-        left: 0;
+        width: 200px;
         bottom: 45px;
-    }
-
-    #startMenu div {
-        padding: 12px;
-        border-bottom: 1px solid #003322;
+        left: 0;
     }
 
     /* Floating Music Player */
@@ -292,11 +287,7 @@ font-weight:bold;
         height: 55px;
     }
 
-    /* Kontrol musik */
-    #progressBar {
-        width: 95%;
-    }
-
+    /* Optimasi kontrol */
     input, button {
         font-size: 14px;
     }
