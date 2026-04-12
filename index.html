@@ -1317,34 +1317,44 @@ requestAnimationFrame(drawMatrix);
 }
 drawMatrix();
 
-/* CONFIRM */
-let confirmCallback=null;
-function showConfirm(text,cb){
-confirmCallback=cb;
-document.getElementById("confirmText").innerText=text;
-document.getElementById("confirmBox").style.display="flex";
+/* =========================
+   🔔 CONFIRM POPUP SYSTEM
+========================= */
+let confirmCallback = null;
+
+function showConfirm(text, cb) {
+    confirmCallback = cb;
+
+    const confirmText = document.getElementById("confirmText");
+    const confirmBox = document.getElementById("confirmBox");
+
+    if (!confirmText || !confirmBox) {
+        console.error("ConfirmBox tidak ditemukan!");
+        return;
+    }
+
+    confirmText.innerText = text;
+    confirmBox.style.display = "flex";
 }
-function confirmYes(){if(confirmCallback)confirmCallback();confirmBox.style.display="none";}
-function confirmNo(){confirmBox.style.display="none";}
 
- 
-    let floatingTimer;
-
-function resetFloating(){
-
-    if(!floatingPlayer) return;
-
-    floatingPlayer.style.opacity = "1";
-
-    clearTimeout(floatingTimer);
-
-    floatingTimer = setTimeout(()=>{
-        floatingPlayer.style.opacity = "0.3";
-    }, 3000);
+function confirmYes() {
+    if (typeof confirmCallback === "function") {
+        confirmCallback();
+    }
+    closeConfirm();
 }
-["click","touchstart","mousemove"].forEach(evt=>{
-    document.addEventListener(evt, resetFloating);
-});
+
+function confirmNo() {
+    closeConfirm();
+}
+
+function closeConfirm() {
+    const confirmBox = document.getElementById("confirmBox");
+    if (confirmBox) {
+        confirmBox.style.display = "none";
+    }
+    confirmCallback = null;
+}
 /* =========================
    💾 SIMPAN POSISI FLOATING
 ========================= */
