@@ -353,7 +353,9 @@ display:none;
 </div>
 
 <div id="desktop">
-<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+    <!-- Tombol Toggle Sidebar -->
+    <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+
 
 <div id="sidebar">
 <h3>PROJECTS</h3>
@@ -1362,7 +1364,7 @@ function loadFloatingPos(){
 /* LOAD SAAT WEB DIBUKA */
 window.addEventListener("DOMContentLoaded", loadFloatingPos);
 
-</script>
+
 
 <script>
 /* =====================================
@@ -1557,7 +1559,7 @@ document.getElementById("cmdInput").focus();
 }
 
 
-
+<script>
     /* =========================
        TERMINAL LISTENER
     ========================= */
@@ -1575,7 +1577,7 @@ document.getElementById("cmdInput").focus();
             }
         });
     }
-<script>
+
 document.addEventListener("DOMContentLoaded", function(){
     /* =========================
        FLOATING PLAYER INIT
@@ -1790,27 +1792,24 @@ function getPoint(e){
     });
 
   
-/* ===============================
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ===============================
        ☰ TOGGLE SIDEBAR (V14)
     =============================== */
-    function toggleSidebar() {
+    window.toggleSidebar = function () {
         const sidebar = document.getElementById("sidebar");
         if (sidebar) {
             sidebar.classList.toggle("active");
         }
-    }
-
-    /* Jadikan fungsi global */
-    window.toggleSidebar = toggleSidebar;
+    };
 
     /* Tutup sidebar otomatis saat menu dipilih di HP */
     document.querySelectorAll(".side-item").forEach(item => {
         item.addEventListener("click", () => {
             if (window.innerWidth <= 768) {
-                const sidebar = document.getElementById("sidebar");
-                if (sidebar) {
-                    sidebar.classList.remove("active");
-                }
+                document.getElementById("sidebar").classList.remove("active");
             }
         });
     });
