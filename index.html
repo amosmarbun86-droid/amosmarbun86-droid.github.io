@@ -721,17 +721,57 @@ function prevMusic(){
 }
  
 function addMusic(){
-    const name=document.getElementById("songName").value;
-    const url=document.getElementById("songURL").value;
-    if(!name||!url) return alert("Lengkapi data!");
+    const name = document.getElementById("songName").value;
+    const url = document.getElementById("songURL").value;
 
-    const song={name,url,folder:"music"};
-    let localMusic=JSON.parse(localStorage.getItem("localMusic"))||[];
-    localMusic.push(song);
-    localStorage.setItem("localMusic",JSON.stringify(localMusic));
+    if(!name || !url) return alert("Lengkapi data!");
 
-    db.collection("files").add(song);
-    loadMusic();
+    const audio = new Audio(url);
+
+    audio.addEventListener("loadedmetadata", function(){
+
+        const minutes = Math.floor(audio.duration / 60);
+        const seconds = Math.floor(audio.duration % 60);
+
+        const duration = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+
+        const song = {
+            name: name,
+            url: url,
+            folder: "music",
+            duration: duration
+        };
+
+        let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
+
+        localMusic.push(song);
+
+        localStorage.setItem("localMusic", JSON.stringify(localMusic));
+
+        db.collection("files").add(song);
+
+        loadMusic();
+    });
+
+    // fallback kalau metadata gagal load
+    audio.addEventListener("error", function(){
+        const song = {
+            name: name,
+            url: url,
+            folder: "music",
+            duration: "00:00"
+        };
+
+        let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
+
+        localMusic.push(song);
+
+        localStorage.setItem("localMusic", JSON.stringify(localMusic));
+
+        db.collection("files").add(song);
+
+        loadMusic();
+    });
 }
 
 function addToFavorites(data){
