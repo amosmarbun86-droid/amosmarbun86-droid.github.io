@@ -669,6 +669,8 @@ function renderMusic(list){
         <button onclick="addToFavorites('${data}')">★</button>
         <button onclick="addToPlaylist('${data}')">＋</button>
         <button onclick="deleteMusic('${data}')">❌</button>
+        <button onclick="deleteFavorite('${data}')">❌</button>
+        <button onclick="deletePlaylist('${data}')">❌</button>
     </div>
 `;
 
@@ -741,21 +743,78 @@ function addToPlaylist(data){
     playlist.push(song);
     localStorage.setItem("playlist", JSON.stringify(playlist));
 }
+// =======================
+// 🎵 DELETE ALL MUSIC
+// =======================
 function deleteMusic(data){
     const song = JSON.parse(decodeURIComponent(data));
 
-    // ambil dari local storage
     let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
 
-    // filter (hapus lagu)
     localMusic = localMusic.filter(s => s.url !== song.url);
 
-    // simpan ulang
     localStorage.setItem("localMusic", JSON.stringify(localMusic));
 
-    // reload list
     loadMusic();
-    }
+}
+
+// =======================
+// ⭐ DELETE FAVORITES
+// =======================
+function deleteFavorite(data){
+    const song = JSON.parse(decodeURIComponent(data));
+
+    let fav = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    fav = fav.filter(s => s.url !== song.url);
+
+    localStorage.setItem("favorites", JSON.stringify(fav));
+
+    loadFavorites();
+}
+
+// =======================
+// 📂 DELETE PLAYLIST
+// =======================
+function deletePlaylist(data){
+    const song = JSON.parse(decodeURIComponent(data));
+
+    let playlist = JSON.parse(localStorage.getItem("playlist")) || [];
+
+    playlist = playlist.filter(s => s.url !== song.url);
+
+    localStorage.setItem("playlist", JSON.stringify(playlist));
+
+    loadPlaylist();
+}
+
+// =======================
+// 🔄 LOAD DATA
+// =======================
+function loadFavorites(){
+    let fav = JSON.parse(localStorage.getItem("favorites")) || [];
+    renderFavorites(fav);
+}
+
+function loadPlaylist(){
+    let playlist = JSON.parse(localStorage.getItem("playlist")) || [];
+    renderPlaylist(playlist);
+}
+
+// =======================
+// 📺 SHOW MENU
+// =======================
+function showFavorites(){
+    loadFavorites();
+}
+
+function showPlaylist(){
+    loadPlaylist();
+}
+
+function showAllMusic(){
+    renderMusic(musicData);
+}
 function showFavorites(){renderMusic(favorites);}
 function showPlaylist(){renderMusic(playlist);}
 function showAllMusic(){renderMusic(musicData);}
