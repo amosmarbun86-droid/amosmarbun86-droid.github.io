@@ -663,14 +663,17 @@ function renderMusic(list){
         const data = encodeURIComponent(JSON.stringify(song));
 
         div.innerHTML = `
-    ${song.name}
-    <div style="float:right;">
+    <div>
+        <div>${song.name}</div>
+        <small>${song.duration || "00:00"}</small>
+    </div>
+
+    <div style="display:flex; gap:5px;">
         <button onclick="playMusic('${data}')">▶</button>
         <button onclick="addToFavorites('${data}')">★</button>
         <button onclick="addToPlaylist('${data}')">＋</button>
         <button onclick="deleteMusic('${data}')">❌</button>
-        
-    </div>
+  </div>
 `;
 
         musicList.appendChild(div);
