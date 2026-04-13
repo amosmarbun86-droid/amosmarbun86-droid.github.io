@@ -216,7 +216,34 @@ input, textarea{
 .floating-player button{
     padding:5px 8px;
 }
+/* 🔥 FLOATING WHATSAPP STYLE */
+#floatingPlayer{
+    position:fixed;
+    top:70%;
+    left:80%;
+    transform:translate(-50%, -50%);
+    z-index:9999;
+    display:none;
+}
 
+.floating-circle{
+    width:60px;
+    height:60px;
+    background:#00ff9f;
+    color:black;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:24px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.6);
+    cursor:grab;
+}
+
+.floating-circle:active{
+    transform:scale(0.9);
+    cursor:grabbing;
+    }
 /* ===============================
    ⚠️ CONFIRM BOX OVERLAY
 ================================= */
@@ -556,9 +583,10 @@ input, textarea{
 
     
 <!-- FLOATING PLAYER -->
-<div id="floatingPlayer" class="floating-player">
-    <span id="floatingTitle">Tidak ada lagu</span>
-    <button onclick="togglePlay()">▶</button>
+<div id="floatingPlayer">
+    <div class="floating-circle" onclick="togglePlay()">
+        🎵
+    </div>
 </div>
 
 <!-- FIREBASE -->
