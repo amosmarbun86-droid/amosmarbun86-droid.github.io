@@ -197,8 +197,11 @@ input, textarea{
 /* FLOATING PLAYER */
 .floating-player{
     position:fixed;
-    bottom:50px;
-    right:10px;
+
+    top:70%;
+    left:80%;
+    transform:translate(-50%, -50%);
+
     background:black;
     border:1px solid #00ff9f;
     padding:10px;
@@ -999,6 +1002,52 @@ document.querySelectorAll(".window").forEach(win => {
     document.addEventListener("touchmove", drag);
     document.addEventListener("touchend", stopDrag);
 
+});
+    // =======================
+// DRAG FLOATING PLAYER
+// =======================
+const floating = document.getElementById("floatingPlayer");
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+// PC (mouse)
+floating.addEventListener("mousedown", (e)=>{
+    isDragging = true;
+    offsetX = e.clientX - floating.offsetLeft;
+    offsetY = e.clientY - floating.offsetTop;
+});
+
+document.addEventListener("mousemove", (e)=>{
+    if(isDragging){
+        floating.style.left = (e.clientX - offsetX) + "px";
+        floating.style.top = (e.clientY - offsetY) + "px";
+        floating.style.transform = "none";
+    }
+});
+
+document.addEventListener("mouseup", ()=>{
+    isDragging = false;
+});
+
+// HP Android (touch)
+floating.addEventListener("touchstart", (e)=>{
+    isDragging = true;
+    offsetX = e.touches[0].clientX - floating.offsetLeft;
+    offsetY = e.touches[0].clientY - floating.offsetTop;
+});
+
+document.addEventListener("touchmove", (e)=>{
+    if(isDragging){
+        floating.style.left = (e.touches[0].clientX - offsetX) + "px";
+        floating.style.top = (e.touches[0].clientY - offsetY) + "px";
+        floating.style.transform = "none";
+    }
+});
+
+document.addEventListener("touchend", ()=>{
+    isDragging = false;
 });
 </script>
 </body>
