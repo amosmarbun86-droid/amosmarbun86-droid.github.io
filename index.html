@@ -585,7 +585,7 @@ input, textarea{
 <!-- FLOATING PLAYER -->
 <div id="floatingPlayer">
     <div class="floating-circle" onclick="togglePlay()">
-        🎵
+        <span id="floatingIcon">▶</span>
     </div>
 </div>
 
@@ -666,8 +666,17 @@ const player=document.getElementById("player");
 const musicList=document.getElementById("musicList");
 const floatingPlayer=document.getElementById("floatingPlayer");
 const floatingTitle=document.getElementById("floatingTitle");
+
 player.addEventListener("ended", nextMusic);
 
+// 🔥 TAMBAHKAN DI SINI
+player.addEventListener("play", ()=>{
+    document.getElementById("floatingIcon").innerText = "⏸";
+});
+
+player.addEventListener("pause", ()=>{
+    document.getElementById("floatingIcon").innerText = "▶";
+});
 let musicData=[];
 let currentIndex = 0;
 let favorites=JSON.parse(localStorage.getItem("favorites"))||[];
@@ -718,14 +727,22 @@ function playMusic(data){
 
     player.src = song.url;
     player.play();
-
+    
+document.getElementById("floatingIcon").innerText = "⏸";
     floatingPlayer.style.display = "flex";
     floatingTitle.innerText = song.name;
 }
 
 function togglePlay(){
-    if(player.paused) player.play();
-    else player.pause();
+    const icon = document.getElementById("floatingIcon");
+
+    if(player.paused){
+        player.play();
+        icon.innerText = "⏸";
+    }else{
+        player.pause();
+        icon.innerText = "▶";
+    }
 }
 function nextMusic(){
     if(musicData.length === 0) return;
@@ -736,6 +753,7 @@ function nextMusic(){
     const song = musicData[currentIndex];
     player.src = song.url;
     player.play();
+    document.getElementById("floatingIcon").innerText = "⏸";
     floatingTitle.innerText = song.name;
 }
 
@@ -748,6 +766,7 @@ function prevMusic(){
     const song = musicData[currentIndex];
     player.src = song.url;
     player.play();
+    document.getElementById("floatingIcon").innerText = "⏸";
     floatingTitle.innerText = song.name;
 }
  
