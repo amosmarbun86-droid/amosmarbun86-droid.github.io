@@ -152,6 +152,9 @@ input, textarea{
     align-items:center;
     border-bottom:1px solid #00ff9f;
     font-weight:bold;
+
+    cursor:move;        /* 🔥 TAMBAHAN */
+    user-select:none;   /* 🔥 TAMBAHAN */
 }
 
 /* MUSIC */
@@ -811,6 +814,66 @@ function openExternal(url) {
         window.location.href = url;
     }
 }
+/* =========================
+   🖐️ DRAG WINDOW (HP & PC)
+========================= */
+
+document.querySelectorAll(".window").forEach(win => {
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    const titleBar = win.querySelector(".titlebar");
+
+    // START DRAG
+    function startDrag(e){
+        isDragging = true;
+
+        const rect = win.getBoundingClientRect();
+
+        if(e.touches){
+            offsetX = e.touches[0].clientX - rect.left;
+            offsetY = e.touches[0].clientY - rect.top;
+        }else{
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        }
+    }
+
+    // DRAG MOVE
+    function drag(e){
+        if(!isDragging) return;
+
+        let x, y;
+
+        if(e.touches){
+            x = e.touches[0].clientX - offsetX;
+            y = e.touches[0].clientY - offsetY;
+        }else{
+            x = e.clientX - offsetX;
+            y = e.clientY - offsetY;
+        }
+
+        win.style.left = x + "px";
+        win.style.top = y + "px";
+        win.style.transform = "none"; // matikan center
+    }
+
+    // STOP DRAG
+    function stopDrag(){
+        isDragging = false;
+    }
+
+    // EVENT
+    titleBar.addEventListener("mousedown", startDrag);
+    document.addEventListener("mousemove", drag);
+    document.addEventListener("mouseup", stopDrag);
+
+    titleBar.addEventListener("touchstart", startDrag);
+    document.addEventListener("touchmove", drag);
+    document.addEventListener("touchend", stopDrag);
+
+});
 </script>
 </body>
 </html>
