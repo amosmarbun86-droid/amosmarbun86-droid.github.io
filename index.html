@@ -136,12 +136,14 @@ input, textarea{
     height:75%;
     background:rgba(0,2,23,0.95);
     border:1px solid #00ff9f;
-    display:none;
+
+    display:flex;
     flex-direction:column;
+    overflow:hidden; /* 🔥 TAMBAHAN PENTING */
+
     z-index:5;
     box-shadow:0 0 15px rgba(0,255,159,0.3);
 }
-
 .titlebar{
     background:black;
     padding:5px 10px;
@@ -154,8 +156,8 @@ input, textarea{
 
 /* MUSIC */
 #musicList{
-    overflow:auto;
     flex:1;
+    overflow:auto;
 }
 
 .music-item{
@@ -320,7 +322,14 @@ input, textarea{
     background:#00ff9f;
     border-radius:10px;
 }
-
+/* 🔥 FIX SCROLL DALAM WINDOW */
+.window textarea,
+#terminalOutput,
+#musicList,
+#fileManagerContent{
+    flex:1;
+    overflow:auto;
+}
 /* ================= RESPONSIVE ================= */
 @media (max-width:768px){
     body{
@@ -328,12 +337,13 @@ input, textarea{
     }
 
     .window{
-        width:95%;
-        height:85%;
-        top:52%;
-        left:50%;
-        transform:translate(-50%, -50%);
-    }
+    width:95%;
+    height:85%;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    border-radius:10px;
+}
 
     #taskbar{
         height:45px;
