@@ -172,6 +172,12 @@ input, textarea{
     background:#001a12;
 }
 
+/* 🔥 TAMBAHAN DI SINI */
+.music-item button{
+    margin-left:3px;
+    font-size:11px;
+    padding:3px 6px;
+}
 /* ===============================
    🎵 MUSIC POPUP / FLOAT PANEL
 ================================= */
@@ -629,6 +635,7 @@ const player=document.getElementById("player");
 const musicList=document.getElementById("musicList");
 const floatingPlayer=document.getElementById("floatingPlayer");
 const floatingTitle=document.getElementById("floatingTitle");
+player.addEventListener("ended", nextMusic);
 
 let musicData=[];
 let currentIndex = 0;
@@ -656,13 +663,14 @@ function renderMusic(list){
         const data = encodeURIComponent(JSON.stringify(song));
 
         div.innerHTML = `
-            ${song.name}
-            <div style="float:right;">
-                <button onclick="playMusic('${data}')">▶</button>
-                <button onclick="addToFavorites('${data}')">★</button>
-                <button onclick="addToPlaylist('${data}')">＋</button>
-            </div>
-        `;
+    ${song.name}
+    <div style="float:right;">
+        <button onclick="playMusic('${data}')">▶</button>
+        <button onclick="addToFavorites('${data}')">★</button>
+        <button onclick="addToPlaylist('${data}')">＋</button>
+        <button onclick="deleteMusic('${data}')">❌</button>
+    </div>
+`;
 
         musicList.appendChild(div);
     });
@@ -733,7 +741,21 @@ function addToPlaylist(data){
     playlist.push(song);
     localStorage.setItem("playlist", JSON.stringify(playlist));
 }
+function deleteMusic(data){
+    const song = JSON.parse(decodeURIComponent(data));
 
+    // ambil dari local storage
+    let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
+
+    // filter (hapus lagu)
+    localMusic = localMusic.filter(s => s.url !== song.url);
+
+    // simpan ulang
+    localStorage.setItem("localMusic", JSON.stringify(localMusic));
+
+    // reload list
+    loadMusic();
+    }
 function showFavorites(){renderMusic(favorites);}
 function showPlaylist(){renderMusic(playlist);}
 function showAllMusic(){renderMusic(musicData);}
