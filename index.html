@@ -495,7 +495,13 @@ input, textarea{
             <div class="titlebar">
                 Music <span onclick="closeApp('music')">X</span>
             </div>
-            <audio id="player" controls style="width:100%"></audio>
+            <div style="display:flex; gap:5px; align-items:center;">
+    <audio id="player" style="flex:1;"></audio>
+
+    <button onclick="prevMusic()">⏮</button>
+    <button onclick="togglePlay()">▶</button>
+    <button onclick="nextMusic()">⏭</button>
+</div>
 
             <div style="padding:10px;">
                 <input type="text" id="songName" placeholder="Judul Lagu">
@@ -625,6 +631,7 @@ const floatingPlayer=document.getElementById("floatingPlayer");
 const floatingTitle=document.getElementById("floatingTitle");
 
 let musicData=[];
+let currentIndex = 0;
 let favorites=JSON.parse(localStorage.getItem("favorites"))||[];
 let playlist=JSON.parse(localStorage.getItem("playlist"))||[];
 
@@ -664,6 +671,8 @@ function renderMusic(list){
 function playMusic(data){
     const song = JSON.parse(decodeURIComponent(data));
 
+    currentIndex = musicData.findIndex(s => s.url === song.url);
+
     player.src = song.url;
     player.play();
 
@@ -675,7 +684,30 @@ function togglePlay(){
     if(player.paused) player.play();
     else player.pause();
 }
+function nextMusic(){
+    if(musicData.length === 0) return;
 
+    currentIndex++;
+    if(currentIndex >= musicData.length) currentIndex = 0;
+
+    const song = musicData[currentIndex];
+    player.src = song.url;
+    player.play();
+    floatingTitle.innerText = song.name;
+}
+
+function prevMusic(){
+    if(musicData.length === 0) return;
+
+    currentIndex--;
+    if(currentIndex < 0) currentIndex = musicData.length - 1;
+
+    const song = musicData[currentIndex];
+    player.src = song.url;
+    player.play();
+    floatingTitle.innerText = song.name;
+}
+ 
 function addMusic(){
     const name=document.getElementById("songName").value;
     const url=document.getElementById("songURL").value;
