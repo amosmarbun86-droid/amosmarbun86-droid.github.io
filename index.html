@@ -358,103 +358,110 @@ input, textarea{
     <button onclick="login()">ENTER</button>
 </div>
 
-<!-- DESKTOP -->
+--><!-- DESKTOP -->
 <div id="desktop">
     <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 
     <!-- SIDEBAR -->
-<div id="sidebar">
-    <h3>🚀 MY GITHUB PROJECTS</h3>
+    <div id="sidebar">
+        <h3>🚀 MY GITHUB PROJECTS</h3>
 
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
-        <i class="fa-solid fa-camera"></i> Camera RCP
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
+            <i class="fa-solid fa-camera"></i> Camera RCP
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
+            <i class="fa-solid fa-location-dot"></i> Fake GPS
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
+            <i class="fa-solid fa-user"></i> CV Amos
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
+            <i class="fa-solid fa-folder"></i> Data Pribadi
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
+            <i class="fa-solid fa-gear"></i> Admin Panel
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
+            <i class="fa-solid fa-coins"></i> SmartDebt
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
+            <i class="fa-solid fa-clock"></i> Alarm
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
+            <i class="fa-solid fa-calendar"></i> Jadwal
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">
+            <i class="fa-solid fa-file"></i> Form
+        </div>
+
+        <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
+            <i class="fa-brands fa-telegram"></i> Telegram Bot
+        </div>
+
+        <hr>
+        <h3>💻 SYSTEM APPS</h3>
+
+        <div class="side-item" onclick="openApp('notes')">
+            <i class="fa-solid fa-note-sticky"></i> Notes
+        </div>
+
+        <div class="side-item" onclick="openApp('music')">
+            <i class="fa-solid fa-music"></i> Music
+        </div>
+
+        <div class="side-item" onclick="openApp('terminal')">
+            <i class="fa-solid fa-terminal"></i> Terminal
+        </div>
+
+        <div class="side-item" onclick="openApp('fileManager')">
+            <i class="fa-solid fa-folder"></i> File Manager
+        </div>
+
+        <div class="side-item" onclick="toggleMatrix()">
+            <i class="fa-solid fa-code"></i> Toggle Matrix
+        </div>
+
+        <hr>
+
+        <div class="side-item" onclick="logout()">
+            <i class="fa-solid fa-sign-out-alt"></i> Logout
+        </div>
     </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
-        <i class="fa-solid fa-location-dot"></i> Fake GPS
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
-        <i class="fa-solid fa-user"></i> CV Amos
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
-        <i class="fa-solid fa-folder"></i> Data Pribadi
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
-        <i class="fa-solid fa-gear"></i> Admin Panel
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
-        <i class="fa-solid fa-coins"></i> SmartDebt
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
-        <i class="fa-solid fa-clock"></i> Alarm
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
-        <i class="fa-solid fa-calendar"></i> Jadwal
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">
-        <i class="fa-solid fa-file"></i> Form
-    </div>
-
-    <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
-        <i class="fa-brands fa-telegram"></i> Telegram Bot
-    </div>
-
-    <hr>
-
-    <h3>💻 SYSTEM APPS</h3>
-
-<div class="side-item" onclick="openApp('notes')">
-    <i class="fa-solid fa-note-sticky"></i> Notes
-</div>
-
-<div class="side-item" onclick="openApp('music')">
-    <i class="fa-solid fa-music"></i> Music
-</div>
-
-<div class="side-item" onclick="openApp('terminal')">
-    <i class="fa-solid fa-terminal"></i> Terminal
-</div>
-
-<div class="side-item" onclick="openApp('fileManager')">
-    <i class="fa-solid fa-folder"></i> File Manager
-</div>
-
-<div class="side-item" onclick="toggleMatrix()">
-    <i class="fa-solid fa-code"></i> Toggle Matrix
-</div>
-
-<hr>
-
-<div class="side-item" onclick="logout()">
-    <i class="fa-solid fa-sign-out-alt"></i> Logout
-</div>
+    <!-- END SIDEBAR -->
 
     <!-- WORKSPACE -->
     <div id="workspace">
 
         <!-- NOTES -->
         <div class="window" id="notes">
-            <div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
+            <div class="titlebar">
+                Notes <span onclick="closeApp('notes')">X</span>
+            </div>
             <textarea style="flex:1;"></textarea>
         </div>
 
         <!-- TERMINAL -->
         <div class="window" id="terminal">
-            <div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
+            <div class="titlebar">
+                Terminal <span onclick="closeApp('terminal')">X</span>
+            </div>
             <div id="terminalOutput"></div>
             <input id="cmdInput" placeholder="Ketik perintah..." />
         </div>
 
         <!-- MUSIC -->
         <div class="window" id="music">
-            <div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
+            <div class="titlebar">
+                Music <span onclick="closeApp('music')">X</span>
+            </div>
             <audio id="player" controls style="width:100%"></audio>
 
             <div style="padding:10px;">
@@ -471,13 +478,16 @@ input, textarea{
 
         <!-- FILE MANAGER -->
         <div class="window" id="fileManager">
-            <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
+            <div class="titlebar">
+                File Manager <span onclick="closeApp('fileManager')">X</span>
+            </div>
             <div id="fileManagerContent" style="padding:10px;">
                 Sistem file berbasis Firebase.
             </div>
         </div>
 
     </div>
+    <!-- END WORKSPACE -->
 
     <!-- TASKBAR -->
     <div id="taskbar">
@@ -492,8 +502,11 @@ input, textarea{
         <div onclick="openApp('terminal')">Terminal</div>
         <div onclick="openApp('fileManager')">File Manager</div>
     </div>
-</div>
 
+</div>
+<!-- END DESKTOP -->
+
+    
 <!-- FLOATING PLAYER -->
 <div id="floatingPlayer" class="floating-player">
     <span id="floatingTitle">Tidak ada lagu</span>
