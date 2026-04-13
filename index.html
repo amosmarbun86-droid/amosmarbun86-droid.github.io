@@ -608,25 +608,34 @@ function loadMusic(){
 
 function renderMusic(list){
     musicList.innerHTML="";
+
     list.forEach(song=>{
         const div=document.createElement("div");
         div.className="music-item";
-        div.innerHTML=`
+
+        const data = encodeURIComponent(JSON.stringify(song));
+
+        div.innerHTML = `
             ${song.name}
             <div style="float:right;">
-                <button onclick='playMusic(${JSON.stringify(song)})'>▶</button>
-                <button onclick='addToFavorites(${JSON.stringify(song)})'>★</button>
-                <button onclick='addToPlaylist(${JSON.stringify(song)})'>＋</button>
-            </div>`;
+                <button onclick="playMusic('${data}')">▶</button>
+                <button onclick="addToFavorites('${data}')">★</button>
+                <button onclick="addToPlaylist('${data}')">＋</button>
+            </div>
+        `;
+
         musicList.appendChild(div);
     });
 }
 
-function playMusic(song){
-    player.src=song.url;
+function playMusic(data){
+    const song = JSON.parse(decodeURIComponent(data));
+
+    player.src = song.url;
     player.play();
-    floatingPlayer.style.display="block";
-    floatingTitle.innerText=song.name;
+
+    floatingPlayer.style.display = "flex";
+    floatingTitle.innerText = song.name;
 }
 
 function togglePlay(){
@@ -648,14 +657,16 @@ function addMusic(){
     loadMusic();
 }
 
-function addToFavorites(song){
+function addToFavorites(data){
+    const song = JSON.parse(decodeURIComponent(data));
     favorites.push(song);
-    localStorage.setItem("favorites",JSON.stringify(favorites));
+    localStorage.setItem("favorites", JSON.stringify(favorites));
 }
 
-function addToPlaylist(song){
+function addToPlaylist(data){
+    const song = JSON.parse(decodeURIComponent(data));
     playlist.push(song);
-    localStorage.setItem("playlist",JSON.stringify(playlist));
+    localStorage.setItem("playlist", JSON.stringify(playlist));
 }
 
 function showFavorites(){renderMusic(favorites);}
