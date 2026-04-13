@@ -669,8 +669,7 @@ function renderMusic(list){
         <button onclick="addToFavorites('${data}')">★</button>
         <button onclick="addToPlaylist('${data}')">＋</button>
         <button onclick="deleteMusic('${data}')">❌</button>
-        <button onclick="deleteFavorite('${data}')">❌</button>
-        <button onclick="deletePlaylist('${data}')">❌</button>
+        
     </div>
 `;
 
@@ -758,35 +757,6 @@ function deleteMusic(data){
     loadMusic();
 }
 
-// =======================
-// ⭐ DELETE FAVORITES
-// =======================
-function deleteFavorite(data){
-    const song = JSON.parse(decodeURIComponent(data));
-
-    let fav = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    fav = fav.filter(s => s.url !== song.url);
-
-    localStorage.setItem("favorites", JSON.stringify(fav));
-
-    loadFavorites();
-}
-
-// =======================
-// 📂 DELETE PLAYLIST
-// =======================
-function deletePlaylist(data){
-    const song = JSON.parse(decodeURIComponent(data));
-
-    let playlist = JSON.parse(localStorage.getItem("playlist")) || [];
-
-    playlist = playlist.filter(s => s.url !== song.url);
-
-    localStorage.setItem("playlist", JSON.stringify(playlist));
-
-    loadPlaylist();
-}
 
 // =======================
 // 🔄 LOAD DATA
