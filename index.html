@@ -641,10 +641,11 @@ function setRandomWallpaper(){
     const random = wallpapers[Math.floor(Math.random() * wallpapers.length)];
 
     document.body.style.backgroundImage = `url('${random}')`;
-
-    // simpan ke localStorage
     localStorage.setItem("wallpaper", random);
-    }
+}
+
+// 🔥 TEST LANGSUNG
+setRandomWallpaper();
 /* LOGIN SYSTEM */
 function login(){
     const pin=document.getElementById("pass").value;
