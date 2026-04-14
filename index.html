@@ -604,10 +604,17 @@ const firebaseConfig = {
   messagingSenderId: "59843745100",
   appId: "1:59843745100:web:b29e5996052a3bf5672be9",
   measurementId: "G-Z2F7MXPSCH"
+    
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 firebase.analytics();
+
+    // =======================
+// ☁️ CLOUDINARY CONFIG (DI SINI)
+// =======================
+const CLOUD_NAME = "dkisbfx29";
+const UPLOAD_PRESET = "ml_default";
 
 /* LOGIN SYSTEM */
 function login(){
