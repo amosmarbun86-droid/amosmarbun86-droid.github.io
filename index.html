@@ -542,6 +542,8 @@ input, textarea{
             <div style="padding:10px;">
                 <input type="text" id="songName" placeholder="Judul Lagu">
                 <input type="text" id="songURL" placeholder="URL Lagu">
+                <input type="file" id="songFile" accept="audio/*">
+                <button onclick="uploadMusic()">Upload File</button>
                 <button onclick="addMusic()">Tambah</button>
                 <button onclick="showAllMusic()">Semua</button>
                 <button onclick="showFavorites()">Favorit</button>
