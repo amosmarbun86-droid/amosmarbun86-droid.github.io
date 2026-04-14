@@ -16,8 +16,14 @@
 body{
     margin:0;
     font-family:Consolas, monospace;
-    background: url('https://res.cloudinary.com/dkisbfx29/image/upload/v1776001576/vo6iv9bdcd86qqt4u193.png') no-repeat center center fixed;
+
+    background-image: url('https://res.cloudinary.com/dkisbfx29/image/upload/v1776001576/vo6iv9bdcd86qqt4u193.png');
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
+
+    background-attachment: fixed; /* PC */
+
     color:#00ff9f;
     overflow:hidden;
 }
@@ -372,8 +378,11 @@ input, textarea{
 /* ================= RESPONSIVE ================= */
 @media (max-width:768px){
     body{
-        background-attachment:scroll;
+        background-attachment: scroll; /* 🔥 penting untuk HP */
+        background-size: cover;
+        background-position: center;
     }
+}
 
     .window{
     width:95%;
