@@ -890,26 +890,7 @@ async function uploadMusic(){
     }
 }
 
-    // fallback kalau metadata gagal load
-    audio.addEventListener("error", function(){
-        const song = {
-            name: name,
-            url: url,
-            folder: "music",
-            duration: "00:00"
-        };
-
-        let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
-
-        localMusic.push(song);
-
-        localStorage.setItem("localMusic", JSON.stringify(localMusic));
-
-        db.collection("files").add(song);
-
-        loadMusic();
-    });
-}
+    
 
 function addToFavorites(data){
     const song = JSON.parse(decodeURIComponent(data));
