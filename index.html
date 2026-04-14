@@ -935,21 +935,21 @@ function loadPlaylist(){
 // =======================
 // 📺 SHOW MENU
 // =======================
+
 function showFavorites(){
-    loadFavorites();
+    musicList.innerHTML = "<h3>⭐ Favorit</h3>";
+    renderMusic(favorites);
 }
 
 function showPlaylist(){
-    loadPlaylist();
+    musicList.innerHTML = "<h3>📀 Playlist</h3>";
+    renderMusic(playlist);
 }
 
 function showAllMusic(){
+    musicList.innerHTML = "<h3>🎵 Semua Lagu</h3>";
     renderMusic(musicData);
 }
-function showFavorites(){renderMusic(favorites);}
-function showPlaylist(){renderMusic(playlist);}
-function showAllMusic(){renderMusic(musicData);}
-
 /* =========================
    🟢 MATRIX EFFECT TOGGLE
 ========================= */
