@@ -623,10 +623,14 @@ const db = firebase.firestore();
 firebase.analytics();
 
     // =======================
-// ☁️ CLOUDINARY CONFIG (DI SINI)
+// ☁️ CLOUDINARY CONFIG
 // =======================
 const CLOUD_NAME = "dkisbfx29";
 const UPLOAD_PRESET = "ml_default";
+
+// =======================
+// 🖼️ AUTO WALLPAPER FINAL
+// =======================
 
 const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776001576/vo6iv9bdcd86qqt4u193.png",
@@ -634,18 +638,25 @@ const wallpapers = [
     "https://images.unsplash.com/photo-1493244040629-496f6d136cc3",
     "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
 ];
-// =======================
-// 🎲 RANDOM WALLPAPER (STEP 2)
-// =======================
-function setRandomWallpaper(){
-    const random = wallpapers[Math.floor(Math.random() * wallpapers.length)];
 
+// 🔁 GANTI WALLPAPER
+function changeWallpaper(){
+    const random = wallpapers[Math.floor(Math.random() * wallpapers.length)];
     document.body.style.backgroundImage = `url('${random}')`;
     localStorage.setItem("wallpaper", random);
 }
 
-// 🔥 TEST LANGSUNG
-setRandomWallpaper();
+// 🚀 LOAD
+document.addEventListener("DOMContentLoaded", ()=>{
+    const saved = localStorage.getItem("wallpaper");
+
+    if(saved){
+        document.body.style.backgroundImage = `url('${saved}')`;
+    }
+
+    changeWallpaper();
+    setInterval(changeWallpaper, 10000);
+});
 /* LOGIN SYSTEM */
 function login(){
     const pin=document.getElementById("pass").value;
