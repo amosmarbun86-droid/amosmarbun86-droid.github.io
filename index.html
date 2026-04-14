@@ -812,6 +812,84 @@ function addMusic(){
         loadMusic();
     });
 
+} // ✅ INI PENUTUP addMusic()
+
+
+// =======================
+// 🎵 UPLOAD FILE (DI LUAR)
+// =======================
+async function uploadMusic(){
+
+    const file = document.getElementById("songFile").files[0];
+    const name = document.getElementById("songName").value;
+
+    if(!file || !name){
+        alert("Pilih file & isi judul!");
+        return;
+    }
+
+    musicList.innerHTML = "Uploading...";
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    // ✅ WAJIB: biar tidak bentrok
+    formData.append("public_id", Date.now() + "_" + file.name);
+
+    // ✅ folder cloud
+    formData.append("folder", "amos-webos/music");
+
+    try{
+        const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const data = await res.json();
+
+        if(!data.secure_url){
+            console.error(data);
+            alert("Upload gagal (cek preset)");
+            return;
+        }
+
+        const url = data.secure_url;
+
+        const audio = new Audio(url);
+
+        audio.addEventListener("loadedmetadata", function(){
+
+            const minutes = Math.floor(audio.duration / 60);
+            const seconds = Math.floor(audio.duration % 60);
+
+            const duration = `${minutes}:${seconds.toString().padStart(2,'0')}`;
+
+            const song = {
+                name: name,
+                url: url,
+                folder: "music",
+                duration: duration,
+                createdAt: Date.now()
+            };
+
+            db.collection("files").add(song).then(()=>{
+                alert("Upload berhasil!");
+                loadMusic();
+            });
+
+        });
+
+    }catch(err){
+        console.error(err);
+        alert("Upload gagal total!");
+    }
+}
+
     // fallback kalau metadata gagal load
     audio.addEventListener("error", function(){
         const song = {
