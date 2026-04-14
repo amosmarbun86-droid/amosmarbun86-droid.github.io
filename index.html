@@ -905,20 +905,42 @@ function addToPlaylist(data){
     localStorage.setItem("playlist", JSON.stringify(playlist));
 }
 // =======================
-// 🎵 DELETE ALL MUSIC
+// 🎵 DELETE MUSIC (FIX FINAL)
 // =======================
-function deleteMusic(data){
+async function deleteMusic(data){
     const song = JSON.parse(decodeURIComponent(data));
 
+    // konfirmasi
+    if(!confirm("Hapus lagu ini?")) return;
+
+    // ======================
+    // 1. HAPUS LOCAL
+    // ======================
     let localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
-
     localMusic = localMusic.filter(s => s.url !== song.url);
-
     localStorage.setItem("localMusic", JSON.stringify(localMusic));
 
+    // ======================
+    // 2. HAPUS FIREBASE
+    // ======================
+    try{
+        const snap = await db.collection("files")
+            .where("url","==", song.url)
+            .get();
+
+        snap.forEach(doc=>{
+            db.collection("files").doc(doc.id).delete();
+        });
+
+    }catch(err){
+        console.error("Gagal hapus Firebase:", err);
+    }
+
+    // ======================
+    // 3. REFRESH LIST
+    // ======================
     loadMusic();
 }
-
 
 // =======================
 // 🔄 LOAD DATA
