@@ -578,14 +578,24 @@ input, textarea{
     <div class="titlebar">
         🧮 Calculator <span onclick="closeApp('calc')">X</span>
     </div>
-    <div style="padding:10px;">Calculator siap 🔥</div>
-</div>
 
+    <div style="padding:10px;">
+        <input id="calcInput" placeholder="Contoh: 2+2" style="width:100%; padding:8px;">
+        <button onclick="hitung()">Hitung</button>
+        <div id="calcResult"></div>
+    </div>
+</div>
 <div class="window" id="todo">
     <div class="titlebar">
         📋 To Do <span onclick="closeApp('todo')">X</span>
     </div>
-    <div style="padding:10px;">To Do siap 🔥</div>
+
+    <div style="padding:10px;">
+        <input id="todoInput" placeholder="Tulis tugas..." />
+        <button onclick="addTodo()">Tambah</button>
+
+        <ul id="todoList"></ul>
+    </div>
 </div>
 
 <div class="window" id="browser">
@@ -594,10 +604,16 @@ input, textarea{
     </div>
 
     <div style="padding:10px; display:flex; flex-direction:column; height:100%;">
-        <input id="urlInput" placeholder="https://google.com" />
-        <button onclick="openWeb()">Buka</button>
+        
+        <!-- 🔥 INPUT -->
+        <input id="urlInput" placeholder="Ketik URL atau cari..." />
 
+        <!-- 🔥 1 TOMBOL SAJA -->
+        <button onclick="openWeb()">Go</button>
+
+        <!-- 🔥 VIEW -->
         <iframe id="webView" style="flex:1; border:none;"></iframe>
+
     </div>
 </div>
 
@@ -605,7 +621,13 @@ input, textarea{
     <div class="titlebar">
         ☁️ Weather <span onclick="closeApp('weather')">X</span>
     </div>
-    <div style="padding:10px;">Weather siap 🔥</div>
+
+    <div style="padding:10px;">
+        <input id="cityInput" placeholder="Masukkan kota..." />
+        <button onclick="getWeather()">Cek</button>
+
+        <div id="weatherResult">Cuaca belum dimuat</div>
+    </div>
 </div>
         <!-- 📱 APP STORE -->
 <div class="window" id="appstore">
@@ -1007,17 +1029,63 @@ function renderMusic(list){
         musicList.appendChild(div);
     });
 }
-
-    function openWeb(){
-    let url = document.getElementById("urlInput").value;
-
-    if(!url.startsWith("http")){
-        url = "https://" + url;
+   function hitung(){
+    const input = document.getElementById("calcInput").value;
+    try{
+        const hasil = eval(input);
+        document.getElementById("calcResult").innerText = hasil;
+    }catch{
+        document.getElementById("calcResult").innerText = "Error";
     }
-
-    document.getElementById("webView").src = url;
 }
-function playMusic(data){
+    function addTodo(){
+    const input = document.getElementById("todoInput");
+    const list = document.getElementById("todoList");
+
+    if(input.value.trim() === "") return;
+
+    const li = document.createElement("li");
+    li.textContent = input.value;
+
+    li.onclick = () => li.remove();
+
+    list.appendChild(li);
+    input.value = "";
+}
+    function openWeb(){
+    let input = document.getElementById("urlInput").value.trim();
+
+    if(input === "") return;
+
+    if(input.includes(".")){
+        // 🔗 ANGAP WEBSITE
+        if(!input.startsWith("http")){
+            input = "https://" + input;
+        }
+        document.getElementById("webView").src = input;
+
+    }else{
+        // 🔎 ANGAP SEARCH GOOGLE
+        const url = "https://www.google.com/search?q=" + encodeURIComponent(input);
+        window.open(url, "_blank");
+    }
+}
+
+   async function getWeather(){
+    const kota = document.getElementById("cityInput").value || "Medan";
+
+    const url = `https://wttr.in/${kota}?format=3`;
+
+    try{
+        const res = await fetch(url);
+        const text = await res.text();
+
+        document.getElementById("weatherResult").innerText = text;
+    }catch{
+        document.getElementById("weatherResult").innerText = "Gagal ambil cuaca";
+    }
+}
+    function playMusic(data){
     const song = JSON.parse(decodeURIComponent(data));
 
     currentIndex = musicData.findIndex(s => s.url === song.url);
