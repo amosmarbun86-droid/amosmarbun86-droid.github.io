@@ -697,19 +697,22 @@ document.addEventListener("DOMContentLoaded", ()=>{
 function login(){
     const pin=document.getElementById("pass").value;
     if(pin==="123"){
-        document.getElementById("login").style.display="none";
-        document.getElementById("desktop").style.display="flex";
-        localStorage.setItem("amosLoggedIn","true");
-        loadMusic();
-    }else alert("PIN salah!");
+    document.getElementById("login").style.display="none";
+    document.getElementById("desktop").style.display="flex";
+    localStorage.setItem("amosLoggedIn","true");
+
+    loadMusic();              // 🎵 musik nyala
+    renderDesktopApps();     // 📱 app icon muncul
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
     if(localStorage.getItem("amosLoggedIn")==="true"){
-        document.getElementById("login").style.display="none";
-        document.getElementById("desktop").style.display="flex";
-        loadMusic();
-    }
+    document.getElementById("login").style.display="none";
+    document.getElementById("desktop").style.display="flex";
+
+    loadMusic();          // 🎵
+    renderDesktopApps();  // 📱 WAJIB TAMBAH
+}
     document.getElementById("pass").addEventListener("keydown",e=>{
         if(e.key==="Enter") login();
     });
@@ -746,13 +749,107 @@ cmdInput.addEventListener("keydown",function(e){
 });
 
 /* MUSIC SYSTEM */
-const player=document.getElementById("player");
-const musicList=document.getElementById("musicList");
-const floatingPlayer=document.getElementById("floatingPlayer");
-const floatingTitle=document.getElementById("floatingTitle");
+const player = document.getElementById("player");
+const musicList = document.getElementById("musicList");
+const floatingPlayer = document.getElementById("floatingPlayer");
+const floatingTitle = document.getElementById("floatingTitle");
 
+// =======================
+// 📱 DATA APP STORE
+// =======================
+const appStoreData = [
+    {
+        name: "Calculator",
+        icon: "🧮",
+        appId: "calc"
+    },
+    {
+        name: "To Do List",
+        icon: "📋",
+        appId: "todo"
+    },
+    {
+        name: "Mini Browser",
+        icon: "🌐",
+        appId: "browser"
+    },
+    {
+        name: "Weather",
+        icon: "☁️",
+        appId: "weather"
+    }
+];
+
+// =======================
+// 🖥️ RENDER APP STORE
+// =======================
+function renderAppStore(){
+    const appList = document.getElementById("appList");
+
+    appList.innerHTML = "";
+
+    appStoreData.forEach(app => {
+        const div = document.createElement("div");
+
+        div.style.background = "#001a12";
+        div.style.border = "1px solid #00ff9f";
+        div.style.padding = "10px";
+        div.style.borderRadius = "8px";
+        div.style.textAlign = "center";
+
+        div.innerHTML = `
+            <div style="font-size:30px">${app.icon}</div>
+            <div>${app.name}</div>
+            <button onclick="installApp('${app.appId}')">Install</button>
+        `;
+
+        appList.appendChild(div);
+    });
+}
+    function installApp(appId){
+    const app = appStoreData.find(a => a.appId === appId);
+
+    if(!app) return;
+
+    // ambil data app yang sudah diinstall
+    let installed = JSON.parse(localStorage.getItem("installedApps")) || [];
+
+    // cek biar tidak double
+    if(installed.find(a => a.appId === appId)){
+        alert("App sudah terinstall!");
+        return;
+    }
+
+    installed.push(app);
+
+    localStorage.setItem("installedApps", JSON.stringify(installed));
+
+    renderDesktopApps(); // 🔥 refresh desktop
+}
+    function renderDesktopApps(){
+    const desktop = document.getElementById("desktopIcons");
+
+    desktop.innerHTML = "";
+
+    let installed = JSON.parse(localStorage.getItem("installedApps")) || [];
+
+    installed.forEach(app => {
+        const div = document.createElement("div");
+
+        div.className = "desktop-icon";
+
+        div.innerHTML = `
+            <div>${app.icon}</div>
+            <span>${app.name}</span>
+        `;
+
+        div.onclick = () => openApp(app.appId);
+
+        desktop.appendChild(div);
+    });
+}
+// lanjut normal
 player.addEventListener("ended", nextMusic);
-
 // 🔥 TAMBAHKAN DI SINI
 player.addEventListener("play", ()=>{
     document.getElementById("floatingIcon").innerText = "⏸";
