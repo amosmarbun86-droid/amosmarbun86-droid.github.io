@@ -549,8 +549,13 @@ input, textarea{
 
 <div style="margin-top:5px;">
     Speed: <span id="speedLabel">1x</span><br>
-    <input type="range" min="0.5" max="2" step="0.1" value="1">
-</div>  
+    <input type="range"
+    min="0.5"
+    max="2"
+    step="0.1"
+    value="1"
+    oninput="setSpeed(this.value)">
+</div>
 
            <div style="padding:10px;">
                 <input type="text" id="songName" placeholder="Judul Lagu">
@@ -796,6 +801,16 @@ function togglePlay(){
         player.pause();
         icon.innerText = "▶";
     }
+}
+
+// 🔥 TAMBAHKAN DI SINI
+function setSpeed(speed){
+    const rate = parseFloat(speed);
+
+    player.playbackRate = rate;
+
+    // 🔥 update tulisan speed
+    document.getElementById("speedLabel").innerText = rate + "x";
 }
 function nextMusic(){
     if(musicData.length === 0) return;
