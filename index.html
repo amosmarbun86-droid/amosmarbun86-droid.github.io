@@ -543,12 +543,16 @@ input, textarea{
             <div style="display:flex; gap:5px; align-items:center;">
     <audio id="player" style="flex:1;"></audio>
 
-    <button onclick="prevMusic()">⏮</button>
-    <button onclick="togglePlay()">▶</button>
-    <button onclick="nextMusic()">⏭</button>
-</div>
+<button onclick="prevMusic()">⏮</button>
+<button onclick="togglePlay()">▶</button>
+<button onclick="nextMusic()">⏭</button>
 
-            <div style="padding:10px;">
+<div style="margin-top:5px;">
+    Speed: <span id="speedLabel">1x</span><br>
+    <input type="range" min="0.5" max="2" step="0.1" value="1">
+</div>  
+
+           <div style="padding:10px;">
                 <input type="text" id="songName" placeholder="Judul Lagu">
                 <input type="text" id="songURL" placeholder="URL Lagu">
                 <input type="file" id="songFile" accept="audio/*">
