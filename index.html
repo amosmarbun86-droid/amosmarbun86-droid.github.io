@@ -739,7 +739,14 @@ function logout(){
 
 /* UI CONTROL */
 function toggleSidebar(){sidebar.classList.toggle("active");}
-function openApp(id){document.getElementById(id).style.display="flex";}
+function openApp(id){
+    document.getElementById(id).style.display = "flex";
+
+    // ✅ TAMBAHAN WAJIB
+    if(id === "appstore"){
+        renderAppStore();
+    }
+}
 function closeApp(id){document.getElementById(id).style.display="none";}
 function toggleStart(){
     startMenu.style.display=startMenu.style.display==="flex"?"none":"flex";
