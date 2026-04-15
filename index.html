@@ -695,29 +695,43 @@ document.addEventListener("DOMContentLoaded", ()=>{
 });
 /* LOGIN SYSTEM */
 function login(){
-    const pin=document.getElementById("pass").value;
-    if(pin==="123"){
-    document.getElementById("login").style.display="none";
-    document.getElementById("desktop").style.display="flex";
-    localStorage.setItem("amosLoggedIn","true");
+    const pin = document.getElementById("pass").value;
 
-    loadMusic();              // 🎵 musik nyala
-    renderDesktopApps();     // 📱 app icon muncul
+    if(pin === "123"){
+        document.getElementById("login").style.display = "none";
+        document.getElementById("desktop").style.display = "flex";
+
+        localStorage.setItem("amosLoggedIn","true");
+
+        loadMusic();
+        renderDesktopApps();
+    }else{
+        alert("PIN salah!");
+    }
 }
 
+/* ✅ HARUS DI LUAR FUNCTION LOGIN */
 document.addEventListener("DOMContentLoaded",()=>{
-    if(localStorage.getItem("amosLoggedIn")==="true"){
-    document.getElementById("login").style.display="none";
-    document.getElementById("desktop").style.display="flex";
+    
+    // auto login
+    if(localStorage.getItem("amosLoggedIn") === "true"){
+        document.getElementById("login").style.display = "none";
+        document.getElementById("desktop").style.display = "flex";
 
-    loadMusic();          // 🎵
-    renderDesktopApps();  // 📱 WAJIB TAMBAH
-}
-    document.getElementById("pass").addEventListener("keydown",e=>{
-        if(e.key==="Enter") login();
-    });
+        loadMusic();
+        renderDesktopApps();
+    }
+
+    // enter key
+    const input = document.getElementById("pass");
+    if(input){
+        input.addEventListener("keydown", e=>{
+            if(e.key === "Enter") login();
+        });
+    }
 });
 
+/* LOGOUT */
 function logout(){
     localStorage.removeItem("amosLoggedIn");
     location.reload();
