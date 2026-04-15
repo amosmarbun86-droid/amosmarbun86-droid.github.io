@@ -80,7 +80,15 @@ input, textarea{
     height:100vh;
     flex-direction:row;
 }
+#desktopIcons{
+    position:absolute;
+    top:80px;
+    left:20px;
 
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
 /* SIDEBAR */
 #sidebar{
     width:220px;
@@ -130,7 +138,10 @@ input, textarea{
 #workspace{
     flex:1;
     position:relative;
+    padding-top:40px;
 }
+
+    
 
 /* WINDOWS */
 .window{
@@ -374,9 +385,46 @@ input, textarea{
 #musicList,
 #fileManagerContent{
     flex:1;
+    min-height:0;
     overflow:auto;
 }
-/* ================= RESPONSIVE ================= */
+
+/* ICON DESKTOP */
+.app-icon{
+    color:#00ff9f;
+    font-size:18px;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    gap:8px;
+
+    width:180px;
+    background:rgba(0,0,0,0.3);
+    padding:8px 10px;
+    border-radius:8px;
+
+    transition:0.2s;
+}
+
+.app-icon:hover{
+    background:rgba(0,255,159,0.2);
+}
+
+.app-icon:active{
+    transform:scale(0.95);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{
+    width:6px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#00ff9f;
+    border-radius:10px;
+}
+   /* ================= RESPONSIVE ================= */
 @media (max-width:768px){
     body{
         background-attachment: scroll; /* 🔥 penting untuk HP */
