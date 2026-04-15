@@ -436,7 +436,7 @@ input, textarea{
     <button onclick="login()">ENTER</button>
 </div>
 
---><!-- DESKTOP -->
+<!-- DESKTOP -->
 <div id="desktop">
     <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 
@@ -537,25 +537,29 @@ input, textarea{
 
         <!-- MUSIC -->
         <div class="window" id="music">
-            <div class="titlebar">
-                Music <span onclick="closeApp('music')">X</span>
-            </div>
-            <div style="display:flex; gap:5px; align-items:center;">
-    <audio id="player" style="flex:1;"></audio>
+    <div class="titlebar">
+        Music <span onclick="closeApp('music')">X</span>
+    </div>
 
-<button onclick="prevMusic()">⏮</button>
-<button onclick="togglePlay()">▶</button>
-<button onclick="nextMusic()">⏭</button>
+    <!-- CONTROL PLAYER -->
+    <div style="display:flex; gap:5px; align-items:center;">
+        <audio id="player" style="flex:1;"></audio>
 
-<div style="margin-top:5px;">
-    Speed: <span id="speedLabel">1x</span><br>
-    <input type="range"
-    min="0.5"
-    max="2"
-    step="0.1"
-    value="1"
-    oninput="setSpeed(this.value)">
-</div>
+        <button onclick="prevMusic()">⏮</button>
+        <button onclick="togglePlay()">▶</button>
+        <button onclick="nextMusic()">⏭</button>
+    </div> <!-- 🔥 WAJIB DITUTUP -->
+
+    <!-- SPEED CONTROL -->
+    <div style="margin-top:5px;">
+        Speed: <span id="speedLabel">1x</span><br>
+        <input type="range"
+            min="0.5"
+            max="2"
+            step="0.1"
+            value="1"
+            oninput="setSpeed(this.value)">
+    </div>
 
            <div style="padding:10px;">
                 <input type="text" id="songName" placeholder="Judul Lagu">
