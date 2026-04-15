@@ -507,6 +507,10 @@ input, textarea{
             <i class="fa-solid fa-code"></i> Toggle Matrix
         </div>
 
+        <div class="side-item" onclick="openApp('appstore')">
+            <i class="fa-solid fa-store"></i> App Store
+        </div>
+
         <hr>
 
         <div class="side-item" onclick="logout()">
@@ -517,6 +521,21 @@ input, textarea{
 
     <!-- WORKSPACE -->
     <div id="workspace">
+        
+        <!-- 📱 APP STORE -->
+<div class="window" id="appstore">
+    <div class="titlebar">
+        📱 App Store <span onclick="closeApp('appstore')">X</span>
+    </div>
+
+    <div id="appList" style="
+        padding:10px;
+        display:grid;
+        grid-template-columns: repeat(2,1fr);
+        gap:10px;
+        overflow:auto;
+    "></div>
+</div>
 
         <!-- NOTES -->
         <div class="window" id="notes">
@@ -601,7 +620,9 @@ input, textarea{
         <div onclick="openApp('music')">Music</div>
         <div onclick="openApp('terminal')">Terminal</div>
         <div onclick="openApp('fileManager')">File Manager</div>
+        <div onclick="openApp('appstore')">App Store</div>
     </div>
+   
 
 </div>
 <!-- END DESKTOP -->
