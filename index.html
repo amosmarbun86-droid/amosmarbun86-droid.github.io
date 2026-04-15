@@ -119,6 +119,7 @@ input, textarea{
         height:100%;
         transform:translateX(-100%);
         z-index:1000;
+        pointer-events:auto;
     }
     #sidebar.active{
         transform:translateX(0);
@@ -147,7 +148,7 @@ input, textarea{
     flex-direction:column;
     overflow:hidden; /* 🔥 TAMBAHAN PENTING */
 
-    z-index:5;
+    z-index:2000; /* 🔥 NAIKKAN */
     box-shadow:0 0 15px rgba(0,255,159,0.3);
 }
 .titlebar{
