@@ -548,6 +548,7 @@ input, textarea{
         <button onclick="prevMusic()">⏮</button>
         <button onclick="togglePlay()">▶</button>
         <button onclick="nextMusic()">⏭</button>
+        <button onclick="toggleShuffle()" id="shuffleBtn">🔀</button>
     </div> <!-- 🔥 WAJIB DITUTUP -->
 
     <!-- SPEED CONTROL -->
@@ -741,6 +742,7 @@ player.addEventListener("pause", ()=>{
 });
 let musicData=[];
 let currentIndex = 0;
+let isShuffle = false;
 let favorites=JSON.parse(localStorage.getItem("favorites"))||[];
 let playlist=JSON.parse(localStorage.getItem("playlist"))||[];
 
@@ -816,15 +818,31 @@ function setSpeed(speed){
     // 🔥 update tulisan speed
     document.getElementById("speedLabel").innerText = rate + "x";
 }
-function nextMusic(){
+function toggleShuffle(){
+    isShuffle = !isShuffle;
+
+    const btn = document.getElementById("shuffleBtn");
+
+    if(isShuffle){
+        btn.style.color = "yellow"; // aktif
+    }else{
+        btn.style.color = "#00ff9f"; // normal
+    }
+}
+   function nextMusic(){
     if(musicData.length === 0) return;
 
-    currentIndex++;
-    if(currentIndex >= musicData.length) currentIndex = 0;
+    if(isShuffle){
+        currentIndex = Math.floor(Math.random() * musicData.length);
+    }else{
+        currentIndex++;
+        if(currentIndex >= musicData.length) currentIndex = 0;
+    }
 
     const song = musicData[currentIndex];
     player.src = song.url;
     player.play();
+
     document.getElementById("floatingIcon").innerText = "⏸";
     floatingTitle.innerText = song.name;
 }
