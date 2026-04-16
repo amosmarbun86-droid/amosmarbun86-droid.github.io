@@ -84,7 +84,8 @@ input, textarea{
     position:absolute;
     top:80px;
     left:20px;
-
+    right:20px; /* 🔥 BATAS KANAN */
+    
     display:flex;
     flex-direction:column;
     gap:15px;
@@ -139,8 +140,8 @@ input, textarea{
     flex:1;
     position:relative;
     padding-top:40px;
+    overflow:hidden; /* 🔥 TAMBAHAN PENTING */
 }
-
     
 
 /* WINDOWS */
@@ -964,7 +965,7 @@ function renderAppStore(){
     installed.forEach(app => {
         const div = document.createElement("div");
 
-        div.className = "desktop-icon";
+        div.className = "app-icon";
 
         div.innerHTML = `
             <div>${app.icon}</div>
