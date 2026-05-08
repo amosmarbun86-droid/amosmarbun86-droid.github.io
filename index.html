@@ -2,41 +2,37 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>AMOS WEB OS V14 PRO FINAL</title>
+    <title>AMOS WEB OS V14 PRO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#00ff9f">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <style>
-        /* CSS internal agar praktis di Acode */
-        body { margin: 0; font-family: Consolas, monospace; background: #000; color: #00ff9f; overflow: hidden; background-size: cover; background-position: center; transition: background-image 1s ease-in-out; }
-        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.25; pointer-events: none; }
-        #login { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column; background: rgba(0,0,0,0.95); z-index: 999; }
-        #desktop { display: none; width: 100%; height: 100vh; flex-direction: row; }
-        #sidebar { width: 250px; background: rgba(0,2,23,0.95); border-right: 1px solid #00ff9f55; padding: 10px; overflow: auto; z-index: 1000; }
-        .side-item { padding: 12px; border-bottom: 1px solid #003322; cursor: pointer; transition: 0.3s; }
-        .side-item:hover { background: rgba(0,255,159,0.1); padding-left: 20px; }
-        #toggleSidebar { position: fixed; top: 10px; left: 10px; z-index: 1001; display: none; background: #000; color: #00ff9f; border: 1px solid #00ff9f; padding: 5px 10px; }
-        #workspace { flex: 1; position: relative; }
-        #taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: black; border-top: 1px solid #00ff9f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 1000; box-sizing: border-box; }
-        input, button { background: black; color: #00ff9f; border: 1px solid #00ff9f; padding: 8px; }
-        @media(max-width:768px){
-            #toggleSidebar { display: block; }
-            #sidebar { position: fixed; height: 100%; transform: translateX(-100%); transition: 0.3s; }
-            #sidebar.active { transform: translateX(0); }
-        }
-    </style>
 </head>
 <body>
     <canvas id="bgCanvas"></canvas>
+
     <div id="login">
-        <h2>AMOS LOGIN</h2>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-microchip" style="font-size: 50px; color: #00ff9f;"></i>
+        </div>
+        <h2 style="letter-spacing: 5px;">AMOS LOGIN</h2>
         <input type="password" id="pass" placeholder="PIN 101312" style="text-align:center;">
         <br><br>
         <button onclick="login()">ENTER SYSTEM</button>
     </div>
+
     <div id="desktop">
         <button id="toggleSidebar" onclick="toggleSidebar()">☰ MENU</button>
+
         <div id="sidebar">
-            <h3 style="border-bottom: 1px solid #00ff9f; padding-bottom: 10px;">🚀 MY 11 PROJECTS</h3>
+            <div style="text-align: center; padding: 20px 0;">
+                <i class="fa-solid fa-user-gear" style="font-size: 50px; color: #00ff9f;"></i>
+                <h3 style="margin-top: 10px; font-size: 14px; letter-spacing: 2px;">AMOS CREATOR</h3>
+            </div>
+
+            <div class="sidebar-label">DASHBOARD PROJECTS</div>
+            
             <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> 1. Camera RCP</div>
             <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> 2. Fake GPS</div>
             <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> 3. CV Amos</div>
@@ -48,15 +44,35 @@
             <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> 9. Telegram Bot</div>
             <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')"><i class="fa-brands fa-whatsapp"></i> 10. WA Sender</div>
             <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')"><i class="fa-solid fa-compact-disc"></i> 11. WebOS Music</div>
-            <hr style="border: 0.5px solid #003322; margin: 20px 0;">
-            <div class="side-item" onclick="logout()" style="color: #ff4444;"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
+
+            <div class="sidebar-label">SYSTEM SETTINGS</div>
+
+            <div class="side-item" onclick="toggleMatrix()">
+                <i class="fa-solid fa-code"></i> Toggle Matrix
+            </div>
+            
+            <div class="side-item" onclick="changeWallpaper()">
+                <i class="fa-solid fa-image"></i> Next Wallpaper
+            </div>
+
+            <div class="side-item logout-btn" onclick="logout()">
+                <i class="fa-solid fa-power-off"></i> Logout
+            </div>
         </div>
+
         <div id="workspace"></div>
+
         <div id="taskbar">
-            <div style="font-weight:bold;">AMOS OS V14</div>
-            <div id="clock"></div>
+            <div style="font-weight:bold; color:#00ff9f; letter-spacing: 1px;">AMOS OS V14</div>
+            <div id="clock">00:00:00</div>
         </div>
     </div>
+
     <script src="script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
