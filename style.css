@@ -1,224 +1,109 @@
-body{
-    margin:0;
-    font-family:Consolas, monospace;
+body {
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #000;
+    color: #00ff9f;
+    overflow: hidden;
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
+    background-attachment: fixed;
     transition: background-image 1s ease-in-out;
-    color:#00ff9f;
-    overflow:hidden;
 }
 
-button{
-    cursor:pointer;
-    background:black;
-    color:#00ff9f;
-    border:1px solid #00ff9f;
-    padding:5px 10px;
+#bgCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.3;
 }
 
-button:hover{
-    background:#00ff9f;
-    color:black;
+#login {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: rgba(0,0,0,0.95);
+    z-index: 9999;
 }
 
-input, textarea{
-    background:black;
-    color:#00ff9f;
-    border:1px solid #00ff9f;
-    padding:5px;
+#desktop {
+    display: none;
+    width: 100%;
+    height: 100vh;
 }
 
-#bgCanvas{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:0;
-    opacity:0.25;
-    pointer-events:none;
+#sidebar {
+    width: 260px;
+    background: rgba(0, 10, 15, 0.98);
+    border-right: 1px solid rgba(0, 255, 159, 0.3);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    overflow-y: auto;
 }
 
-#login{
-    position:fixed;
-    width:100%;
-    height:100%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    background:rgba(0,0,0,0.95);
-    z-index:999;
+.sidebar-label {
+    padding: 10px 15px;
+    font-size: 10px;
+    color: #008855;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #003322;
+    margin-top: 10px;
 }
 
-#desktop{
-    display:none;
-    width:100%;
-    height:100vh;
-    flex-direction:row;
+.side-item {
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 13.5px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-#desktopIcons{
-    position:absolute;
-    top:80px;
-    left:20px;
-    right:20px;
-    display:flex;
-    flex-direction:column;
-    gap:15px;
+.side-item i { width: 20px; text-align: center; color: #00ff9f; }
+
+.side-item:hover {
+    background: rgba(0, 255, 159, 0.1);
+    padding-left: 28px;
 }
 
-#sidebar{
-    width:220px;
-    background:rgba(0,2,23,0.95);
-    border-right:1px solid #00ff9f55;
-    padding:10px;
-    overflow:auto;
-    transition:transform 0.3s;
+#toggleSidebar {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 2000;
+    background: #000;
+    color: #00ff9f;
+    border: 1px solid #00ff9f;
+    padding: 8px 15px;
+    display: none;
 }
 
-.side-item{
-    padding:10px;
-    border-bottom:1px solid #003322;
-    cursor:pointer;
+#taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(0,0,0,0.9);
+    border-top: 1px solid #00ff9f;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
-.side-item:hover{
-    background:#001a12;
+@media (max-width: 768px) {
+    #sidebar { position: fixed; left: -260px; height: 100%; transition: 0.4s; }
+    #sidebar.active { left: 0; }
+    #toggleSidebar { display: block; }
 }
-
-#toggleSidebar{
-    position:fixed;
-    top:10px;
-    left:10px;
-    z-index:1001;
-    display:none;
-}
-
-@media(max-width:768px){
-    #toggleSidebar{ display:block; }
-    #sidebar{
-        position:fixed;
-        height:100%;
-        transform:translateX(-100%);
-        z-index:1000;
-        pointer-events:auto;
-    }
-    #sidebar.active{ transform:translateX(0); }
-    .window{ width:95%; height:85%; }
-}
-
-#workspace{
-    flex:1;
-    position:relative;
-    padding-top:40px;
-    overflow:hidden;
-}
-
-.window{
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    width:90%;
-    max-width:650px;
-    height:75%;
-    background:rgba(0,2,23,0.95);
-    border:1px solid #00ff9f;
-    display:flex;
-    flex-direction:column;
-    overflow:hidden;
-    z-index:2000;
-    box-shadow:0 0 15px rgba(0,255,159,0.3);
-}
-
-.titlebar{
-    background:black;
-    padding:5px 10px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #00ff9f;
-    font-weight:bold;
-    cursor:move;
-    user-select:none;
-}
-
-#musicList{ flex:1; overflow:auto; }
-.music-item{ padding:8px; border-bottom:1px solid #003322; }
-.music-item:hover{ background:#001a12; }
-.music-item button{ margin-left:3px; font-size:11px; padding:3px 6px; }
-
-#floatingPlayer{
-    position:fixed;
-    top:70%;
-    left:80%;
-    transform:translate(-50%, -50%);
-    z-index:9999;
-    display:none;
-}
-
-.floating-circle{
-    width:60px;
-    height:60px;
-    background:#00ff9f;
-    color:black;
-    border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:24px;
-    box-shadow:0 4px 12px rgba(0,0,0,0.6);
-    cursor:grab;
-}
-
-#taskbar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    height:40px;
-    background:black;
-    border-top:1px solid #00ff9f;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:0 15px;
-    z-index:1000;
-}
-
-#startMenu{
-    position:fixed;
-    bottom:40px;
-    left:10px;
-    background:black;
-    border:1px solid #00ff9f;
-    display:none;
-    flex-direction:column;
-    min-width:160px;
-    z-index:1001;
-}
-
-#startMenu div{ padding:10px; cursor:pointer; }
-#startMenu div:hover{ background:#001a12; }
-
-.app-icon{
-    color:#00ff9f;
-    font-size:18px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    width:180px;
-    background:rgba(0,0,0,0.3);
-    padding:8px 10px;
-    border-radius:8px;
-    transition:0.2s;
-}
-
-.app-icon:hover{ background:rgba(0,255,159,0.2); }
-
-::-webkit-scrollbar{ width:6px; }
-::-webkit-scrollbar-track{ background:black; }
-::-webkit-scrollbar-thumb{ background:#00ff9f; border-radius:10px; }
