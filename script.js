@@ -1,19 +1,27 @@
-/* FIREBASE CONFIG */
+/* ==========================================
+   1. FIREBASE & CLOUDINARY CONFIG
+   ========================================== */
 const firebaseConfig = {
-  apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
-  authDomain: "amos-web-os.firebaseapp.com",
-  projectId: "amos-web-os",
-  storageBucket: "amos-web-os.firebasestorage.app",
-  messagingSenderId: "59843745100",
-  appId: "1:59843745100:web:b29e5996052a3bf5672be9",
-  measurementId: "G-Z2F7MXPSCH"
+    apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
+    authDomain: "amos-web-os.firebaseapp.com",
+    projectId: "amos-web-os",
+    storageBucket: "amos-web-os.firebasestorage.app",
+    messagingSenderId: "59843745100",
+    appId: "1:59843745100:web:b29e5996052a3bf5672be9",
+    measurementId: "G-Z2F7MXPSCH"
 };
+
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Cloudinary Keys
 const CLOUD_NAME = "dkisbfx29";
 const UPLOAD_PRESET = "ml_default";
 
+/* ==========================================
+   2. WALLPAPER SYSTEM
+   ========================================== */
 const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201824/iij3x03m3leuwuca1sem.png",
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776200829/n4vqmisi9iwz09fnf8mp.png",
@@ -22,19 +30,22 @@ const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201249/pxpbgdjpvoztiyhedtba.png"
 ];
 
-function changeWallpaper(){
+function changeWallpaper() {
     const random = wallpapers[Math.floor(Math.random() * wallpapers.length)];
     document.body.style.backgroundImage = `url('${random}')`;
     localStorage.setItem("wallpaper", random);
 }
 
-document.addEventListener("DOMContentLoaded", ()=>{
+/* ==========================================
+   3. CORE SYSTEM (LOGIN & UI)
+   ========================================== */
+document.addEventListener("DOMContentLoaded", () => {
     const saved = localStorage.getItem("wallpaper");
-    if(saved) document.body.style.backgroundImage = `url('${saved}')`;
+    if (saved) document.body.style.backgroundImage = `url('${saved}')`;
     changeWallpaper();
     setInterval(changeWallpaper, 10000);
-    
-    if(localStorage.getItem("amosLoggedIn") === "true"){
+
+    if (localStorage.getItem("amosLoggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("desktop").style.display = "flex";
         loadMusic();
@@ -42,55 +53,75 @@ document.addEventListener("DOMContentLoaded", ()=>{
     }
 
     const pinInput = document.getElementById("pass");
-    if(pinInput){
-        pinInput.addEventListener("keydown", e => { if(e.key === "Enter") login(); });
+    if (pinInput) {
+        pinInput.addEventListener("keydown", e => { if (e.key === "Enter") login(); });
     }
+    
+    if(matrixEnabled) drawMatrix();
 });
 
-function login(){
+function login() {
     const pin = document.getElementById("pass").value;
-    if(pin === "101312"){
+    if (pin === "101312") {
         document.getElementById("login").style.display = "none";
         document.getElementById("desktop").style.display = "flex";
-        localStorage.setItem("amosLoggedIn","true");
+        localStorage.setItem("amosLoggedIn", "true");
         loadMusic();
         renderDesktopApps();
-    }else{
+    } else {
         alert("PIN salah!");
     }
 }
 
-function logout(){ localStorage.removeItem("amosLoggedIn"); location.reload(); }
-function toggleSidebar(){ document.getElementById("sidebar").classList.toggle("active"); }
-function openApp(id){
-    document.getElementById(id).style.display = "flex";
-    if(id === "appstore") renderAppStore();
+function logout() {
+    localStorage.removeItem("amosLoggedIn");
+    location.reload();
 }
-function closeApp(id){ document.getElementById(id).style.display="none"; }
-function toggleStart(){
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+}
+
+function openApp(id) {
+    document.getElementById(id).style.display = "flex";
+    if (id === "appstore") renderAppStore();
+}
+
+function closeApp(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+function toggleStart() {
     const menu = document.getElementById("startMenu");
     menu.style.display = menu.style.display === "flex" ? "none" : "flex";
 }
 
 setInterval(() => {
-    document.getElementById("clock").innerHTML = new Date().toLocaleTimeString("id-ID");
+    const clockEl = document.getElementById("clock");
+    if(clockEl) clockEl.innerHTML = new Date().toLocaleTimeString("id-ID");
 }, 1000);
 
-/* TERMINAL LOGIC */
+/* ==========================================
+   4. TERMINAL LOGIC
+   ========================================== */
 const cmdInput = document.getElementById("cmdInput");
 const terminalOutput = document.getElementById("terminalOutput");
-cmdInput.addEventListener("keydown", function(e){
-    if(e.key === "Enter"){
-        let cmd = this.value;
-        this.value = "";
-        terminalOutput.innerHTML += "> " + cmd + "<br>";
-        if(cmd === "halo") terminalOutput.innerHTML += "AI: Halo Amos!<br>";
-        else if(cmd === "status") terminalOutput.innerHTML += "AI: Sistem normal.<br>";
-        else terminalOutput.innerHTML += "AI: Perintah tidak dikenali.<br>";
-    }
-});
+if(cmdInput) {
+    cmdInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            let cmd = this.value;
+            this.value = "";
+            terminalOutput.innerHTML += "> " + cmd + "<br>";
+            if (cmd === "halo") terminalOutput.innerHTML += "AI: Halo Amos!<br>";
+            else if (cmd === "status") terminalOutput.innerHTML += "AI: Sistem normal.<br>";
+            else terminalOutput.innerHTML += "AI: Perintah tidak dikenali.<br>";
+        }
+    });
+}
 
-/* MUSIC SYSTEM */
+/* ==========================================
+   5. MUSIC SYSTEM & CLOUDINARY UPLOAD
+   ========================================== */
 const player = document.getElementById("player");
 const musicList = document.getElementById("musicList");
 const floatingPlayer = document.getElementById("floatingPlayer");
@@ -98,81 +129,110 @@ const floatingTitle = document.getElementById("floatingTitle");
 let musicData = [];
 let currentIndex = 0;
 let isShuffle = false;
-let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-let playlist = JSON.parse(localStorage.getItem("playlist")) || [];
 
-function loadMusic(){
+async function uploadMusic() {
+    const fileInput = document.getElementById("songFile");
+    const nameInput = document.getElementById("songName");
+    const file = fileInput.files[0];
+    const name = nameInput.value;
+
+    if (!file || !name) return alert("Isi judul dan pilih file!");
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("folder", "music");
+
+    try {
+        const res = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+            { method: "POST", body: formData }
+        );
+        const data = await res.json();
+
+        if (data.secure_url) {
+            await db.collection("files").add({
+                name: name,
+                url: data.secure_url,
+                folder: "music",
+                createdAt: Date.now()
+            });
+            alert("Berhasil Upload!");
+            fileInput.value = "";
+            nameInput.value = "";
+            loadMusic();
+        }
+    } catch (err) {
+        alert("Gagal Upload: " + err.message);
+    }
+}
+
+function loadMusic() {
     musicData = [];
+    if(!musicList) return;
     musicList.innerHTML = "Memuat...";
-    db.collection("files").where("folder","==","music").get().then(snap=>{
+    db.collection("files").where("folder", "==", "music").orderBy("createdAt", "desc").get().then(snap => {
+        musicList.innerHTML = "";
         snap.forEach(doc => musicData.push(doc.data()));
-        const localMusic = JSON.parse(localStorage.getItem("localMusic")) || [];
-        musicData = musicData.concat(localMusic);
         renderMusic(musicData);
     });
 }
 
-function renderMusic(list){
+function renderMusic(list) {
     musicList.innerHTML = "";
     list.forEach(song => {
         const div = document.createElement("div");
         div.className = "music-item";
         const data = encodeURIComponent(JSON.stringify(song));
         div.innerHTML = `
-            <div><div>${song.name}</div><small>${song.duration || "00:00"}</small></div>
+            <div><div>${song.name}</div></div>
             <div style="display:flex; gap:5px;">
                 <button onclick="playMusic('${data}')">▶</button>
-                <button onclick="addToFavorites('${data}')">★</button>
-                <button onclick="addToPlaylist('${data}')">＋</button>
-                <button onclick="deleteMusic('${data}')">❌</button>
             </div>`;
         musicList.appendChild(div);
     });
 }
 
-function playMusic(data){
+function playMusic(data) {
     const song = JSON.parse(decodeURIComponent(data));
     currentIndex = musicData.findIndex(s => s.url === song.url);
     player.src = song.url;
     player.play();
     document.getElementById("floatingIcon").innerText = "⏸";
-    floatingPlayer.style.display = "flex";
-    floatingTitle.innerText = song.name;
+    if(floatingPlayer) floatingPlayer.style.display = "flex";
+    if(floatingTitle) floatingTitle.innerText = song.name;
 }
 
-function togglePlay(){
+function togglePlay() {
     const icon = document.getElementById("floatingIcon");
-    if(player.paused){ player.play(); icon.innerText = "⏸"; }
-    else { player.pause(); icon.innerText = "▶"; }
+    if (player.paused) {
+        player.play();
+        icon.innerText = "⏸";
+    } else {
+        player.pause();
+        icon.innerText = "▶";
+    }
 }
 
-function setSpeed(speed){
-    player.playbackRate = parseFloat(speed);
-    document.getElementById("speedLabel").innerText = speed + "x";
-}
-
-function nextMusic(){
-    if(musicData.length === 0) return;
-    currentIndex = isShuffle ? Math.floor(Math.random() * musicData.length) : (currentIndex + 1) % musicData.length;
+function nextMusic() {
+    if (musicData.length === 0) return;
+    currentIndex = (currentIndex + 1) % musicData.length;
     playMusic(encodeURIComponent(JSON.stringify(musicData[currentIndex])));
 }
 
-function prevMusic(){
-    if(musicData.length === 0) return;
-    currentIndex = (currentIndex - 1 + musicData.length) % musicData.length;
-    playMusic(encodeURIComponent(JSON.stringify(musicData[currentIndex])));
-}
-
-/* APP STORE & DESKTOP LOGIC */
+/* ==========================================
+   6. APP STORE & DESKTOP LOGIC
+   ========================================== */
 const appStoreData = [
-    { name: "Calculator", icon: "🧮", appId: "calc" },
-    { name: "To Do List", icon: "📋", appId: "todo" },
+    { name: "Calculator", icon: "📊", appId: "calc" },
+    { name: "To Do List", icon: "📝", appId: "todo" },
     { name: "Mini Browser", icon: "🌐", appId: "browser" },
     { name: "Weather", icon: "☁️", appId: "weather" }
 ];
 
-function renderAppStore(){
+function renderAppStore() {
     const appList = document.getElementById("appList");
+    if(!appList) return;
     appList.innerHTML = "";
     appStoreData.forEach(app => {
         const div = document.createElement("div");
@@ -182,16 +242,17 @@ function renderAppStore(){
     });
 }
 
-function installApp(appId){
+function installApp(appId) {
     let installed = JSON.parse(localStorage.getItem("installedApps")) || [];
-    if(installed.find(a => a.appId === appId)) return alert("App sudah terinstall!");
+    if (installed.find(a => a.appId === appId)) return alert("App sudah terinstall!");
     installed.push(appStoreData.find(a => a.appId === appId));
     localStorage.setItem("installedApps", JSON.stringify(installed));
     renderDesktopApps();
 }
 
-function renderDesktopApps(){
+function renderDesktopApps() {
     const desktop = document.getElementById("desktopIcons");
+    if(!desktop) return;
     desktop.innerHTML = "";
     let installed = JSON.parse(localStorage.getItem("installedApps")) || [];
     installed.forEach(app => {
@@ -203,15 +264,17 @@ function renderDesktopApps(){
     });
 }
 
-/* UTILS */
-function hitung(){
-    try{ document.getElementById("calcResult").innerText = eval(document.getElementById("calcInput").value); }
-    catch{ document.getElementById("calcResult").innerText = "Error"; }
+/* ==========================================
+   7. UTILS (CALC, TODO, WEATHER)
+   ========================================== */
+function hitung() {
+    try { document.getElementById("calcResult").innerText = eval(document.getElementById("calcInput").value); }
+    catch { document.getElementById("calcResult").innerText = "Error"; }
 }
 
-function addTodo(){
+function addTodo() {
     const input = document.getElementById("todoInput");
-    if(!input.value.trim()) return;
+    if (!input.value.trim()) return;
     const li = document.createElement("li");
     li.textContent = input.value;
     li.onclick = () => li.remove();
@@ -219,72 +282,71 @@ function addTodo(){
     input.value = "";
 }
 
-function openWeb(){
-    let input = document.getElementById("urlInput").value.trim();
-    if(!input) return;
-    if(input.includes(".")){
-        if(!input.startsWith("http")) input = "https://" + input;
-        document.getElementById("webView").src = input;
-    }else{
-        window.open("https://www.google.com/search?q=" + encodeURIComponent(input), "_blank");
-    }
-}
-
-async function getWeather(){
+async function getWeather() {
     const kota = document.getElementById("cityInput").value || "Medan";
-    try{
+    try {
         const res = await fetch(`https://wttr.in/${kota}?format=3`);
         document.getElementById("weatherResult").innerText = await res.text();
-    }catch{ document.getElementById("weatherResult").innerText = "Gagal ambil cuaca"; }
+    } catch { document.getElementById("weatherResult").innerText = "Gagal ambil cuaca"; }
 }
 
-/* MATRIX EFFECT */
+/* ==========================================
+   8. MATRIX EFFECT
+   ========================================== */
 const canvas = document.getElementById("bgCanvas");
-const ctx = canvas.getContext("2d");
-let matrixEnabled = true;
+const ctx = canvas ? canvas.getContext("2d") : null;
+let matrixEnabled = localStorage.getItem("matrixEnabled") !== "false";
 let animationId;
 const letters = "AMOSWEBOS123456789";
 const fontSize = 16;
 let columns = Math.floor(window.innerWidth / fontSize);
 let drops = Array(columns).fill(1);
 
-function drawMatrix(){
-    if(!matrixEnabled) return;
+function drawMatrix() {
+    if (!matrixEnabled || !ctx) return;
     ctx.fillStyle = "rgba(0,0,0,0.05)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#00ff9f";
     ctx.font = fontSize + "px monospace";
-    for(let i = 0; i < drops.length; i++){
+    for (let i = 0; i < drops.length; i++) {
         const text = letters[Math.floor(Math.random() * letters.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-        if(drops[i] * fontSize > canvas.height) drops[i] = 0;
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
         drops[i]++;
     }
     animationId = requestAnimationFrame(drawMatrix);
 }
 
-function toggleMatrix(){
+function toggleMatrix() {
     matrixEnabled = !matrixEnabled;
-    if(matrixEnabled) drawMatrix();
-    else { cancelAnimationFrame(animationId); ctx.clearRect(0,0,canvas.width,canvas.height); }
     localStorage.setItem("matrixEnabled", matrixEnabled);
+    if (matrixEnabled) drawMatrix();
+    else { cancelAnimationFrame(animationId); ctx.clearRect(0, 0, canvas.width, canvas.height); }
 }
 
-/* DRAG WINDOW LOGIC */
+/* ==========================================
+   9. DRAG & EXTERNAL
+   ========================================== */
 document.querySelectorAll(".window").forEach(win => {
     let isDragging = false;
     let offsetX, offsetY;
     const titleBar = win.querySelector(".titlebar");
+    if(!titleBar) return;
+
     const startDrag = (e) => {
         isDragging = true;
         const rect = win.getBoundingClientRect();
-        offsetX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-        offsetY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        offsetX = clientX - rect.left;
+        offsetY = clientY - rect.top;
     };
     const drag = (e) => {
-        if(!isDragging) return;
-        win.style.left = ((e.touches ? e.touches[0].clientX : e.clientX) - offsetX) + "px";
-        win.style.top = ((e.touches ? e.touches[0].clientY : e.clientY) - offsetY) + "px";
+        if (!isDragging) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        win.style.left = (clientX - offsetX) + "px";
+        win.style.top = (clientY - offsetY) + "px";
         win.style.transform = "none";
     };
     titleBar.addEventListener("mousedown", startDrag);
@@ -296,3 +358,4 @@ document.querySelectorAll(".window").forEach(win => {
 });
 
 function openExternal(url) { window.open(url, "_blank"); }
+  
