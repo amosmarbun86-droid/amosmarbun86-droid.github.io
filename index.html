@@ -4,164 +4,59 @@
     <meta charset="UTF-8">
     <title>AMOS WEB OS V14 PRO FINAL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#00ff9f">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS internal agar praktis di Acode */
+        body { margin: 0; font-family: Consolas, monospace; background: #000; color: #00ff9f; overflow: hidden; background-size: cover; background-position: center; transition: background-image 1s ease-in-out; }
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.25; pointer-events: none; }
+        #login { position: fixed; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; flex-direction: column; background: rgba(0,0,0,0.95); z-index: 999; }
+        #desktop { display: none; width: 100%; height: 100vh; flex-direction: row; }
+        #sidebar { width: 250px; background: rgba(0,2,23,0.95); border-right: 1px solid #00ff9f55; padding: 10px; overflow: auto; z-index: 1000; }
+        .side-item { padding: 12px; border-bottom: 1px solid #003322; cursor: pointer; transition: 0.3s; }
+        .side-item:hover { background: rgba(0,255,159,0.1); padding-left: 20px; }
+        #toggleSidebar { position: fixed; top: 10px; left: 10px; z-index: 1001; display: none; background: #000; color: #00ff9f; border: 1px solid #00ff9f; padding: 5px 10px; }
+        #workspace { flex: 1; position: relative; }
+        #taskbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 40px; background: black; border-top: 1px solid #00ff9f; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; z-index: 1000; box-sizing: border-box; }
+        input, button { background: black; color: #00ff9f; border: 1px solid #00ff9f; padding: 8px; }
+        @media(max-width:768px){
+            #toggleSidebar { display: block; }
+            #sidebar { position: fixed; height: 100%; transform: translateX(-100%); transition: 0.3s; }
+            #sidebar.active { transform: translateX(0); }
+        }
+    </style>
 </head>
 <body>
-
-<canvas id="bgCanvas"></canvas>
-
-<div id="login">
-    <h2>AMOS LOGIN</h2>
-    <input type="password" id="pass" placeholder="PIN 123">
-    <br><br>
-    <button onclick="login()">ENTER</button>
-</div>
-
-<div id="desktop">
-    <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
-
-    <div id="sidebar">
-        <h3>🚀 MY GITHUB PROJECTS</h3>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> Camera RCP</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> Fake GPS</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> CV Amos</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> Data Pribadi</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> Admin Panel</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> SmartDebt</div>
-        <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> Alarm</div>
-        <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> Jadwal</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')"><i class="fa-solid fa-file"></i> Form</div>
-        <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> Telegram Bot</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')"><i class="fa-brands fa-whatsapp"></i> WA Sender</div>
-        <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')">   <i class="fa-solid fa-compact-disc"></i> WebOS Music   </div>
-
-        <hr>
-        <h3>💻 SYSTEM APPS</h3>
-        <div class="side-item" onclick="openApp('notes')"><i class="fa-solid fa-note-sticky"></i> Notes</div>
-        <div class="side-item" onclick="openApp('music')"><i class="fa-solid fa-music"></i> Music</div>
-        <div class="side-item" onclick="openApp('terminal')"><i class="fa-solid fa-terminal"></i> Terminal</div>
-        <div class="side-item" onclick="openApp('fileManager')"><i class="fa-solid fa-folder"></i> File Manager</div>
-        <div class="side-item" onclick="toggleMatrix()"><i class="fa-solid fa-code"></i> Toggle Matrix</div>
-        <div class="side-item" onclick="openApp('appstore')"><i class="fa-solid fa-store"></i> App Store</div>
-        <hr>
-        <div class="side-item" onclick="logout()"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
+    <canvas id="bgCanvas"></canvas>
+    <div id="login">
+        <h2>AMOS LOGIN</h2>
+        <input type="password" id="pass" placeholder="PIN 101312" style="text-align:center;">
+        <br><br>
+        <button onclick="login()">ENTER SYSTEM</button>
     </div>
-
-    <div id="workspace">
-        <div id="desktopIcons"></div>
-
-        <div class="window" id="calc">
-            <div class="titlebar">🧮 Calculator <span onclick="closeApp('calc')">X</span></div>
-            <div style="padding:10px;">
-                <input id="calcInput" placeholder="Contoh: 2+2" style="width:100%; padding:8px;">
-                <button onclick="hitung()">Hitung</button>
-                <div id="calcResult"></div>
-            </div>
+    <div id="desktop">
+        <button id="toggleSidebar" onclick="toggleSidebar()">☰ MENU</button>
+        <div id="sidebar">
+            <h3 style="border-bottom: 1px solid #00ff9f; padding-bottom: 10px;">🚀 MY 11 PROJECTS</h3>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> 1. Camera RCP</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> 2. Fake GPS</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> 3. CV Amos</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> 4. Data Pribadi</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> 5. Admin Panel</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> 6. SmartDebt</div>
+            <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> 7. Alarm System</div>
+            <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> 8. Jadwal Kerja</div>
+            <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> 9. Telegram Bot</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')"><i class="fa-brands fa-whatsapp"></i> 10. WA Sender</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')"><i class="fa-solid fa-compact-disc"></i> 11. WebOS Music</div>
+            <hr style="border: 0.5px solid #003322; margin: 20px 0;">
+            <div class="side-item" onclick="logout()" style="color: #ff4444;"><i class="fa-solid fa-sign-out-alt"></i> Logout</div>
         </div>
-
-        <div class="window" id="todo">
-            <div class="titlebar">📋 To Do <span onclick="closeApp('todo')">X</span></div>
-            <div style="padding:10px;">
-                <input id="todoInput" placeholder="Tulis tugas..." />
-                <button onclick="addTodo()">Tambah</button>
-                <ul id="todoList"></ul>
-            </div>
-        </div>
-
-        <div class="window" id="browser">
-            <div class="titlebar">🌐 Browser <span onclick="closeApp('browser')">X</span></div>
-            <div style="padding:10px; display:flex; flex-direction:column; height:100%;">
-                <input id="urlInput" placeholder="Ketik URL atau cari..." />
-                <button onclick="openWeb()">Go</button>
-                <iframe id="webView" style="flex:1; border:none;"></iframe>
-            </div>
-        </div>
-
-        <div class="window" id="weather">
-            <div class="titlebar">☁️ Weather <span onclick="closeApp('weather')">X</span></div>
-            <div style="padding:10px;">
-                <input id="cityInput" placeholder="Masukkan kota..." />
-                <button onclick="getWeather()">Cek</button>
-                <div id="weatherResult">Cuaca belum dimuat</div>
-            </div>
-        </div>
-
-        <div class="window" id="appstore">
-            <div class="titlebar">📱 App Store <span onclick="closeApp('appstore')">X</span></div>
-            <div id="appList" style="padding:10px; display:grid; grid-template-columns: repeat(2,1fr); gap:10px; overflow:auto;"></div>
-        </div>
-
-        <div class="window" id="notes">
-            <div class="titlebar">Notes <span onclick="closeApp('notes')">X</span></div>
-            <textarea style="flex:1;"></textarea>
-        </div>
-
-        <div class="window" id="terminal">
-            <div class="titlebar">Terminal <span onclick="closeApp('terminal')">X</span></div>
-            <div id="terminalOutput"></div>
-            <input id="cmdInput" placeholder="Ketik perintah..." />
-        </div>
-
-        <div class="window" id="music">
-            <div class="titlebar">Music <span onclick="closeApp('music')">X</span></div>
-            <div style="display:flex; gap:5px; align-items:center;">
-                <audio id="player" style="flex:1;"></audio>
-                <button onclick="prevMusic()">⏮</button>
-                <button onclick="togglePlay()">▶</button>
-                <button onclick="nextMusic()">⏭</button>
-                <button onclick="toggleShuffle()" id="shuffleBtn">🔀</button>
-            </div>
-            <div style="margin-top:5px;">
-                Speed: <span id="speedLabel">1x</span><br>
-                <input type="range" min="0.5" max="2" step="0.1" value="1" oninput="setSpeed(this.value)">
-            </div>
-            <div style="padding:10px;">
-                <input type="text" id="songName" placeholder="Judul Lagu">
-                <input type="text" id="songURL" placeholder="URL Lagu">
-                <input type="file" id="songFile" accept="audio/*">
-                <button onclick="uploadMusic()">Upload File</button>
-                <button onclick="addMusic()">Tambah</button>
-                <button onclick="showAllMusic()">Semua</button>
-                <button onclick="showFavorites()">Favorit</button>
-                <button onclick="showPlaylist()">Playlist</button>
-            </div>
-            <div id="musicList"></div>
-        </div>
-
-        <div class="window" id="fileManager">
-            <div class="titlebar">File Manager <span onclick="closeApp('fileManager')">X</span></div>
-            <div id="fileManagerContent" style="padding:10px;">Sistem file berbasis Firebase.</div>
+        <div id="workspace"></div>
+        <div id="taskbar">
+            <div style="font-weight:bold;">AMOS OS V14</div>
+            <div id="clock"></div>
         </div>
     </div>
-
-    <div id="taskbar">
-        <div onclick="toggleStart()">Start</div>
-        <div id="clock"></div>
-    </div>
-
-    <div id="startMenu">
-        <div onclick="openApp('notes')">Notes</div>
-        <div onclick="openApp('music')">Music</div>
-        <div onclick="openApp('terminal')">Terminal</div>
-        <div onclick="openApp('fileManager')">File Manager</div>
-        <div onclick="openApp('appstore')">App Store</div>
-    </div>
-</div>
-
-<div id="floatingPlayer">
-    <div class="floating-circle" onclick="togglePlay()">
-        <span id="floatingIcon">▶</span>
-    </div>
-    <div id="floatingTitle" style="font-size:10px; text-align:center;"></div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
-    
