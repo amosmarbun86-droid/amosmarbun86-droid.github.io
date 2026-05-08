@@ -1,16 +1,27 @@
-// CONFIG WALLPAPER
+// CONFIG WALLPAPER LENGKAP
 const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201824/iij3x03m3leuwuca1sem.png",
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776200829/n4vqmisi9iwz09fnf8mp.png",
-    "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201095/m4n5tyz02ffvtymy7ahu.png"
+    "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201095/m4n5tyz02ffvtymy7ahu.png",
+    "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201174/kdauhikka25fkb8zaudm.png",
+    "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201249/pxpbgdjpvoztiyhedtba.png"
 ];
+
+let matrixActive = true;
 
 function changeWallpaper() {
     const random = wallpapers[Math.floor(Math.random() * wallpapers.length)];
     document.body.style.backgroundImage = `url('${random}')`;
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundPosition = "center";
 }
 
-// CORE SYSTEM
+function toggleMatrix() {
+    matrixActive = !matrixActive;
+    const canvas = document.getElementById("bgCanvas");
+    if(canvas) canvas.style.display = matrixActive ? "block" : "none";
+}
+
 function login() {
     const pin = document.getElementById("pass").value;
     if (pin === "101312") {
@@ -32,10 +43,12 @@ function toggleSidebar() {
 }
 
 function openExternal(url) {
-    window.open(url, "_blank");
+    if(url && url !== "#") {
+        window.open(url, "_blank");
+    }
 }
 
-// INITIALIZE
+// INITIALIZE SYSTEM
 document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("amosLoggedIn") === "true") {
         document.getElementById("login").style.display = "none";
@@ -43,19 +56,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     changeWallpaper();
-    setInterval(changeWallpaper, 15000);
+    setInterval(changeWallpaper, 20000);
     
-    // Matrix Effect Simple
+    // Matrix Effect Logic
     const canvas = document.getElementById("bgCanvas");
     const ctx = canvas.getContext("2d");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
     const letters = "AMOS101312";
     const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
+    let columns = canvas.width / fontSize;
+    let drops = Array(Math.floor(columns)).fill(1);
 
     function draw() {
+        if(!matrixActive) return;
         ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#00ff9f";
@@ -70,7 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(draw, 33);
 });
 
-// CLOCK
+// CLOCK SYSTEM
 setInterval(() => {
-    document.getElementById("clock").innerHTML = new Date().toLocaleTimeString("id-ID");
+    const clock = document.getElementById("clock");
+    if(clock) clock.innerHTML = new Date().toLocaleTimeString("id-ID");
 }, 1000);
