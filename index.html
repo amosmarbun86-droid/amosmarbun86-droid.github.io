@@ -23,47 +23,39 @@
     </div>
 
     <div id="desktop">
-        <button id="toggleSidebar" onclick="toggleSidebar()">☰ MENU</button>
-
         <div id="sidebar">
-            <div style="text-align: center; padding: 20px 0;">
-                <i class="fa-solid fa-user-gear" style="font-size: 50px; color: #00ff9f;"></i>
-                <h3 style="margin-top: 10px; font-size: 14px; letter-spacing: 2px;">AMOS CREATOR</h3>
+            <div class="sidebar-header">
+                <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+                <h3 class="sidebar-title">AMOS CREATOR</h3>
             </div>
 
-            <div class="sidebar-label">DASHBOARD PROJECTS</div>
+            <div class="sidebar-label">Dashboard Projects</div>
             
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> 1. Camera RCP</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> 2. Fake GPS</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> 3. CV Amos</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> 4. Data Pribadi</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> 5. Admin Panel</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> 6. SmartDebt</div>
-            <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> 7. Alarm System</div>
-            <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> 8. Jadwal Kerja</div>
-            <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> 9. Telegram Bot</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')"><i class="fa-brands fa-whatsapp"></i> 10. WA Sender</div>
-            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')"><i class="fa-solid fa-compact-disc"></i> 11. WebOS Music</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')"><i class="fa-solid fa-camera"></i> Camera RCP</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')"><i class="fa-solid fa-location-dot"></i> Fake GPS</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')"><i class="fa-solid fa-user"></i> CV Amos</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')"><i class="fa-solid fa-folder"></i> Data Pribadi</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')"><i class="fa-solid fa-gear"></i> Admin Panel</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')"><i class="fa-solid fa-coins"></i> SmartDebt</div>
+            <div class="side-item" onclick="openExternal('https://alarm-telegram-24jam.onrender.com')"><i class="fa-solid fa-clock"></i> Alarm System</div>
+            <div class="side-item" onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')"><i class="fa-solid fa-calendar"></i> Jadwal Kerja</div>
+            <div class="side-item" onclick="openExternal('https://t.me/routealarmsiborong2026_bot')"><i class="fa-brands fa-telegram"></i> Telegram Bot</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')"><i class="fa-brands fa-whatsapp"></i> WA Sender</div>
+            <div class="side-item" onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')"><i class="fa-solid fa-compact-disc"></i> WebOS Music</div>
 
-            <div class="sidebar-label">SYSTEM SETTINGS</div>
+            <div class="sidebar-label">System Settings</div>
+            <div class="side-item" onclick="toggleMatrix()"><i class="fa-solid fa-code"></i> Toggle Matrix</div>
+            <div class="side-item" onclick="changeWallpaper()"><i class="fa-solid fa-image"></i> Next Wallpaper</div>
 
-            <div class="side-item" onclick="toggleMatrix()">
-                <i class="fa-solid fa-code"></i> Toggle Matrix
-            </div>
-            
-            <div class="side-item" onclick="changeWallpaper()">
-                <i class="fa-solid fa-image"></i> Next Wallpaper
-            </div>
-
-            <div class="side-item logout-btn" onclick="logout()">
-                <i class="fa-solid fa-power-off"></i> Logout
-            </div>
+            <div class="side-item logout-btn" onclick="logout()"><i class="fa-solid fa-power-off"></i> Logout</div>
         </div>
 
-        <div id="workspace"></div>
+        <div id="workspace">
+            <button id="mobileMenuBtn" onclick="toggleSidebar()">☰ MENU</button>
+        </div>
 
         <div id="taskbar">
-            <div style="font-weight:bold; color:#00ff9f; letter-spacing: 1px;">AMOS OS V14</div>
+            <div style="font-weight:bold; color:#00ff9f;">AMOS OS V14</div>
             <div id="clock">00:00:00</div>
         </div>
     </div>
