@@ -55,8 +55,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("desktop").style.display = "flex";
     }
     
+    // Jalankan ganti wallpaper pertama kali
     changeWallpaper();
-    setInterval(changeWallpaper, 20000);
+    
+    // SET INTERVAL AUTO WALLPAPER: 10 DETIK (10000 ms)
+    setInterval(changeWallpaper, 10000);
     
     // Matrix Effect Logic
     const canvas = document.getElementById("bgCanvas");
