@@ -1,169 +1,482 @@
-body {
-    margin: 0;
-    font-family: 'Courier New', Courier, monospace;
-    background-color: #000;
-    color: #00ff9f;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    transition: background-image 1s ease-in-out;
+/* =========================
+   AMOS WEB OS V14 FINAL
+========================= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-#bgCanvas {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    z-index: -1;
-    opacity: 0.3;
-}
+body{
+    font-family:'Courier New', Courier, monospace;
+    background:#000;
+    color:#00ff9f;
+    overflow:hidden;
 
-#login {
-    position: fixed;
-    width: 100%; height: 100%;
-    display: flex; justify-content: center; align-items: center;
-    flex-direction: column; background: rgba(0,0,0,0.95);
-    z-index: 9999;
-}
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
 
-#desktop { display: none; width: 100%; height: 100vh; }
-
-#sidebar {
-    width: 260px;
-    background: rgba(0, 10, 15, 0.98);
-    border-right: 1px solid rgba(0, 255, 159, 0.3);
-    display: flex; flex-direction: column;
-    z-index: 1000; overflow-y: auto;
-    transition: transform 0.3s ease;
-}
-
-.sidebar-header {
-    display: flex; align-items: center; gap: 12px;
-    padding: 20px 15px; border-bottom: 1px solid #003322;
-}
-
-.sidebar-title { margin: 0; font-size: 14px; letter-spacing: 1px; color: #00ff9f; }
-
-.sidebar-label {
-    padding: 15px 15px 8px 15px; font-size: 10px;
-    color: #008855; text-transform: uppercase; letter-spacing: 1.5px;
-}
-
-.side-item {
-    padding: 12px 15px; cursor: pointer; transition: all 0.3s ease;
-    display: flex; align-items: center; gap: 12px;
-}
-
-.side-item i { width: 20px; text-align: center; color: #00ff9f; }
-
-.side-item:hover {
-    background: rgba(0, 255, 159, 0.1); padding-left: 25px; color: #fff;
-}
-
-.logout-btn { color: #ff4444 !important; margin-top: auto; border-top: 1px solid #330000; }
-.logout-btn i { color: #ff4444; }
-
-#workspace { flex: 1; position: relative; }
-
-#mobileMenuBtn {
-    position: absolute; top: 15px; left: 15px;
-    background: #000; color: #00ff9f; border: 1px solid #00ff9f;
-    padding: 8px 15px; cursor: pointer; display: none;
-}
-
-#taskbar {
-    position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
-    background: rgba(0,0,0,0.9); border-top: 1px solid #00ff9f;
-    display: flex; justify-content: space-between; align-items: center; padding: 0 20px;
-    box-sizing: border-box; font-size: 13px;
-}
-
-input, button { background: #000; color: #00ff9f; border: 1px solid #00ff9f; padding: 10px 20px; }
-
-@media (max-width: 768px) {
-    #sidebar { position: fixed; left: -260px; height: 100%; }
-    #sidebar.active { left: 0; }
-    #mobileMenuBtn { display: block; }
-    #toggleSidebar { display: block; background: none; border: none; color: #00ff9f; font-size: 20px; }
+    transition:background-image 1s ease-in-out;
 }
 
 /* =========================
-   AMOS BOOT SYSTEM
+   BACKGROUND CANVAS
+========================= */
+
+#bgCanvas{
+    position:fixed;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    z-index:-1;
+
+    opacity:0.3;
+}
+
+/* =========================
+   LOGIN SYSTEM
+========================= */
+
+#login{
+    position:fixed;
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+
+    background:rgba(0,0,0,0.95);
+
+    z-index:9999;
+}
+
+#login h2{
+    margin-bottom:20px;
+
+    font-size:28px;
+
+    color:#00ff9f;
+
+    text-shadow:0 0 20px #00ff9f;
+}
+
+#login input{
+    width:260px;
+
+    padding:12px 15px;
+
+    background:#000;
+
+    color:#00ff9f;
+
+    border:1px solid #00ff9f;
+
+    outline:none;
+
+    border-radius:10px;
+
+    text-align:center;
+
+    font-size:16px;
+}
+
+#login button{
+    padding:12px 25px;
+
+    background:#000;
+
+    color:#00ff9f;
+
+    border:1px solid #00ff9f;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+#login button:hover{
+    background:#00ff9f;
+    color:#000;
+
+    box-shadow:0 0 20px #00ff9f;
+}
+
+/* =========================
+   DESKTOP SYSTEM
+========================= */
+
+#desktop{
+    display:none;
+
+    width:100%;
+    height:100vh;
+
+    position:relative;
+
+    overflow:hidden;
+}
+
+/* =========================
+   DESKTOP ICONS
+========================= */
+
+.desktop-icons{
+    position:absolute;
+
+    top:90px;
+    left:20px;
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill, 90px);
+
+    gap:25px;
+
+    z-index:5;
+}
+
+.desktop-icon{
+    width:80px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    transition:0.3s;
+
+    text-align:center;
+}
+
+.desktop-icon:hover{
+    transform:scale(1.1);
+}
+
+.desktop-icon img{
+    width:55px;
+    height:55px;
+
+    object-fit:contain;
+
+    margin-bottom:8px;
+
+    filter:drop-shadow(0 0 10px #00ff9f);
+}
+
+.desktop-icon span{
+    font-size:12px;
+
+    color:#00ff9f;
+
+    text-shadow:0 0 10px #00ff9f;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+#sidebar{
+    position:fixed;
+
+    top:0;
+    right:0;
+
+    width:260px;
+    height:100vh;
+
+    background:rgba(0,10,15,0.96);
+
+    border-left:1px solid rgba(0,255,159,0.25);
+
+    backdrop-filter:blur(12px);
+
+    display:flex;
+    flex-direction:column;
+
+    overflow-y:auto;
+
+    z-index:1000;
+
+    transition:0.3s;
+}
+
+.sidebar-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:20px 15px;
+
+    border-bottom:1px solid #003322;
+}
+
+.sidebar-title{
+    font-size:14px;
+
+    letter-spacing:1px;
+
+    color:#00ff9f;
+}
+
+.sidebar-label{
+    padding:15px 15px 8px;
+
+    font-size:10px;
+
+    color:#008855;
+
+    text-transform:uppercase;
+
+    letter-spacing:2px;
+}
+
+.side-item{
+    padding:12px 15px;
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.side-item i{
+    width:20px;
+
+    text-align:center;
+
+    color:#00ff9f;
+}
+
+.side-item:hover{
+    background:rgba(0,255,159,0.08);
+
+    padding-left:25px;
+
+    color:#fff;
+}
+
+.logout-btn{
+    margin-top:auto;
+
+    color:#ff4444 !important;
+
+    border-top:1px solid #330000;
+}
+
+.logout-btn i{
+    color:#ff4444;
+}
+
+/* =========================
+   WORKSPACE
+========================= */
+
+#workspace{
+    width:100%;
+    height:100%;
+    position:relative;
+}
+
+/* =========================
+   MOBILE MENU BUTTON
+========================= */
+
+#mobileMenuBtn{
+    position:absolute;
+
+    top:15px;
+    left:15px;
+
+    background:#000;
+
+    color:#00ff9f;
+
+    border:1px solid #00ff9f;
+
+    padding:8px 15px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    display:none;
+
+    z-index:2000;
+}
+
+#toggleSidebar{
+    background:none;
+    border:none;
+
+    color:#00ff9f;
+
+    font-size:18px;
+
+    cursor:pointer;
+}
+
+/* =========================
+   TASKBAR
+========================= */
+
+#taskbar{
+    position:fixed;
+
+    left:0;
+    bottom:0;
+
+    width:100%;
+    height:42px;
+
+    background:rgba(0,0,0,0.92);
+
+    border-top:1px solid #00ff9f;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:0 20px;
+
+    font-size:13px;
+
+    z-index:999;
+}
+
+/* =========================
+   GLOBAL FORM
+========================= */
+
+input,
+button{
+    font-family:inherit;
+}
+
+/* =========================
+   BOOT SYSTEM
 ========================= */
 
 #bootScreen{
     position:fixed;
     inset:0;
+
     background:#000;
+
     z-index:999999;
+
     overflow:hidden;
+
     display:flex;
     justify-content:center;
     align-items:center;
-    font-family:monospace;
 }
 
 #bootMatrix{
     position:absolute;
+
     width:100%;
     height:100%;
+
     opacity:0.25;
 }
 
 .boot-overlay{
     position:relative;
+
     z-index:2;
+
     width:90%;
     max-width:700px;
+
     text-align:center;
+
     color:#00ff88;
 }
 
 .boot-logo h1{
     font-size:70px;
+
     margin:0;
+
     text-shadow:0 0 25px #00ff88;
+
     animation:pulse 2s infinite;
 }
 
 .boot-logo span{
     letter-spacing:4px;
+
     opacity:0.7;
 }
 
 .boot-loader{
     width:100%;
     height:12px;
+
     border:1px solid #00ff88;
+
     margin-top:40px;
+
     overflow:hidden;
+
     border-radius:30px;
 }
 
 .boot-progress{
     width:0%;
+
     height:100%;
+
     background:#00ff88;
+
     box-shadow:0 0 20px #00ff88;
+
     transition:width 0.4s;
 }
 
 .boot-status{
     margin-top:20px;
+
     font-size:14px;
+
     letter-spacing:2px;
 }
 
 .boot-terminal{
     margin-top:30px;
+
     text-align:left;
+
     height:180px;
+
     overflow:hidden;
+
     background:rgba(0,0,0,0.45);
+
     border:1px solid #00ff88;
+
     padding:15px;
+
     border-radius:15px;
+
     font-size:13px;
+
     line-height:1.6;
 }
 
@@ -171,14 +484,66 @@ input, button { background: #000; color: #00ff9f; border: 1px solid #00ff9f; pad
     margin-bottom:6px;
 }
 
+/* =========================
+   ANIMATION
+========================= */
+
 @keyframes pulse{
+
     0%{
         transform:scale(1);
     }
+
     50%{
         transform:scale(1.05);
     }
+
     100%{
         transform:scale(1);
     }
+
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    #sidebar{
+        right:-260px;
     }
+
+    #sidebar.active{
+        right:0;
+    }
+
+    #mobileMenuBtn{
+        display:block;
+    }
+
+    .desktop-icons{
+
+        grid-template-columns:repeat(2, 90px);
+
+        gap:20px;
+
+        left:10px;
+        top:80px;
+    }
+
+    .desktop-icon img{
+        width:50px;
+        height:50px;
+    }
+
+    .boot-logo h1{
+        font-size:45px;
+    }
+
+    .boot-terminal{
+        height:140px;
+        font-size:11px;
+    }
+
+}
