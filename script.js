@@ -231,7 +231,7 @@ function drawMatrix(){
 
 }
 
-setInterval(drawMatrix,35);
+setInterval(drawMatrix,25);
 
 window.addEventListener("resize",()=>{
 
