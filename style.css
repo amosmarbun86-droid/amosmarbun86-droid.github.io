@@ -86,3 +86,99 @@ input, button { background: #000; color: #00ff9f; border: 1px solid #00ff9f; pad
     #mobileMenuBtn { display: block; }
     #toggleSidebar { display: block; background: none; border: none; color: #00ff9f; font-size: 20px; }
 }
+
+/* =========================
+   AMOS BOOT SYSTEM
+========================= */
+
+#bootScreen{
+    position:fixed;
+    inset:0;
+    background:#000;
+    z-index:999999;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:monospace;
+}
+
+#bootMatrix{
+    position:absolute;
+    width:100%;
+    height:100%;
+    opacity:0.25;
+}
+
+.boot-overlay{
+    position:relative;
+    z-index:2;
+    width:90%;
+    max-width:700px;
+    text-align:center;
+    color:#00ff88;
+}
+
+.boot-logo h1{
+    font-size:70px;
+    margin:0;
+    text-shadow:0 0 25px #00ff88;
+    animation:pulse 2s infinite;
+}
+
+.boot-logo span{
+    letter-spacing:4px;
+    opacity:0.7;
+}
+
+.boot-loader{
+    width:100%;
+    height:12px;
+    border:1px solid #00ff88;
+    margin-top:40px;
+    overflow:hidden;
+    border-radius:30px;
+}
+
+.boot-progress{
+    width:0%;
+    height:100%;
+    background:#00ff88;
+    box-shadow:0 0 20px #00ff88;
+    transition:width 0.4s;
+}
+
+.boot-status{
+    margin-top:20px;
+    font-size:14px;
+    letter-spacing:2px;
+}
+
+.boot-terminal{
+    margin-top:30px;
+    text-align:left;
+    height:180px;
+    overflow:hidden;
+    background:rgba(0,0,0,0.45);
+    border:1px solid #00ff88;
+    padding:15px;
+    border-radius:15px;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.boot-line{
+    margin-bottom:6px;
+}
+
+@keyframes pulse{
+    0%{
+        transform:scale(1);
+    }
+    50%{
+        transform:scale(1.05);
+    }
+    100%{
+        transform:scale(1);
+    }
+    }
