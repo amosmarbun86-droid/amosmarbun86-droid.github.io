@@ -8,9 +8,11 @@
     <meta name="theme-color" content="#00ff9f">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-<body>
-    <div id="bootScreen">
+</head><!-- =========================
+     BOOT SCREEN
+========================= -->
+
+<div id="bootScreen">
 
     <canvas id="bootMatrix"></canvas>
 
@@ -33,23 +35,120 @@
 
     </div>
 
+    <!-- BOOT SOUND -->
+
     <audio id="bootSound" preload="auto">
-        <source src="assets/sounds/boot.mp3" type="audio/mpeg">
+        <source src="assets/sounds/boot.mp3"
+                type="audio/mpeg">
     </audio>
 
 </div>
-    
-    <canvas id="bgCanvas"></canvas>
 
-    <div id="login">
-        <div style="text-align: center; margin-bottom: 20px;">
-            <i class="fa-solid fa-microchip" style="font-size: 50px; color: #00ff9f;"></i>
-        </div>
-        <h2 style="letter-spacing: 5px;">AMOS LOGIN</h2>
-        <input type="password" id="pass" style="text-align:center;">
-        <br><br>
-        <button onclick="login()">ENTER SYSTEM</button>
+<!-- =========================
+     BACKGROUND EFFECT
+========================= -->
+
+<canvas id="bgCanvas"></canvas>
+
+<!-- =========================
+     LOGIN SYSTEM
+========================= -->
+
+<div id="login">
+
+    <div style="text-align:center; margin-bottom:20px;">
+
+        <i class="fa-solid fa-microchip"
+           style="font-size:50px; color:#00ff9f;">
+        </i>
+
     </div>
+
+    <h2 style="letter-spacing:5px;">
+        AMOS LOGIN
+    </h2>
+
+    <input type="password"
+           id="pass"
+           style="text-align:center;">
+
+    <br><br>
+
+    <button onclick="login()">
+        ENTER SYSTEM
+    </button>
+
+</div>
+
+<!-- =========================
+     DESKTOP SYSTEM
+========================= -->
+
+<div id="desktop">
+
+    <!-- DESKTOP ICONS -->
+
+    <div class="desktop-icons">
+
+        <div class="desktop-icon">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
+
+            <span>AI</span>
+
+        </div>
+
+        <div class="desktop-icon">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+
+            <span>Browser</span>
+
+        </div>
+
+        <div class="desktop-icon">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
+
+            <span>Music</span>
+
+        </div>
+
+        <div class="desktop-icon">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
+
+            <span>Files</span>
+
+        </div>
+
+        <div class="desktop-icon">
+
+            <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
+
+            <span>Terminal</span>
+
+        </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+
+    <div id="sidebar">
+
+        <div class="sidebar-header">
+
+            <button id="toggleSidebar"
+                    onclick="toggleSidebar()">
+                ☰
+            </button>
+
+            <h3 class="sidebar-title">
+                AMOS CREATOR
+            </h3>
+
+        </div>
+    
 
     <div id="desktop">
         <div id="sidebar">
