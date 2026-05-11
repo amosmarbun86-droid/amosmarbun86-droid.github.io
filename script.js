@@ -117,6 +117,7 @@ const bootTerminal = document.getElementById("bootTerminal");
 const bootStatus = document.getElementById("bootStatus");
 const bootProgress = document.querySelector(".boot-progress");
 
+const bootSound = document.getElementById("bootSound");
 let progress = 0;
 
 function typeBootLine(element, text){
@@ -151,8 +152,22 @@ function addBootLine(text){
 }
 
 function runBootSequence(){
+    
+bootSound.volume = 0.7;
 
-    bootMessages.forEach((msg, index)=>{
+const playPromise = bootSound.play();
+
+if(playPromise !== undefined){
+
+    playPromise.catch(error => {
+
+        console.log("Autoplay blocked:", error);
+
+    });
+
+}
+   bootMessages.forEach((msg, index)=>{
+        
 
         setTimeout(()=>{
 
