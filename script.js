@@ -98,3 +98,144 @@ setInterval(() => {
     const clock = document.getElementById("clock");
     if(clock) clock.innerHTML = new Date().toLocaleTimeString("id-ID");
 }, 1000);
+
+/* =========================
+   AMOS BOOT SYSTEM
+========================= */
+
+const bootMessages = [
+    "Initializing AMOS Kernel...",
+    "Loading AI Engine...",
+    "Connecting Cloud Node...",
+    "Starting Security Layer...",
+    "Loading Media System...",
+    "Preparing Desktop...",
+    "Launching AMOS Ecosystem..."
+];
+
+const bootTerminal = document.getElementById("bootTerminal");
+const bootStatus = document.getElementById("bootStatus");
+const bootProgress = document.querySelector(".boot-progress");
+
+let progress = 0;
+
+function typeBootLine(element, text){
+
+    let i = 0;
+
+    const typing = setInterval(()=>{
+
+        element.innerHTML += text.charAt(i);
+
+        i++;
+
+        if(i >= text.length){
+            clearInterval(typing);
+        }
+
+    }, 40);
+
+}
+
+function addBootLine(text){
+
+    const line = document.createElement("div");
+
+    line.className = "boot-line";
+
+    bootTerminal.appendChild(line);
+
+    typeBootLine(line, `[ OK ] ${text}`);
+
+    bootTerminal.scrollTop = bootTerminal.scrollHeight;
+}
+
+function runBootSequence(){
+
+    bootMessages.forEach((msg, index)=>{
+
+        setTimeout(()=>{
+
+            addBootLine(msg);
+
+            bootStatus.innerText = msg;
+
+            progress += 100 / bootMessages.length;
+
+            bootProgress.style.width = progress + "%";
+
+        }, index * 2500);
+
+    });
+
+    setTimeout(()=>{
+
+        document.getElementById("bootScreen").style.transition = "2s";
+
+        document.getElementById("bootScreen").style.opacity = "0";
+
+        setTimeout(()=>{
+
+            document.getElementById("bootScreen").remove();
+
+        },2000);
+
+    }, bootMessages.length * 2500 + 4000);
+
+}
+
+runBootSequence();
+
+/* =========================
+   MATRIX EFFECT
+========================= */
+
+const canvas = document.getElementById("bootMatrix");
+
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const chars = "AMOS0123456789SYSTEM";
+const fontSize = 14;
+
+let columns = canvas.width / fontSize;
+
+const drops = [];
+
+for(let x=0; x<columns; x++){
+    drops[x]=1;
+}
+
+function drawMatrix(){
+
+    ctx.fillStyle = "rgba(0,0,0,0.08)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "#00ff88";
+    ctx.font = fontSize + "px monospace";
+
+    for(let i=0; i<drops.length; i++){
+
+        const text = chars[Math.floor(Math.random()*chars.length)];
+
+        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975){
+            drops[i]=0;
+        }
+
+        drops[i]++;
+    }
+
+}
+
+setInterval(drawMatrix,35);
+
+window.addEventListener("resize",()=>{
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+});
