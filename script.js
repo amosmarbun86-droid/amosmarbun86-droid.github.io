@@ -167,6 +167,7 @@ if(playPromise !== undefined){
 
 }
    bootMessages.forEach((msg, index)=>{
+   
         
 
         setTimeout(()=>{
@@ -254,3 +255,31 @@ window.addEventListener("resize",()=>{
     canvas.height = window.innerHeight;
 
 });
+
+/* =========================
+   WINDOW SYSTEM
+========================= */
+
+function openWindow(id){
+
+    const win = document.getElementById(id);
+
+    if(win){
+
+        win.style.display = "flex";
+
+    }
+
+}
+
+function closeWindow(id){
+
+    const win = document.getElementById(id);
+
+    if(win){
+
+        win.style.display = "none";
+
+    }
+
+}
