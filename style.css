@@ -546,4 +546,150 @@ button{
         font-size:11px;
     }
 
+
+  /* =========================
+   WINDOW SYSTEM
+========================= */
+
+.app-window{
+
+    position:absolute;
+
+    top:100px;
+    left:120px;
+
+    width:420px;
+    height:320px;
+
+    background:rgba(0,0,0,0.96);
+
+    border:1px solid #00ff9f;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    display:none;
+
+    flex-direction:column;
+
+    z-index:9999;
+
+    box-shadow:0 0 35px rgba(0,255,159,0.35);
+
+    backdrop-filter:blur(12px);
+
+    animation:windowOpen 0.3s ease;
+}
+
+/* =========================
+   WINDOW HEADER
+========================= */
+
+.window-header{
+
+    height:45px;
+
+    background:#001a12;
+
+    border-bottom:1px solid #00ff9f;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 15px;
+
+    color:#00ff9f;
+
+    font-size:14px;
+
+    letter-spacing:1px;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.window-header button{
+
+    background:none;
+
+    border:none;
+
+    color:#ff4444;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.window-header button:hover{
+
+    transform:scale(1.2);
+
+    color:#ff0000;
+}
+
+/* =========================
+   WINDOW CONTENT
+========================= */
+
+.window-content{
+
+    flex:1;
+
+    padding:20px;
+
+    overflow:auto;
+
+    color:#00ff9f;
+}
+
+/* =========================
+   WINDOW ANIMATION
+========================= */
+
+@keyframes windowOpen{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(0.8);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    .app-window{
+
+        width:90%;
+
+        height:70%;
+
+        left:5%;
+
+        top:90px;
+
+    }
+
 }
