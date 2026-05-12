@@ -103,59 +103,64 @@
          DESKTOP ICONS
     ========================= -->
 
-    <div class="desktop-icons">
+<div class="desktop-icons">
 
-        <!-- AI -->
+    <!-- AI -->
 
-        <div class="desktop-icon">
+    <div class="desktop-icon"
+         onclick="openWindow('aiWindow')">
 
-            <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
 
-            <span>AI</span>
-
-        </div>
-
-        <!-- BROWSER -->
-
-        <div class="desktop-icon">
-
-            <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
-
-            <span>Browser</span>
-
-        </div>
-
-        <!-- MUSIC -->
-
-        <div class="desktop-icon">
-
-            <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
-
-            <span>Music</span>
-
-        </div>
-
-        <!-- FILES -->
-
-        <div class="desktop-icon">
-
-            <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
-
-            <span>Files</span>
-
-        </div>
-
-        <!-- TERMINAL -->
-
-        <div class="desktop-icon">
-
-            <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
-
-            <span>Terminal</span>
-
-        </div>
+        <span>AI</span>
 
     </div>
+
+    <!-- BROWSER -->
+
+    <div class="desktop-icon"
+         onclick="openWindow('browserWindow')">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+
+        <span>Browser</span>
+
+    </div>
+
+    <!-- MUSIC -->
+
+    <div class="desktop-icon"
+         onclick="openWindow('musicWindow')">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
+
+        <span>Music</span>
+
+    </div>
+
+    <!-- FILES -->
+
+    <div class="desktop-icon"
+         onclick="openWindow('filesWindow')">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
+
+        <span>Files</span>
+
+    </div>
+
+    <!-- TERMINAL -->
+
+    <div class="desktop-icon"
+         onclick="openWindow('terminalWindow')">
+
+        <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
+
+        <span>Terminal</span>
+
+    </div>
+
+</div>
 
     <!-- =========================
          SIDEBAR
@@ -319,6 +324,7 @@
     ========================= -->
 
     <div id="workspace">
+    
 
         <button id="mobileMenuBtn"
                 onclick="toggleSidebar()">
@@ -326,8 +332,140 @@
             ☰ MENU
 
         </button>
+        <!-- =========================
+     AI WINDOW
+========================= -->
+
+<div class="app-window" id="aiWindow">
+
+    <div class="window-header">
+
+        <span>AMOS AI</span>
+
+        <button onclick="closeWindow('aiWindow')">
+            ✕
+        </button>
 
     </div>
+
+    <div class="window-content">
+
+        <h2>AMOS AI SYSTEM</h2>
+
+        <p>Welcome to AMOS AI Ecosystem</p>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     BROWSER WINDOW
+========================= -->
+
+<div class="app-window" id="browserWindow">
+
+    <div class="window-header">
+
+        <span>Browser</span>
+
+        <button onclick="closeWindow('browserWindow')">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="window-content">
+
+        <iframe src="https://www.google.com"
+                style="width:100%; height:100%; border:none;">
+        </iframe>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     MUSIC WINDOW
+========================= -->
+
+<div class="app-window" id="musicWindow">
+
+    <div class="window-header">
+
+        <span>Music Player</span>
+
+        <button onclick="closeWindow('musicWindow')">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="window-content">
+
+        <h2>AMOS Music</h2>
+
+        <p>Music Ecosystem Ready</p>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     FILES WINDOW
+========================= -->
+
+<div class="app-window" id="filesWindow">
+
+    <div class="window-header">
+
+        <span>File Manager</span>
+
+        <button onclick="closeWindow('filesWindow')">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="window-content">
+
+        <h2>AMOS File System</h2>
+
+        <p>Storage Manager Active</p>
+
+    </div>
+
+</div>
+
+<!-- =========================
+     TERMINAL WINDOW
+========================= -->
+
+<div class="app-window" id="terminalWindow">
+
+    <div class="window-header">
+
+        <span>Terminal</span>
+
+        <button onclick="closeWindow('terminalWindow')">
+            ✕
+        </button>
+
+    </div>
+
+    <div class="window-content">
+
+<pre>
+AMOS TERMINAL v14
+
+root@amos-os:~#
+
+system ready...
+</pre>
+
+    </div>
+
+</div>
+
 
     <!-- =========================
          TASKBAR
