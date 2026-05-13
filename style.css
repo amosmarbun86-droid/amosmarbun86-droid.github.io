@@ -545,7 +545,7 @@ button{
         height:140px;
         font-size:11px;
     }
-}
+
 
   /* =========================
    WINDOW SYSTEM
@@ -690,6 +690,219 @@ button{
 
         top:90px;
 
+    }
+
+}
+
+/* =========================
+   MUSIC PLAYER UI
+========================= */
+
+#musicWindow .window-content{
+
+    padding:15px;
+
+    overflow-y:auto;
+}
+
+/* AUDIO PLAYER */
+
+#player{
+
+    width:100%;
+
+    margin-bottom:10px;
+
+    filter:hue-rotate(70deg);
+}
+
+/* INPUT */
+
+#musicWindow input{
+
+    width:100%;
+
+    margin-top:8px;
+
+    padding:10px;
+
+    background:#00110b;
+
+    border:1px solid #00ff9f;
+
+    color:#00ff9f;
+
+    border-radius:10px;
+
+    box-sizing:border-box;
+}
+
+/* BUTTON */
+
+#musicWindow button{
+
+    background:#00110b;
+
+    color:#00ff9f;
+
+    border:1px solid #00ff9f;
+
+    padding:8px 12px;
+
+    border-radius:10px;
+
+    margin-top:8px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+#musicWindow button:hover{
+
+    background:#00ff9f;
+
+    color:#000;
+
+    transform:scale(1.05);
+}
+
+/* MUSIC CONTROL */
+
+.music-controls{
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+
+    margin-bottom:10px;
+}
+
+/* MUSIC LIST */
+
+#musicList{
+
+    margin-top:15px;
+
+    max-height:250px;
+
+    overflow-y:auto;
+
+    border-top:1px solid rgba(0,255,159,0.2);
+}
+
+/* MUSIC ITEM */
+
+.music-item{
+
+    padding:12px;
+
+    border-bottom:1px solid rgba(0,255,159,0.15);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    transition:0.3s;
+}
+
+.music-item:hover{
+
+    background:rgba(0,255,159,0.08);
+}
+
+/* FLOATING PLAYER */
+
+#floatingPlayer{
+
+    position:fixed;
+
+    bottom:70px;
+
+    right:20px;
+
+    z-index:99999;
+
+    display:none;
+}
+
+.floating-circle{
+
+    width:65px;
+
+    height:65px;
+
+    background:#00ff9f;
+
+    color:#000;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    box-shadow:0 0 20px #00ff9f;
+
+    cursor:pointer;
+}
+
+#floatingTitle{
+
+    margin-top:6px;
+
+    color:#00ff9f;
+
+    font-size:11px;
+
+    text-align:center;
+
+    width:80px;
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+}
+
+/* SPEED SLIDER */
+
+#musicWindow input[type=\"range\"]{
+
+    accent-color:#00ff9f;
+
+    margin-top:10px;
+}
+
+/* MOBILE MUSIC FIX */
+
+@media(max-width:768px){
+
+    #musicWindow{
+
+        width:92% !important;
+
+        left:4% !important;
+
+        top:80px !important;
+
+        height:75% !important;
+    }
+
+    #floatingPlayer{
+
+        right:10px;
+
+        bottom:80px;
     }
 
 }
