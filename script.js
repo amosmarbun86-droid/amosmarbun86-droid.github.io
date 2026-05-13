@@ -1,3 +1,41 @@
+// =======================
+// ☁️ CLOUDINARY CONFIG
+// =======================
+
+const CLOUD_NAME = "dkisbfx29";
+
+const UPLOAD_PRESET = "ml_default";
+
+/* =========================
+   FIREBASE CONFIG
+========================= */
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
+
+  authDomain: "amos-web-os.firebaseapp.com",
+
+  projectId: "amos-web-os",
+
+  storageBucket: "amos-web-os.firebasestorage.app",
+
+  messagingSenderId: "59843745100",
+
+  appId: "1:59843745100:web:b29e5996052a3bf5672be9",
+
+  measurementId: "G-Z2F7MXPSCH"
+
+};
+
+// INITIALIZE FIREBASE
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+firebase.analytics();
+
 // CONFIG WALLPAPER LENGKAP
 const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201824/iij3x03m3leuwuca1sem.png",
@@ -283,3 +321,295 @@ function closeWindow(id){
     }
 
 }
+/* =========================
+   MUSIC DATA
+========================= */
+
+let musicData = [];
+
+/* =========================
+   LOAD MUSIC
+========================= */
+
+function loadMusic(){
+
+    musicData = [
+
+        {
+
+            name:"Cyber Music",
+
+            url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+
+            duration:"03:20"
+
+        },
+
+        {
+
+            name:"AMOS SYSTEM",
+
+            url:"https://res.cloudinary.com/dkisbfx29/video/upload/v174000/musicboot.mp3",
+
+            duration:"04:10"
+
+        }
+
+    ];
+
+    renderMusic(musicData);
+
+}
+function renderMusic(list){
+
+    const musicList =
+    document.getElementById("musicList");
+
+    musicList.innerHTML = "";
+
+    list.forEach(song=>{
+
+        const div =
+        document.createElement("div");
+
+        div.className = "music-item";
+
+        div.innerHTML = `
+
+        <div>
+
+            <b>${song.name}</b>
+
+            <br>
+
+            <small>${song.duration}</small>
+
+        </div>
+
+        <button onclick="playMusic('${song.url}')">
+
+            ▶
+
+        </button>
+
+        `;
+
+        musicList.appendChild(div);
+
+    });
+
+}
+function playMusic(url){
+
+    const player =
+    document.getElementById("player");
+
+    const floatingPlayer =
+    document.getElementById("floatingPlayer");
+
+    const floatingIcon =
+    document.getElementById("floatingIcon");
+
+    player.src = url;
+
+    player.play();
+
+    floatingPlayer.style.display = "block";
+
+    floatingIcon.innerHTML = "⏸";
+
+}
+function playMusic(url){
+
+    const player =
+    document.getElementById("player");
+
+    const floatingPlayer =
+    document.getElementById("floatingPlayer");
+
+    const floatingIcon =
+    document.getElementById("floatingIcon");
+
+    player.src = url;
+
+    player.play();
+
+    floatingPlayer.style.display = "block";
+
+    floatingIcon.innerHTML = "⏸";
+
+}
+
+/* =========================
+   MUSIC CONTROL
+========================= */
+
+let currentIndex = 0;
+
+/* PLAY / PAUSE */
+
+function togglePlay(){
+
+    const player =
+    document.getElementById("player");
+
+    const floatingIcon =
+    document.getElementById("floatingIcon");
+
+    if(player.paused){
+
+        player.play();
+
+        floatingIcon.innerHTML = "⏸";
+
+    }else{
+
+        player.pause();
+
+        floatingIcon.innerHTML = "▶";
+
+    }
+
+}
+
+/* NEXT MUSIC */
+
+function nextMusic(){
+
+    currentIndex++;
+
+    if(currentIndex >= musicData.length){
+
+        currentIndex = 0;
+
+    }
+
+    playMusic(musicData[currentIndex].url);
+
+}
+
+/* PREVIOUS MUSIC */
+
+function prevMusic(){
+
+    currentIndex--;
+
+    if(currentIndex < 0){
+
+        currentIndex =
+        musicData.length - 1;
+
+    }
+
+    playMusic(musicData[currentIndex].url);
+
+}
+
+/* SPEED CONTROL */
+
+function setSpeed(speed){
+
+    const player =
+    document.getElementById("player");
+
+    const speedLabel =
+    document.getElementById("speedLabel");
+
+    player.playbackRate = speed;
+
+    speedLabel.innerHTML =
+    speed + "x";
+
+}
+
+/* SHUFFLE */
+
+function toggleShuffle(){
+
+    alert("Shuffle Ready");
+
+}
+/* =========================
+   UPLOAD MUSIC
+========================= */
+
+async function uploadMusic(){
+
+    const file =
+    document.getElementById("songFile").files[0];
+
+    const songName =
+    document.getElementById("songName").value;
+
+    if(!file){
+
+        alert("Pilih file musik!");
+
+        return;
+
+    }
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    formData.append(
+        "upload_preset",
+        UPLOAD_PRESET
+    );
+
+    try{
+
+        alert("Uploading...");
+
+        const response = await fetch(
+
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+
+            {
+
+                method:"POST",
+
+                body:formData
+
+            }
+
+        );
+
+        const data =
+        await response.json();
+
+        if(data.secure_url){
+
+            const song = {
+
+                name: songName || file.name,
+
+                url: data.secure_url,
+
+                duration:"00:00"
+
+            };
+
+            musicData.push(song);
+
+            renderMusic(musicData);
+
+            alert("Upload berhasil!");
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+        alert("Upload gagal!");
+
+    }
+
+}
+window.addEventListener("load",()=>{
+
+    loadMusic();
+
+});
