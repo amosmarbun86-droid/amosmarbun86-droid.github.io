@@ -333,31 +333,28 @@ let musicData = [];
 
 function loadMusic(){
 
-    musicData = [
+    musicData = [];
 
-        {
+    const musicList =
+    document.getElementById("musicList");
 
-            name:"Cyber Music",
+    musicList.innerHTML = "Loading...";
 
-            url:"https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    db.collection("music")
 
-            duration:"03:20"
+    .get()
 
-        },
+    .then((snapshot)=>{
 
-        {
+        snapshot.forEach((doc)=>{
 
-            name:"AMOS SYSTEM",
+            musicData.push(doc.data());
 
-            url:"https://res.cloudinary.com/dkisbfx29/video/upload/v174000/musicboot.mp3",
+        });
 
-            duration:"04:10"
+        renderMusic(musicData);
 
-        }
-
-    ];
-
-    renderMusic(musicData);
+    });
 
 }
 function renderMusic(list){
@@ -591,9 +588,19 @@ async function uploadMusic(){
 
             };
 
-            musicData.push(song);
+            // SIMPAN KE FIREBASE
 
-            renderMusic(musicData);
+db.collection("music")
+
+.add(song)
+
+.then(()=>{
+
+    alert("Upload berhasil!");
+
+    loadMusic();
+
+});
 
             alert("Upload berhasil!");
 
