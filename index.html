@@ -585,10 +585,8 @@ system ready...
 </div>
 
 <!-- =========================
-     JAVASCRIPT
+     FIREBASE SDK
 ========================= -->
-
-<!-- FIREBASE SDK -->
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 
@@ -596,17 +594,19 @@ system ready...
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 
-<!-- MAIN SCRIPT -->
+<!-- =========================
+     MAIN SCRIPT
+========================= -->
 
 <script src="script.js"></script>
 
 <script>
 
-    if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator) {
 
-        navigator.serviceWorker.register('sw.js');
+    navigator.serviceWorker.register('sw.js');
 
-    }
+}
 
 </script>
 
