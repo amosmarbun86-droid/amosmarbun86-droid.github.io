@@ -379,15 +379,29 @@ function renderMusic(list){
 
             <br>
 
-            <small>${song.duration}</small>
+            <small>
+
+                ⏱ ${song.duration}
+
+            </small>
 
         </div>
 
-        <button onclick="playMusic('${song.url}')">
+        <div style="display:flex; gap:5px;">
 
-            ▶
+            <button onclick="playMusic('${song.url}')">
 
-        </button>
+                ▶
+
+            </button>
+
+            <button onclick="deleteMusic('${song.id}')">
+
+                🗑
+
+            </button>
+
+        </div>
 
         `;
 
@@ -578,15 +592,51 @@ async function uploadMusic(){
 
         if(data.secure_url){
 
-            const song = {
+const audio =
+new Audio(data.secure_url);
 
-                name: songName || file.name,
+audio.addEventListener(
+"loadedmetadata",
 
-                url: data.secure_url,
+function(){
 
-                duration:"00:00"
+    const minutes =
+    Math.floor(audio.duration / 60);
 
-            };
+    const seconds =
+    Math.floor(audio.duration % 60);
+
+    const duration =
+    `${minutes}:${seconds
+    .toString()
+    .padStart(2,'0')}`;
+
+    const song = {
+
+        name:
+        songName || file.name,
+
+        url:
+        data.secure_url,
+
+        duration:
+        duration
+
+    };
+
+    db.collection("music")
+
+    .add(song)
+
+    .then(()=>{
+
+        alert("Upload berhasil!");
+
+        loadMusic();
+
+    });
+
+});
 
             // SIMPAN KE FIREBASE
 
@@ -620,3 +670,20 @@ window.addEventListener("load",()=>{
     loadMusic();
 
 });
+
+
+/* =========================
+   DELETE MUSIC
+========================= */
+
+async function deleteMusic(id){
+
+    if(!confirm("Hapus lagu?")) return;
+
+    await db.collection("music")
+
+    .doc(id)
+
+    .delete();
+
+}
