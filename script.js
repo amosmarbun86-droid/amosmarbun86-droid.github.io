@@ -327,28 +327,36 @@ function closeWindow(id){
 
 let musicData = [];
 
+let currentIndex = 0;
+
 /* =========================
-   LOAD MUSIC
+   LOAD MUSIC REALTIME
 ========================= */
 
 function loadMusic(){
 
-    musicData = [];
-
     const musicList =
     document.getElementById("musicList");
 
-    musicList.innerHTML = "Loading...";
+    musicList.innerHTML =
+    "Loading Music...";
 
     db.collection("music")
 
-    .get()
+    .onSnapshot((snapshot)=>{
 
-    .then((snapshot)=>{
+        musicData = [];
 
         snapshot.forEach((doc)=>{
 
-            musicData.push(doc.data());
+            const song =
+            doc.data();
+
+            // FIREBASE DOCUMENT ID
+
+            song.id = doc.id;
+
+            musicData.push(song);
 
         });
 
@@ -357,6 +365,11 @@ function loadMusic(){
     });
 
 }
+
+/* =========================
+   RENDER MUSIC
+========================= */
+
 function renderMusic(list){
 
     const musicList =
@@ -364,7 +377,7 @@ function renderMusic(list){
 
     musicList.innerHTML = "";
 
-    list.forEach(song=>{
+    list.forEach((song,index)=>{
 
         const div =
         document.createElement("div");
@@ -389,7 +402,7 @@ function renderMusic(list){
 
         <div style="display:flex; gap:5px;">
 
-            <button onclick="playMusic('${song.url}')">
+            <button onclick="playMusic(${index})">
 
                 ▶
 
@@ -410,7 +423,17 @@ function renderMusic(list){
     });
 
 }
-function playMusic(url){
+
+/* =========================
+   PLAY MUSIC
+========================= */
+
+function playMusic(index){
+
+    currentIndex = index;
+
+    const song =
+    musicData[currentIndex];
 
     const player =
     document.getElementById("player");
@@ -421,7 +444,10 @@ function playMusic(url){
     const floatingIcon =
     document.getElementById("floatingIcon");
 
-    player.src = url;
+    const floatingTitle =
+    document.getElementById("floatingTitle");
+
+    player.src = song.url;
 
     player.play();
 
@@ -429,35 +455,14 @@ function playMusic(url){
 
     floatingIcon.innerHTML = "⏸";
 
-}
-function playMusic(url){
-
-    const player =
-    document.getElementById("player");
-
-    const floatingPlayer =
-    document.getElementById("floatingPlayer");
-
-    const floatingIcon =
-    document.getElementById("floatingIcon");
-
-    player.src = url;
-
-    player.play();
-
-    floatingPlayer.style.display = "block";
-
-    floatingIcon.innerHTML = "⏸";
+    floatingTitle.innerHTML =
+    song.name;
 
 }
 
 /* =========================
-   MUSIC CONTROL
+   PLAY / PAUSE
 ========================= */
-
-let currentIndex = 0;
-
-/* PLAY / PAUSE */
 
 function togglePlay(){
 
@@ -483,7 +488,9 @@ function togglePlay(){
 
 }
 
-/* NEXT MUSIC */
+/* =========================
+   NEXT MUSIC
+========================= */
 
 function nextMusic(){
 
@@ -495,11 +502,13 @@ function nextMusic(){
 
     }
 
-    playMusic(musicData[currentIndex].url);
+    playMusic(currentIndex);
 
 }
 
-/* PREVIOUS MUSIC */
+/* =========================
+   PREVIOUS MUSIC
+========================= */
 
 function prevMusic(){
 
@@ -512,11 +521,13 @@ function prevMusic(){
 
     }
 
-    playMusic(musicData[currentIndex].url);
+    playMusic(currentIndex);
 
 }
 
-/* SPEED CONTROL */
+/* =========================
+   SPEED CONTROL
+========================= */
 
 function setSpeed(speed){
 
@@ -533,13 +544,21 @@ function setSpeed(speed){
 
 }
 
-/* SHUFFLE */
+/* =========================
+   SHUFFLE
+========================= */
 
 function toggleShuffle(){
 
-    alert("Shuffle Ready");
+    if(musicData.length === 0) return;
+
+    const randomIndex =
+    Math.floor(Math.random() * musicData.length);
+
+    playMusic(randomIndex);
 
 }
+
 /* =========================
    UPLOAD MUSIC
 ========================= */
@@ -560,7 +579,8 @@ async function uploadMusic(){
 
     }
 
-    const formData = new FormData();
+    const formData =
+    new FormData();
 
     formData.append("file", file);
 
@@ -573,17 +593,18 @@ async function uploadMusic(){
 
         alert("Uploading...");
 
-        const response = await fetch(
+        const response =
+        await fetch(
 
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
 
-            {
+        {
 
-                method:"POST",
+            method:"POST",
 
-                body:formData
+            body:formData
 
-            }
+        }
 
         );
 
@@ -592,67 +613,54 @@ async function uploadMusic(){
 
         if(data.secure_url){
 
-const audio =
-new Audio(data.secure_url);
+            const audio =
+            new Audio(data.secure_url);
 
-audio.addEventListener(
-"loadedmetadata",
+            audio.addEventListener(
 
-function(){
+            "loadedmetadata",
 
-    const minutes =
-    Math.floor(audio.duration / 60);
+            function(){
 
-    const seconds =
-    Math.floor(audio.duration % 60);
+                const minutes =
+                Math.floor(audio.duration / 60);
 
-    const duration =
-    `${minutes}:${seconds
-    .toString()
-    .padStart(2,'0')}`;
+                const seconds =
+                Math.floor(audio.duration % 60);
 
-    const song = {
+                const duration =
 
-        name:
-        songName || file.name,
+                `${minutes}:${seconds
+                .toString()
+                .padStart(2,'0')}`;
 
-        url:
-        data.secure_url,
+                const song = {
 
-        duration:
-        duration
+                    name:
+                    songName || file.name,
 
-    };
+                    url:
+                    data.secure_url,
 
-    db.collection("music")
+                    duration:
+                    duration,
 
-    .add(song)
+                    createdAt:
+                    Date.now()
 
-    .then(()=>{
+                };
 
-        alert("Upload berhasil!");
+                db.collection("music")
 
-        loadMusic();
+                .add(song)
 
-    });
+                .then(()=>{
 
-});
+                    alert("Upload berhasil!");
 
-            // SIMPAN KE FIREBASE
+                });
 
-db.collection("music")
-
-.add(song)
-
-.then(()=>{
-
-    alert("Upload berhasil!");
-
-    loadMusic();
-
-});
-
-            alert("Upload berhasil!");
+            });
 
         }
 
@@ -665,25 +673,56 @@ db.collection("music")
     }
 
 }
+
+/* =========================
+   DELETE MUSIC ONLINE
+========================= */
+
+async function deleteMusic(id){
+
+    const confirmDelete =
+    confirm("Hapus lagu ini?");
+
+    if(!confirmDelete) return;
+
+    try{
+
+        await db.collection("music")
+
+        .doc(id)
+
+        .delete();
+
+        alert("Lagu berhasil dihapus!");
+
+    }catch(error){
+
+        console.log(error);
+
+        alert("Gagal menghapus lagu!");
+
+    }
+
+}
+
+/* =========================
+   AUTO NEXT
+========================= */
+
+document.getElementById("player")
+
+.addEventListener("ended",()=>{
+
+    nextMusic();
+
+});
+
+/* =========================
+   START SYSTEM
+========================= */
+
 window.addEventListener("load",()=>{
 
     loadMusic();
 
 });
-
-
-/* =========================
-   DELETE MUSIC
-========================= */
-
-async function deleteMusic(id){
-
-    if(!confirm("Hapus lagu?")) return;
-
-    await db.collection("music")
-
-    .doc(id)
-
-    .delete();
-
-}
