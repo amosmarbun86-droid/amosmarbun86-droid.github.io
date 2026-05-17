@@ -741,32 +741,67 @@ function hideFloatingPlayer(){
 }
 
 /* =========================
-   DRAG DESKTOP ICONS
+   DRAG DESKTOP ICONS SAVE
 ========================= */
 
 const desktopIcons =
 document.querySelectorAll(".desktop-icon");
 
+let activeIcon = null;
+
+let startX = 0;
+let startY = 0;
+
+let offsetX = 0;
+let offsetY = 0;
+
+let moved = false;
+
 desktopIcons.forEach(icon=>{
 
-    let isDragging = false;
+    const iconId = icon.id;
 
-    let offsetX, offsetY;
+    // LOAD POSITION
+
+    const savedX =
+    localStorage.getItem(`${iconId}-x`);
+
+    const savedY =
+    localStorage.getItem(`${iconId}-y`);
+
+    if(savedX && savedY){
+
+        icon.style.left =
+        savedX + "px";
+
+        icon.style.top =
+        savedY + "px";
+
+    }
 
     icon.addEventListener(
+
     "touchstart",
 
     (e)=>{
 
-        isDragging = true;
+        activeIcon = icon;
+
+        moved = false;
 
         const touch = e.touches[0];
 
+        startX = touch.clientX;
+
+        startY = touch.clientY;
+
         offsetX =
+
         touch.clientX -
         icon.offsetLeft;
 
         offsetY =
+
         touch.clientY -
         icon.offsetTop;
 
@@ -774,45 +809,85 @@ desktopIcons.forEach(icon=>{
 
     );
 
-    document.addEventListener(
-    "touchmove",
-
-    (e)=>{
-
-        if(!isDragging) return;
-
-        const touch = e.touches[0];
-
-        icon.style.position =
-        "absolute";
-
-        icon.style.left =
-
-        (touch.clientX - offsetX)
-        + "px";
-
-        icon.style.top =
-
-        (touch.clientY - offsetY)
-        + "px";
-
-    }
-
-    );
-
-    document.addEventListener(
-    "touchend",
-
-    ()=>{
-
-        isDragging = false;
-
-    }
-
-    );
-
 });
 
+/* GLOBAL MOVE */
+
+document.addEventListener(
+
+"touchmove",
+
+(e)=>{
+
+    if(!activeIcon) return;
+
+    const touch = e.touches[0];
+
+    const dx =
+    Math.abs(touch.clientX - startX);
+
+    const dy =
+    Math.abs(touch.clientY - startY);
+
+    // DRAG THRESHOLD
+
+    if(dx > 8 || dy > 8){
+
+        moved = true;
+
+    }
+
+    if(!moved) return;
+
+    const newX =
+    touch.clientX - offsetX;
+
+    const newY =
+    touch.clientY - offsetY;
+
+    activeIcon.style.left =
+    newX + "px";
+
+    activeIcon.style.top =
+    newY + "px";
+
+}
+
+);
+
+/* END DRAG */
+
+document.addEventListener(
+
+"touchend",
+
+()=>{
+
+    if(!activeIcon) return;
+
+    // SAVE POSITION
+
+    localStorage.setItem(
+
+    `${activeIcon.id}-x`,
+
+    parseInt(activeIcon.style.left)
+
+    );
+
+    localStorage.setItem(
+
+    `${activeIcon.id}-y`,
+
+    parseInt(activeIcon.style.top)
+
+    );
+
+    activeIcon = null;
+
+}
+
+);
 /* =========================
    FLOATING PLAYER DRAG
 ========================= */
