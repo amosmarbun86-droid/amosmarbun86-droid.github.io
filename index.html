@@ -1,627 +1,987 @@
-<!DOCTYPE html>
-<html lang="id">
+/* =========================
+   AMOS WEB OS V14 FINAL
+========================= */
 
-<head>
-    <meta charset="UTF-8">
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-    <title>AMOS WEB OS V14 PRO</title>
+body{
+    font-family:'Courier New', Courier, monospace;
+    background:#000;
+    color:#00ff9f;
+    overflow:hidden;
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    background-size:cover;
+    background-position:center;
+    background-repeat:no-repeat;
+    background-attachment:fixed;
 
-    <link rel="manifest" href="manifest.json">
+    transition:background-image 1s ease-in-out;
+}
 
-    <meta name="theme-color" content="#00ff9f">
+/* =========================
+   BACKGROUND CANVAS
+========================= */
 
-    <link rel="stylesheet" href="style.css">
+#bgCanvas{
+    position:fixed;
+    inset:0;
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
+    width:100%;
+    height:100%;
 
-<body>
+    z-index:-1;
 
-<!-- =========================
-     BOOT SCREEN
-========================= -->
+    opacity:0.3;
+}
 
-<div id="bootScreen">
+/* =========================
+   LOGIN SYSTEM
+========================= */
 
-    <canvas id="bootMatrix"></canvas>
+#login{
+    position:fixed;
+    inset:0;
 
-    <div class="boot-overlay">
+    width:100%;
+    height:100%;
 
-        <div class="boot-logo">
-            <h1>AMOS OS</h1>
-            <span>AI WEB ECOSYSTEM</span>
-        </div>
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
 
-        <div class="boot-loader">
-            <div class="boot-progress"></div>
-        </div>
+    background:rgba(0,0,0,0.95);
 
-        <div class="boot-status" id="bootStatus">
-            Initializing System...
-        </div>
+    z-index:9999;
+}
 
-        <div class="boot-terminal" id="bootTerminal"></div>
+#login h2{
+    margin-bottom:20px;
 
-    </div>
+    font-size:28px;
 
-    <!-- BOOT SOUND -->
+    color:#00ff9f;
 
-    <audio id="bootSound" preload="auto">
-        <source src="assets/sounds/boot.mp3"
-                type="audio/mpeg">
-    </audio>
+    text-shadow:0 0 20px #00ff9f;
+}
 
-</div>
+#login input{
+    width:260px;
 
-<!-- =========================
-     BACKGROUND EFFECT
-========================= -->
+    padding:12px 15px;
 
-<canvas id="bgCanvas"></canvas>
+    background:#000;
 
-<!-- =========================
-     LOGIN SYSTEM
-========================= -->
+    color:#00ff9f;
 
-<div id="login">
+    border:1px solid #00ff9f;
 
-    <div style="text-align:center; margin-bottom:20px;">
+    outline:none;
 
-        <i class="fa-solid fa-microchip"
-           style="font-size:50px; color:#00ff9f;">
-        </i>
+    border-radius:10px;
 
-    </div>
+    text-align:center;
 
-    <h2 style="letter-spacing:5px;">
-        AMOS LOGIN
-    </h2>
+    font-size:16px;
+}
 
-    <input type="password"
-           id="pass"
-           style="text-align:center;">
+#login button{
+    padding:12px 25px;
 
-    <br><br>
+    background:#000;
 
-    <button onclick="login()">
-        ENTER SYSTEM
-    </button>
+    color:#00ff9f;
 
-</div>
+    border:1px solid #00ff9f;
 
-<!-- =========================
-     DESKTOP SYSTEM
-========================= -->
+    border-radius:10px;
 
-<div id="desktop">
+    cursor:pointer;
 
-    <!-- =========================
-         DESKTOP ICONS
-    ========================= -->
+    transition:0.3s;
+}
 
-<div class="desktop-icons">
+#login button:hover{
+    background:#00ff9f;
+    color:#000;
 
-    <!-- AI -->
+    box-shadow:0 0 20px #00ff9f;
+}
 
-<div class="desktop-icon"
-     id="icon-ai"
-     onclick="openWindow('aiWindow')">
+/* =========================
+   DESKTOP SYSTEM
+========================= */
 
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
+#desktop{
+    display:none;
 
-        <span>AI</span>
+    width:100%;
+    height:100vh;
 
-    </div>
+    position:relative;
 
-    <!-- BROWSER -->
+    overflow:hidden;
+}
 
-    <div class="desktop-icon"
-    id="icon-browser"
-         onclick="openWindow('browserWindow')">
+/* =========================
+   DESKTOP ICONS
+========================= */
 
-        <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
+.desktop-icons{
+    position:absolute;
 
-        <span>Browser</span>
+    top:90px;
+    left:20px;
 
-    </div>
+    display:grid;
 
-    <!-- MUSIC -->
+    grid-template-columns:repeat(auto-fill, 90px);
 
-    <div class="desktop-icon"
-       id="icon-music"
-         onclick="openWindow('musicWindow')">
+    gap:25px;
 
-        <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
+    z-index:5;
+}
 
-        <span>Music</span>
+.desktop-icon{
+    width:80px;
 
-    </div>
+    display:flex;
+    flex-direction:column;
 
-    <!-- FILES -->
+    align-items:center;
 
-    <div class="desktop-icon"
-     id="icon-files"
-         onclick="openWindow('filesWindow')">
+    cursor:pointer;
 
-        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
+    transition:0.3s;
 
-        <span>Files</span>
-
-    </div>
-
-    <!-- TERMINAL -->
-
-    <div class="desktop-icon"
-     id="icon-terminal"
-         onclick="openWindow('terminalWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
-
-        <span>Terminal</span>
-
-    </div>
-
-</div>
-
-    <!-- =========================
-         SIDEBAR
-    ========================= -->
-
-    <div id="sidebar">
-
-        <div class="sidebar-header">
-
-            <button id="toggleSidebar"
-                    onclick="toggleSidebar()">
-                ☰
-            </button>
-
-            <h3 class="sidebar-title">
-                AMOS CREATOR
-            </h3>
-
-        </div>
-
-        <!-- =========================
-             DASHBOARD PROJECTS
-        ========================= -->
-
-        <div class="sidebar-label">
-            Dashboard Projects
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
-
-            <i class="fa-solid fa-camera"></i>
-            Camera RCP
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
-
-            <i class="fa-solid fa-location-dot"></i>
-            Fake GPS
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
-
-            <i class="fa-solid fa-user"></i>
-            CV Amos
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
-
-            <i class="fa-solid fa-folder"></i>
-            Data Pribadi
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
-
-            <i class="fa-solid fa-gear"></i>
-            Admin Panel
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
-
-            <i class="fa-solid fa-coins"></i>
-            SmartDebt
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
-
-            <i class="fa-solid fa-clock"></i>
-            Alarm
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
-
-            <i class="fa-solid fa-calendar"></i>
-            Jadwal
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid-form-wilayah-spx-sbb-mainkode-wemahi.streamlit.app/')">
-
-            <i class="fa-solid fa-file"></i>
-            Form
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
-
-            <i class="fa-brands fa-telegram"></i>
-            Telegram Bot
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v4/')">
-
-            <i class="fa-brands fa-whatsapp"></i>
-            WA Sender
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')">
-
-            <i class="fa-solid fa-compact-disc"></i>
-            WebOS Music
-
-        </div>
-
-        <!-- =========================
-             SYSTEM SETTINGS
-        ========================= -->
-
-        <div class="sidebar-label">
-            System Settings
-        </div>
-
-        <div class="side-item"
-             onclick="toggleMatrix()">
-
-            <i class="fa-solid fa-code"></i>
-            Toggle Matrix
-
-        </div>
-
-        <div class="side-item"
-             onclick="changeWallpaper()">
-
-            <i class="fa-solid fa-image"></i>
-            Next Wallpaper
-
-        </div>
-
-        <div class="side-item logout-btn"
-             onclick="logout()">
-
-            <i class="fa-solid fa-power-off"></i>
-            Logout
-
-        </div>
-
-    </div>
-
-    <!-- =========================
-         WORKSPACE
-    ========================= -->
-
-    <div id="workspace">
+    text-align:center;
     
+    touch-action:none;
 
-        <button id="mobileMenuBtn"
-                onclick="toggleSidebar()">
+   user-select:none;
+}
 
-            ☰ MENU
+.desktop-icon:hover{
+    transform:scale(1.1);
+}
 
-        </button>
-        <!-- =========================
-     AI WINDOW
-========================= -->
+.desktop-icon img{
+    width:55px;
+    height:55px;
 
-<div class="app-window" id="aiWindow">
+    object-fit:contain;
 
-    <div class="window-header">
+    margin-bottom:8px;
 
-        <span>AMOS AI</span>
+    filter:drop-shadow(0 0 10px #00ff9f);
+}
 
-        <button onclick="closeWindow('aiWindow')">
-            ✕
-        </button>
+.desktop-icon span{
+    font-size:12px;
 
-    </div>
+    color:#00ff9f;
 
-    <div class="window-content">
+    text-shadow:0 0 10px #00ff9f;
+}
 
-        <h2>AMOS AI SYSTEM</h2>
+/* =========================
+   SIDEBAR
+========================= */
 
-        <p>Welcome to AMOS AI Ecosystem</p>
+#sidebar{
+    position:fixed;
 
-    </div>
+    top:0;
+    right:0;
 
-</div>
+    width:260px;
+    height:100vh;
 
-<!-- =========================
-     BROWSER WINDOW
-========================= -->
+    background:rgba(0,10,15,0.96);
 
-<div class="app-window" id="browserWindow">
+    border-left:1px solid rgba(0,255,159,0.25);
 
-    <div class="window-header">
+    backdrop-filter:blur(12px);
 
-        <span>Browser</span>
+    display:flex;
+    flex-direction:column;
 
-        <button onclick="closeWindow('browserWindow')">
-            ✕
-        </button>
+    overflow-y:auto;
 
-    </div>
+    z-index:1000;
 
-    <div class="window-content">
+    transition:0.3s;
+}
 
-<iframe 
-src="https://wikipedia.org"
-style="width:100%;height:100%;border:none;">
-</iframe>
+.sidebar-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
 
-    </div>
+    padding:20px 15px;
 
-</div>
+    border-bottom:1px solid #003322;
+}
 
-<!-- =========================
-     MUSIC WINDOW
-========================= -->
+.sidebar-title{
+    font-size:14px;
 
-<div class="app-window" id="musicWindow">
+    letter-spacing:1px;
 
-    <div class="window-header">
+    color:#00ff9f;
+}
 
-        <span>Music Player</span>
+.sidebar-label{
+    padding:15px 15px 8px;
 
-        <button onclick="closeWindow('musicWindow')">
-            ✕
-        </button>
+    font-size:10px;
 
-    </div>
+    color:#008855;
 
-    <div class="window-content">
+    text-transform:uppercase;
 
-<div style="display:flex;
-            gap:5px;
-            align-items:center;
-            padding:10px;">
+    letter-spacing:2px;
+}
 
-    <audio id="player"
-           style="flex:1;">
-    </audio>
+.side-item{
+    padding:12px 15px;
 
-    <button onclick="prevMusic()">
-        ⏮
-    </button>
+    display:flex;
+    align-items:center;
+    gap:12px;
 
-    <button onclick="togglePlay()">
-        ▶
-    </button>
+    cursor:pointer;
 
-    <button onclick="nextMusic()">
-        ⏭
-    </button>
+    transition:0.3s;
+}
 
-    <button onclick="toggleShuffle()"
-            id="shuffleBtn">
-        🔀
-    </button>
+.side-item i{
+    width:20px;
 
-</div>
+    text-align:center;
 
-<div style="margin-top:5px;
-            padding:0 10px;">
+    color:#00ff9f;
+}
 
-    Speed:
-    <span id="speedLabel">
-        1x
-    </span>
+.side-item:hover{
+    background:rgba(0,255,159,0.08);
 
-    <br>
+    padding-left:25px;
 
-    <input type="range"
-           min="0.5"
-           max="2"
-           step="0.1"
-           value="1"
-           oninput="setSpeed(this.value)">
+    color:#fff;
+}
 
-</div>
+.logout-btn{
+    margin-top:auto;
 
-<div style="padding:10px;">
+    color:#ff4444 !important;
 
-    <input type="text"
-           id="songName"
-           placeholder="Judul Lagu">
+    border-top:1px solid #330000;
+}
 
-    <input type="text"
-           id="songURL"
-           placeholder="URL Lagu">
+.logout-btn i{
+    color:#ff4444;
+}
 
-    <input type="file"
-           id="songFile"
-           accept="audio/*">
+/* =========================
+   WORKSPACE
+========================= */
 
-    <button onclick="uploadMusic()">
-        Upload File
-    </button>
+#workspace{
+    width:100%;
+    height:100%;
+    position:relative;
+}
 
-    <button onclick="showAllMusic()">
-        Semua
-    </button>
+/* =========================
+   MOBILE MENU BUTTON
+========================= */
 
-    <button onclick="showFavorites()">
-        Favorit
-    </button>
+#mobileMenuBtn{
+    position:absolute;
 
-    <button onclick="showPlaylist()">
-        Playlist
-    </button>
+    top:15px;
+    left:15px;
 
-</div>
+    background:#000;
 
-<div id="musicList"></div>
+    color:#00ff9f;
 
-    </div>
+    border:1px solid #00ff9f;
 
-</div>
+    padding:8px 15px;
 
-<!-- =========================
-     FILES WINDOW
-========================= -->
+    border-radius:10px;
 
-<div class="app-window" id="filesWindow">
+    cursor:pointer;
 
-    <div class="window-header">
+    display:none;
 
-        <span>File Manager</span>
+    z-index:2000;
+}
 
-        <button onclick="closeWindow('filesWindow')">
-            ✕
-        </button>
+#toggleSidebar{
+    background:none;
+    border:none;
 
-    </div>
+    color:#00ff9f;
 
-    <div class="window-content">
+    font-size:18px;
 
-        <h2>AMOS File System</h2>
+    cursor:pointer;
+}
 
-        <p>Storage Manager Active</p>
+/* =========================
+   TASKBAR
+========================= */
 
-    </div>
+#taskbar{
+    position:fixed;
 
-</div>
+    left:0;
+    bottom:0;
 
-<!-- =========================
-     TERMINAL WINDOW
-========================= -->
+    width:100%;
+    height:42px;
 
-<div class="app-window" id="terminalWindow">
+    background:rgba(0,0,0,0.92);
 
-    <div class="window-header">
+    border-top:1px solid #00ff9f;
 
-        <span>Terminal</span>
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 
-        <button onclick="closeWindow('terminalWindow')">
-            ✕
-        </button>
+    padding:0 20px;
 
-    </div>
+    font-size:13px;
 
-    <div class="window-content">
+    z-index:999;
+}
 
-<pre>
-AMOS TERMINAL v14
+/* =========================
+   GLOBAL FORM
+========================= */
 
-root@amos-os:~#
+input,
+button{
+    font-family:inherit;
+}
 
-system ready...
-</pre>
+/* =========================
+   BOOT SYSTEM
+========================= */
 
-    </div>
+#bootScreen{
+    position:fixed;
+    inset:0;
 
-</div>
+    background:#000;
 
-<!-- =========================
-     FLOATING PLAYER
-========================= -->
+    z-index:999999;
 
-<div id="floatingPlayer">
+    overflow:hidden;
 
-    <div class="floating-close"
-         onclick="hideFloatingPlayer()">
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
 
-        ✕
+#bootMatrix{
+    position:absolute;
 
-    </div>
+    width:100%;
+    height:100%;
 
-    <div class="floating-circle"
-         onclick="togglePlay()">
+    opacity:0.25;
+}
 
-        <span id="floatingIcon">
-            ▶
-        </span>
+.boot-overlay{
+    position:relative;
 
-    </div>
+    z-index:2;
 
-    <div id="floatingTitle"
-         style="font-size:10px;
-                text-align:center;">
+    width:90%;
+    max-width:700px;
 
-    </div>
+    text-align:center;
 
-</div>
+    color:#00ff88;
+}
 
-    <!-- =========================
-         TASKBAR
-    ========================= -->
+.boot-logo h1{
+    font-size:70px;
 
-    <div id="taskbar">
+    margin:0;
 
-        <div style="font-weight:bold; color:#00ff9f;">
-            AMOS OS V14
-        </div>
+    text-shadow:0 0 25px #00ff88;
 
-        <div id="clock">
-            00:00:00
-        </div>
+    animation:pulse 2s infinite;
+}
 
-    </div>
+.boot-logo span{
+    letter-spacing:4px;
 
-</div>
+    opacity:0.7;
+}
 
-<!-- =========================
-     JAVASCRIPT
-========================= -->
+.boot-loader{
+    width:100%;
+    height:12px;
 
-<!-- FIREBASE SDK -->
+    border:1px solid #00ff88;
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    margin-top:40px;
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    overflow:hidden;
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
+    border-radius:30px;
+}
 
-<!-- MAIN SCRIPT -->
+.boot-progress{
+    width:0%;
 
-<script src="script.js"></script>
+    height:100%;
 
-<script>
+    background:#00ff88;
 
-    if ('serviceWorker' in navigator) {
+    box-shadow:0 0 20px #00ff88;
 
-        navigator.serviceWorker.register('sw.js');
+    transition:width 0.4s;
+}
+
+.boot-status{
+    margin-top:20px;
+
+    font-size:14px;
+
+    letter-spacing:2px;
+}
+
+.boot-terminal{
+    margin-top:30px;
+
+    text-align:left;
+
+    height:180px;
+
+    overflow:hidden;
+
+    background:rgba(0,0,0,0.45);
+
+    border:1px solid #00ff88;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    font-size:13px;
+
+    line-height:1.6;
+}
+
+.boot-line{
+    margin-bottom:6px;
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.05);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    #sidebar{
+        right:-260px;
+    }
+
+    #sidebar.active{
+        right:0;
+    }
+
+    #mobileMenuBtn{
+        display:block;
+    }
+
+    .desktop-icons{
+
+        grid-template-columns:repeat(2, 90px);
+
+        gap:20px;
+
+        left:10px;
+        top:80px;
+    }
+
+    .desktop-icon img{
+        width:50px;
+        height:50px;
+    }
+
+    .boot-logo h1{
+        font-size:45px;
+    }
+
+    .boot-terminal{
+        height:140px;
+        font-size:11px;
+    }
+
+
+  /* =========================
+   WINDOW SYSTEM
+========================= */
+
+.app-window{
+
+    position:absolute;
+
+    top:100px;
+    left:120px;
+
+    width:420px;
+    height:320px;
+
+    background:rgba(0,0,0,0.96);
+
+    border:1px solid #00ff9f;
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+    display:none;
+
+    flex-direction:column;
+
+    z-index:9999;
+
+    box-shadow:0 0 35px rgba(0,255,159,0.35);
+
+    backdrop-filter:blur(12px);
+
+    animation:windowOpen 0.3s ease;
+}
+
+/* =========================
+   WINDOW HEADER
+========================= */
+
+.window-header{
+
+    height:45px;
+
+    background:#001a12;
+
+    border-bottom:1px solid #00ff9f;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 15px;
+
+    color:#00ff9f;
+
+    font-size:14px;
+
+    letter-spacing:1px;
+}
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+.window-header button{
+
+    background:none;
+
+    border:none;
+
+    color:#ff4444;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+.window-header button:hover{
+
+    transform:scale(1.2);
+
+    color:#ff0000;
+}
+
+/* =========================
+   WINDOW CONTENT
+========================= */
+
+.window-content{
+
+    flex:1;
+
+    padding:20px;
+
+    overflow:auto;
+
+    color:#00ff9f;
+}
+
+/* =========================
+   WINDOW ANIMATION
+========================= */
+
+@keyframes windowOpen{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(0.8);
 
     }
 
-</script>
+    to{
 
-</body>
-</html>
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    .app-window{
+
+        width:90%;
+
+        height:70%;
+
+        left:5%;
+
+        top:90px;
+
+    }
+
+}
+
+/* =========================
+   MUSIC PLAYER UI
+========================= */
+
+#musicWindow .window-content{
+
+    padding:15px;
+
+    overflow-y:auto;
+}
+
+/* AUDIO PLAYER */
+
+#player{
+
+    width:100%;
+
+    margin-bottom:10px;
+
+    filter:hue-rotate(70deg);
+}
+
+/* INPUT */
+
+#musicWindow input{
+
+    width:100%;
+
+    margin-top:8px;
+
+    padding:10px;
+
+    background:#00110b;
+
+    border:1px solid #00ff9f;
+
+    color:#00ff9f;
+
+    border-radius:10px;
+
+    box-sizing:border-box;
+}
+
+/* BUTTON */
+
+#musicWindow button{
+
+    background:#00110b;
+
+    color:#00ff9f;
+
+    border:1px solid #00ff9f;
+
+    padding:8px 12px;
+
+    border-radius:10px;
+
+    margin-top:8px;
+
+    cursor:pointer;
+
+    transition:0.3s;
+}
+
+#musicWindow button:hover{
+
+    background:#00ff9f;
+
+    color:#000;
+
+    transform:scale(1.05);
+}
+
+/* MUSIC CONTROL */
+
+.music-controls{
+
+    display:flex;
+
+    gap:10px;
+
+    align-items:center;
+
+    margin-bottom:10px;
+}
+
+/* MUSIC LIST */
+
+#musicList{
+
+    margin-top:15px;
+
+    max-height:250px;
+
+    overflow-y:auto;
+
+    border-top:1px solid rgba(0,255,159,0.2);
+}
+
+/* MUSIC ITEM */
+
+.music-item{
+
+    padding:12px;
+
+    border-bottom:1px solid rgba(0,255,159,0.15);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    transition:0.3s;
+}
+
+.music-item:hover{
+
+    background:rgba(0,255,159,0.08);
+}
+
+/* FLOATING PLAYER */
+
+#floatingPlayer{
+
+    #floatingPlayer{
+
+    position:fixed;
+
+    bottom:70px;
+
+    right:20px;
+
+    z-index:99999;
+
+    display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+  
+    animation:floatingAnim 3s ease-in-out infinite;
+    touch-action:none;
+
+    cursor:grab;
+}
+
+
+.floating-circle{
+
+    width:65px;
+
+    height:65px;
+
+    background:#00ff9f;
+
+    color:#000;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    box-shadow:0 0 20px #00ff9f;
+
+    cursor:pointer;
+
+    border:2px solid #00ff9f;
+
+    backdrop-filter:blur(10px);
+
+    transition:0.3s;
+}
+.floating-circle:hover{
+
+    transform:scale(1.1);
+
+    box-shadow:
+    0 0 20px #00ff9f,
+    0 0 40px #00ff9f;
+
+}
+#floatingTitle{
+
+    margin-top:6px;
+
+    color:#00ff9f;
+
+    font-size:12px;
+
+   font-weight:bold;
+
+    text-align:center;
+
+    width:80px;
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+}
+.floating-close{
+
+    width:22px;
+
+    height:22px;
+
+    background:#ff0033;
+
+    color:#fff;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    margin-bottom:6px;
+
+    box-shadow:0 0 10px #ff0033;
+
+}
+/* SPEED SLIDER */
+
+#musicWindow input[type=\"range\"]{
+
+    accent-color:#00ff9f;
+
+    margin-top:10px;
+}
+
+/* MOBILE MUSIC FIX */
+
+@media(max-width:768px){
+
+    #musicWindow{
+
+        width:92% !important;
+
+        left:4% !important;
+
+        top:80px !important;
+
+        height:75% !important;
+    }
+
+    #floatingPlayer{
+
+        right:10px;
+
+        bottom:80px;
+    }
+
+}
+@keyframes floatingAnim{
+
+    0%{
+
+        transform:translateY(0px);
+
+    }
+
+    50%{
+
+        transform:translateY(-6px);
+
+    }
+
+    100%{
+
+        transform:translateY(0px);
+
+    }
+
+}
