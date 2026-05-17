@@ -739,78 +739,165 @@ function hideFloatingPlayer(){
     .style.display = "none";
 
 }
+
+/* =========================
+   DRAG DESKTOP ICONS
+========================= */
+
+const desktopIcons =
+document.querySelectorAll(".desktop-icon");
+
+desktopIcons.forEach(icon=>{
+
+    let isDragging = false;
+
+    let offsetX, offsetY;
+
+    icon.addEventListener(
+    "touchstart",
+
+    (e)=>{
+
+        isDragging = true;
+
+        const touch = e.touches[0];
+
+        offsetX =
+        touch.clientX -
+        icon.offsetLeft;
+
+        offsetY =
+        touch.clientY -
+        icon.offsetTop;
+
+    }
+
+    );
+
+    document.addEventListener(
+    "touchmove",
+
+    (e)=>{
+
+        if(!isDragging) return;
+
+        const touch = e.touches[0];
+
+        icon.style.position =
+        "absolute";
+
+        icon.style.left =
+
+        (touch.clientX - offsetX)
+        + "px";
+
+        icon.style.top =
+
+        (touch.clientY - offsetY)
+        + "px";
+
+    }
+
+    );
+
+    document.addEventListener(
+    "touchend",
+
+    ()=>{
+
+        isDragging = false;
+
+    }
+
+    );
+
+});
+
 /* =========================
    FLOATING PLAYER DRAG
 ========================= */
 
-const floatingPlayer =
-document.getElementById("floatingPlayer");
+function initFloatingDrag(){
 
-let isDragging = false;
+    const floatingPlayer =
 
-let offsetX, offsetY;
+    document.getElementById(
+    "floatingPlayer"
+    );
 
-floatingPlayer.addEventListener(
-"touchstart",
+    let floatingDragging = false;
 
-(e)=>{
+    let floatingOffsetX = 0;
 
-    isDragging = true;
+    let floatingOffsetY = 0;
 
-    const touch = e.touches[0];
+    floatingPlayer.addEventListener(
 
-    offsetX =
-    touch.clientX -
-    floatingPlayer.offsetLeft;
+    "touchstart",
 
-    offsetY =
-    touch.clientY -
-    floatingPlayer.offsetTop;
+    (e)=>{
+
+        floatingDragging = true;
+
+        const touch = e.touches[0];
+
+        floatingOffsetX =
+
+        touch.clientX -
+        floatingPlayer.offsetLeft;
+
+        floatingOffsetY =
+
+        touch.clientY -
+        floatingPlayer.offsetTop;
+
+    }
+
+    );
+
+    document.addEventListener(
+
+    "touchmove",
+
+    (e)=>{
+
+        if(!floatingDragging) return;
+
+        const touch = e.touches[0];
+
+        floatingPlayer.style.left =
+
+        (touch.clientX - floatingOffsetX)
+        + "px";
+
+        floatingPlayer.style.top =
+
+        (touch.clientY - floatingOffsetY)
+        + "px";
+
+        floatingPlayer.style.right =
+        "auto";
+
+        floatingPlayer.style.bottom =
+        "auto";
+
+    }
+
+    );
+
+    document.addEventListener(
+
+    "touchend",
+
+    ()=>{
+
+        floatingDragging = false;
+
+    }
+
+    );
 
 }
-
-);
-
-document.addEventListener(
-"touchmove",
-
-(e)=>{
-
-    if(!isDragging) return;
-
-    const touch = e.touches[0];
-
-    floatingPlayer.style.left =
-
-    (touch.clientX - offsetX)
-    + "px";
-
-    floatingPlayer.style.top =
-
-    (touch.clientY - offsetY)
-    + "px";
-
-    floatingPlayer.style.right =
-    "auto";
-
-    floatingPlayer.style.bottom =
-    "auto";
-
-}
-
-);
-
-document.addEventListener(
-"touchend",
-
-()=>{
-
-    isDragging = false;
-
-}
-
-);
-
 /* =========================
    START SYSTEM
 ========================= */
@@ -818,5 +905,7 @@ document.addEventListener(
 window.addEventListener("load",()=>{
 
     loadMusic();
+
+    initFloatingDrag();
 
 });
