@@ -716,6 +716,100 @@ document.getElementById("player")
     nextMusic();
 
 });
+document.getElementById("player")
+
+.addEventListener("pause",()=>{
+
+    document.getElementById("floatingIcon")
+    .innerHTML = "▶";
+
+});
+
+document.getElementById("player")
+
+.addEventListener("play",()=>{
+
+    document.getElementById("floatingIcon")
+    .innerHTML = "⏸";
+
+});
+function hideFloatingPlayer(){
+
+    document.getElementById("floatingPlayer")
+    .style.display = "none";
+
+}
+/* =========================
+   FLOATING PLAYER DRAG
+========================= */
+
+const floatingPlayer =
+document.getElementById("floatingPlayer");
+
+let isDragging = false;
+
+let offsetX, offsetY;
+
+floatingPlayer.addEventListener(
+"touchstart",
+
+(e)=>{
+
+    isDragging = true;
+
+    const touch = e.touches[0];
+
+    offsetX =
+    touch.clientX -
+    floatingPlayer.offsetLeft;
+
+    offsetY =
+    touch.clientY -
+    floatingPlayer.offsetTop;
+
+}
+
+);
+
+document.addEventListener(
+"touchmove",
+
+(e)=>{
+
+    if(!isDragging) return;
+
+    const touch = e.touches[0];
+
+    floatingPlayer.style.left =
+
+    (touch.clientX - offsetX)
+    + "px";
+
+    floatingPlayer.style.top =
+
+    (touch.clientY - offsetY)
+    + "px";
+
+    floatingPlayer.style.right =
+    "auto";
+
+    floatingPlayer.style.bottom =
+    "auto";
+
+}
+
+);
+
+document.addEventListener(
+"touchend",
+
+()=>{
+
+    isDragging = false;
+
+}
+
+);
 
 /* =========================
    START SYSTEM
