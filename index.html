@@ -376,9 +376,10 @@
 
     <div class="window-content">
 
-        <iframe src="https://wikipedia.org"
-    style="width:100%;height:100%;border:none;">
-     </iframe>
+<iframe 
+src="https://wikipedia.org"
+style="width:100%;height:100%;border:none;">
+</iframe>
 
     </div>
 
@@ -549,6 +550,13 @@ system ready...
 
 <div id="floatingPlayer">
 
+    <div class="floating-close"
+         onclick="hideFloatingPlayer()">
+
+        ✕
+
+    </div>
+
     <div class="floating-circle"
          onclick="togglePlay()">
 
@@ -585,8 +593,10 @@ system ready...
 </div>
 
 <!-- =========================
-     FIREBASE SDK
+     JAVASCRIPT
 ========================= -->
+
+<!-- FIREBASE SDK -->
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 
@@ -594,19 +604,17 @@ system ready...
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 
-<!-- =========================
-     MAIN SCRIPT
-========================= -->
+<!-- MAIN SCRIPT -->
 
 <script src="script.js"></script>
 
 <script>
 
-if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
 
-    navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('sw.js');
 
-}
+    }
 
 </script>
 
