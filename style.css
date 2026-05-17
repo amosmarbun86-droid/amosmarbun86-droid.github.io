@@ -819,6 +819,8 @@ button{
 
 #floatingPlayer{
 
+    #floatingPlayer{
+
     position:fixed;
 
     bottom:70px;
@@ -828,7 +830,17 @@ button{
     z-index:99999;
 
     display:none;
+
+    flex-direction:column;
+
+    align-items:center;
+  
+    animation:floatingAnim 3s ease-in-out infinite;
+    touch-action:none;
+
+    cursor:grab;
 }
+
 
 .floating-circle{
 
@@ -853,15 +865,31 @@ button{
     box-shadow:0 0 20px #00ff9f;
 
     cursor:pointer;
-}
 
+    border:2px solid #00ff9f;
+
+    backdrop-filter:blur(10px);
+
+    transition:0.3s;
+}
+.floating-circle:hover{
+
+    transform:scale(1.1);
+
+    box-shadow:
+    0 0 20px #00ff9f,
+    0 0 40px #00ff9f;
+
+}
 #floatingTitle{
 
     margin-top:6px;
 
     color:#00ff9f;
 
-    font-size:11px;
+    font-size:12px;
+
+   font-weight:bold;
 
     text-align:center;
 
@@ -873,7 +901,33 @@ button{
 
     text-overflow:ellipsis;
 }
+.floating-close{
 
+    width:22px;
+
+    height:22px;
+
+    background:#ff0033;
+
+    color:#fff;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:12px;
+
+    cursor:pointer;
+
+    margin-bottom:6px;
+
+    box-shadow:0 0 10px #ff0033;
+
+}
 /* SPEED SLIDER */
 
 #musicWindow input[type=\"range\"]{
@@ -903,6 +957,27 @@ button{
         right:10px;
 
         bottom:80px;
+    }
+
+}
+@keyframes floatingAnim{
+
+    0%{
+
+        transform:translateY(0px);
+
+    }
+
+    50%{
+
+        transform:translateY(-6px);
+
+    }
+
+    100%{
+
+        transform:translateY(0px);
+
     }
 
 }
