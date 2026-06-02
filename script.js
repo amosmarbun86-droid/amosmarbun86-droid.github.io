@@ -7,33 +7,25 @@ const CLOUD_NAME = "dkisbfx29";
 const UPLOAD_PRESET = "ml_default";
 
 /* =========================
-   FIREBASE CONFIG
+   FIREBASE CONFIG 
 ========================= */
 
+
+const decodeSandi = (teksSandi) => atob(teksSandi);
+
 const firebaseConfig = {
-
-  apiKey: "AIzaSyD2QRiYnyHWRqG3OgZcWV9YA1arXPsvoE0",
-
-  authDomain: "amos-web-os.firebaseapp.com",
-
-  projectId: "amos-web-os",
-
-  storageBucket: "amos-web-os.firebasestorage.app",
-
-  messagingSenderId: "59843745100",
-
-  appId: "1:59843745100:web:b29e5996052a3bf5672be9",
-
-  measurementId: "G-Z2F7MXPSCH"
-
+  apiKey: decodeSandi("QUl6YVN5RDJRUmlZbnlIV1JxRzNPZ1pjV1ZZQTFhclhQc3ZvRTA="),
+  authDomain: decodeSandi("YW1vcy13ZWItb3MuZmlyZWJhc2VhcHAuY29t"),
+  projectId: decodeSandi("YW1vcy13ZWItb3M="),
+  storageBucket: decodeSandi("YW1vcy13ZWItb3MuZmlyZWJhc3RvcmFnZS5hcHA="),
+  messagingSenderId: decodeSandi("NTk4NDM3NDUxMDA="),
+  appId: decodeSandi("MTo1OTg0Mzc0NTEwMDp3ZWI6YjI5ZTV5OTYwNTJhM2JmNTY3MmJlOQ=="),
+  measurementId: decodeSandi("Ry1aMkY3TVhQU0NI")
 };
 
-// INITIALIZE FIREBASE
-
+// INITIALIZE FIREBASE 
 firebase.initializeApp(firebaseConfig);
-
 const db = firebase.firestore();
-
 firebase.analytics();
 
 // CONFIG WALLPAPER LENGKAP
