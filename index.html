@@ -1,640 +1,406 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-    <meta charset="UTF-8">
-
-    <title>AMOS WEB OS V14 PRO</title>
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <link rel="manifest" href="manifest.json">
-
-    <meta name="theme-color" content="#00ff9f">
-
-    <link rel="stylesheet" href="style.css">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KunciPDA — Admin Dashboard</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: #14110f;
+    color: #f2ece4;
+  }
+  header {
+    background: linear-gradient(90deg, #a9651f, #7c4413);
+    padding: 16px 20px;
+  }
+  header h1 { margin: 0; font-size: 1.2rem; }
+  header .sub { font-size: 0.78rem; opacity: 0.85; margin-top: 2px; }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  .request-card {
+    background: #221a30;
+    border: 1px solid #4a3a6a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .request-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .request-name { font-weight: 700; font-size: 1rem; }
+  .request-meta { font-size: 0.78rem; color: #b3a8d0; margin-bottom: 10px; }
+  .request-actions { display: flex; gap: 8px; }
+  .request-actions button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+  }
+  .btn-approve { background: #245c3a; color: #d9ffe6; }
+  .btn-reject { background: #6e2424; color: #ffd9d9; }
+  .pulse-badge {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #c084fc;
+    margin-right: 6px;
+    animation: pulse 1.2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .section-title {
+    font-size: 0.85rem;
+    color: #9a8f80;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 18px 4px 8px;
+  }
+  .device-card {
+    background: #1c1815;
+    border: 1px solid #3a322a;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .device-card.flag {
+    border-color: #8a5a24;
+    background: #221a12;
+  }
+  .device-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .device-id { font-weight: 700; font-size: 1.02rem; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+  .badge.available { background: #245c3a; color: #b9f3cf; }
+  .badge.inuse { background: #5c4a24; color: #f3dfb9; }
+  .badge.locked { background: #5c2424; color: #f3b9b9; }
+  .badge.lost { background: #5c2424; color: #f3b9b9; }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.83rem;
+    color: #c9bfb2;
+    margin-top: 3px;
+  }
+  .row b { color: #f2ece4; }
+  .holder-banner {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: #2a2014;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: #e0a64f;
+  }
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .actions button {
+    flex: 1;
+    padding: 9px 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+  }
+  .btn-lock { background: #6e2424; color: #ffd9d9; }
+  .btn-unlock { background: #245c3a; color: #d9ffe6; }
+  .btn-checkin { background: #2a4a5c; color: #d9eeff; }
+  .pending-tag {
+    font-size: 0.7rem;
+    color: #e0a64f;
+    margin-top: 6px;
+  }
+  .user-row {
+    display: flex;
+    justify-content: space-between;
+    background: #1c1815;
+    border: 1px solid #3a322a;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+  }
+  .user-row .name { font-weight: 600; }
+  .user-row .device { color: #9a8f80; }
+  .empty { color: #8a7f80; font-size: 0.85rem; padding: 10px 4px; }
+  .refresh-info {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #8a7f70;
+    margin-top: 20px;
+    padding-bottom: 20px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a2319;
+    border: 1px solid #5a4628;
+    color: #f2ece4;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+  .toast.show { opacity: 1; }
+</style>
 </head>
-
 <body>
 
-<!-- =========================
-     BOOT SCREEN
-========================= -->
+<header>
+  <h1>🔐 KunciPDA — Admin Dashboard</h1>
+  <div class="sub" id="last-update">Memuat data...</div>
+</header>
 
-<div id="bootScreen">
+<main>
+  <div class="section-title">⏳ Menunggu Persetujuan Login</div>
+  <div id="request-list"></div>
 
-    <canvas id="bootMatrix"></canvas>
+  <div class="section-title">Device Belum Dikembalikan</div>
+  <div id="flagged-list"></div>
 
-    <div class="boot-overlay">
+  <div class="section-title">Semua Device</div>
+  <div id="device-list"></div>
 
-        <div class="boot-logo">
-            <h1>AMOS OS</h1>
-            <span>AI WEB ECOSYSTEM</span>
-        </div>
+  <div class="section-title">Daftar Staff</div>
+  <div id="user-list"></div>
 
-        <div class="boot-loader">
-            <div class="boot-progress"></div>
-        </div>
+  <div class="refresh-info">Auto-refresh setiap 5 detik</div>
+</main>
 
-        <div class="boot-status" id="bootStatus">
-            Initializing System...
-        </div>
-
-        <div class="boot-terminal" id="bootTerminal"></div>
-
-    </div>
-
-    <!-- BOOT SOUND -->
-
-    <audio id="bootSound" preload="auto">
-        <source src="assets/sounds/boot.mp3"
-                type="audio/mpeg">
-    </audio>
-
-</div>
-
-<!-- =========================
-     BACKGROUND EFFECT
-========================= -->
-
-<canvas id="bgCanvas"></canvas>
-
-<!-- =========================
-     LOGIN SYSTEM
-========================= -->
-
-<div id="login">
-
-    <div style="text-align:center; margin-bottom:20px;">
-
-        <i class="fa-solid fa-microchip"
-           style="font-size:50px; color:#00ff9f;">
-        </i>
-
-    </div>
-
-    <h2 style="letter-spacing:5px;">
-        AMOS LOGIN
-    </h2>
-
-    <input type="password"
-           id="pass"
-           style="text-align:center;">
-
-    <br><br>
-
-    <button onclick="login()">
-        ENTER SYSTEM
-    </button>
-
-</div>
-
-<!-- =========================
-     DESKTOP SYSTEM
-========================= -->
-
-<div id="desktop">
-
-    <!-- =========================
-         DESKTOP ICONS
-    ========================= -->
-
-<div class="desktop-icons">
-
-    <!-- AI -->
-
-<div class="desktop-icon"
-     id="icon-ai"
-
-     style="
-     left:220px;
-     top:20px;
-     "
-
-     onclick="openWindow('aiWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png">
-
-        <span>AI</span>
-
-    </div>
-
-    <!-- BROWSER -->
-
-    <div class="desktop-icon"
-    id="icon-browser"
-    style="
-    left:20px;
-    top:20px;
-    "
-         onclick="openWindow('browserWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/1006/1006771.png">
-
-        <span>Browser</span>
-
-    </div>
-
-    <!-- MUSIC -->
-
-    <div class="desktop-icon"
-       id="icon-music"
-       style="
-       left:120px;
-       top:20px;
-       "
-         onclick="openWindow('musicWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/727/727245.png">
-
-        <span>Music</span>
-
-    </div>
-
-    <!-- FILES -->
-
-    <div class="desktop-icon"
-     id="icon-files"
-     style="
-     left:20px;
-     top:140px;
-     "
-         onclick="openWindow('filesWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/716/716784.png">
-
-        <span>Files</span>
-
-    </div>
-
-    <!-- TERMINAL -->
-
-    <div class="desktop-icon"
-     id="icon-terminal"
-     style="
-     left:120px;
-     top:140px;
-     "
-         onclick="openWindow('terminalWindow')">
-
-        <img src="https://cdn-icons-png.flaticon.com/512/906/906324.png">
-
-        <span>Terminal</span>
-
-    </div>
-
-</div>
-
-    <!-- =========================
-         SIDEBAR
-    ========================= -->
-
-    <div id="sidebar">
-
-        <div class="sidebar-header">
-
-            <button id="toggleSidebar"
-                    onclick="toggleSidebar()">
-                ☰
-            </button>
-
-            <h3 class="sidebar-title">
-                AMOS CREATOR
-            </h3>
-
-        </div>
-
-        <!-- =========================
-             DASHBOARD PROJECTS
-        ========================= -->
-
-        <div class="sidebar-label">
-            Dashboard Projects
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/camera-Rcp-pro/')">
-
-            <i class="fa-solid fa-camera"></i>
-            Camera RCP
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/fake-gps-map/')">
-
-            <i class="fa-solid fa-location-dot"></i>
-            Fake GPS
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/cv-amos/')">
-
-            <i class="fa-solid fa-user"></i>
-            CV Amos
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/')">
-
-            <i class="fa-solid fa-folder"></i>
-            Data Pribadi
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/data-pribadi/admin.html')">
-
-            <i class="fa-solid fa-gear"></i>
-            Admin Panel
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/smartdebt-system/')">
-
-            <i class="fa-solid fa-coins"></i>
-            SmartDebt
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://alarm-telegram-24jam.onrender.com')">
-
-            <i class="fa-solid fa-clock"></i>
-            Alarm
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://jadwal-kerja-eqhfsftfwps6axdunrghan.streamlit.app')">
-
-            <i class="fa-solid fa-calendar"></i>
-            Jadwal
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://t.me/routealarmsiborong2026_bot')">
-
-            <i class="fa-brands fa-telegram"></i>
-            Telegram Bot
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/wa_sender_v5/')">
-
-            <i class="fa-brands fa-whatsapp"></i>
-            WA Sender
-
-        </div>
-
-        <div class="side-item"
-             onclick="openExternal('https://amosmarbun86-droid.github.io/webos-music/')">
-
-            <i class="fa-solid fa-compact-disc"></i>
-            WebOS Music
-
-        </div>
-
-        <!-- =========================
-             SYSTEM SETTINGS
-        ========================= -->
-
-        <div class="sidebar-label">
-            System Settings
-        </div>
-
-        <div class="side-item"
-             onclick="toggleMatrix()">
-
-            <i class="fa-solid fa-code"></i>
-            Toggle Matrix
-
-        </div>
-
-        <div class="side-item"
-             onclick="changeWallpaper()">
-
-            <i class="fa-solid fa-image"></i>
-            Next Wallpaper
-
-        </div>
-
-        <div class="side-item logout-btn"
-             onclick="logout()">
-
-            <i class="fa-solid fa-power-off"></i>
-            Logout
-
-        </div>
-
-    </div>
-
-    <!-- =========================
-         WORKSPACE
-    ========================= -->
-
-    <div id="workspace">
-    
-
-        <button id="mobileMenuBtn"
-                onclick="toggleSidebar()">
-
-            ☰ MENU
-
-        </button>
-        <!-- =========================
-     AI WINDOW
-========================= -->
-
-<div class="app-window" id="aiWindow">
-
-    <div class="window-header">
-
-        <span>AMOS AI</span>
-
-        <button onclick="closeWindow('aiWindow')">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="window-content">
-
-        <h2>AMOS AI SYSTEM</h2>
-
-        <p>Welcome to AMOS AI Ecosystem</p>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     BROWSER WINDOW
-========================= -->
-
-<div class="app-window" id="browserWindow">
-
-    <div class="window-header">
-
-        <span>Browser</span>
-
-        <button onclick="closeWindow('browserWindow')">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="window-content">
-
-<iframe 
-src="https://wikipedia.org"
-style="width:100%;height:100%;border:none;">
-</iframe>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     MUSIC WINDOW
-========================= -->
-
-<div class="app-window" id="musicWindow">
-
-    <div class="window-header">
-
-        <span>Music Player</span>
-
-        <button onclick="closeWindow('musicWindow')">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="window-content">
-
-<div style="display:flex;
-            gap:5px;
-            align-items:center;
-            padding:10px;">
-
-    <audio id="player"
-           style="flex:1;">
-    </audio>
-
-    <button onclick="prevMusic()">
-        ⏮
-    </button>
-
-    <button onclick="togglePlay()">
-        ▶
-    </button>
-
-    <button onclick="nextMusic()">
-        ⏭
-    </button>
-
-    <button onclick="toggleShuffle()"
-            id="shuffleBtn">
-        🔀
-    </button>
-
-</div>
-
-<div style="margin-top:5px;
-            padding:0 10px;">
-
-    Speed:
-    <span id="speedLabel">
-        1x
-    </span>
-
-    <br>
-
-    <input type="range"
-           min="0.5"
-           max="2"
-           step="0.1"
-           value="1"
-           oninput="setSpeed(this.value)">
-
-</div>
-
-<div style="padding:10px;">
-
-    <input type="text"
-           id="songName"
-           placeholder="Judul Lagu">
-
-    <input type="text"
-           id="songURL"
-           placeholder="URL Lagu">
-
-    <input type="file"
-           id="songFile"
-           accept="audio/*">
-
-    <button onclick="uploadMusic()">
-        Upload File
-    </button>
-
-    <button onclick="showAllMusic()">
-        Semua
-    </button>
-
-    <button onclick="showFavorites()">
-        Favorit
-    </button>
-
-    <button onclick="showPlaylist()">
-        Playlist
-    </button>
-
-</div>
-
-<div id="musicList"></div>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     FILES WINDOW
-========================= -->
-
-<div class="app-window" id="filesWindow">
-
-    <div class="window-header">
-
-        <span>File Manager</span>
-
-        <button onclick="closeWindow('filesWindow')">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="window-content">
-
-        <h2>AMOS File System</h2>
-
-        <p>Storage Manager Active</p>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     TERMINAL WINDOW
-========================= -->
-
-<div class="app-window" id="terminalWindow">
-
-    <div class="window-header">
-
-        <span>Terminal</span>
-
-        <button onclick="closeWindow('terminalWindow')">
-            ✕
-        </button>
-
-    </div>
-
-    <div class="window-content">
-
-<pre>
-AMOS TERMINAL v14
-
-root@amos-os:~#
-
-system ready...
-</pre>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     FLOATING PLAYER
-========================= -->
-
-<div id="floatingPlayer">
-
-    <div class="floating-close"
-         onclick="hideFloatingPlayer()">
-
-        ✕
-
-    </div>
-
-    <div class="floating-circle"
-         onclick="togglePlay()">
-
-        <span id="floatingIcon">
-            ▶
-        </span>
-
-    </div>
-
-    <div id="floatingTitle"
-         style="font-size:10px;
-                text-align:center;">
-
-    </div>
-
-</div>
-
-    <!-- =========================
-         TASKBAR
-    ========================= -->
-
-    <div id="taskbar">
-
-        <div style="font-weight:bold; color:#00ff9f;">
-            AMOS OS V14
-        </div>
-
-        <div id="clock">
-            00:00:00
-        </div>
-
-    </div>
-
-</div>
-
-<!-- =========================
-     JAVASCRIPT
-========================= -->
-
-<!-- FIREBASE SDK -->
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
-
-<!-- MAIN SCRIPT -->
-
-<script src="script.js"></script>
+<div class="toast" id="toast"></div>
 
 <script>
+const DATABASE_URL = "https://kuncipda-default-rtdb.asia-southeast1.firebasedatabase.app";
+const REFRESH_MS = 5000;
 
-    if ('serviceWorker' in navigator) {
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
 
-        navigator.serviceWorker.register('sw.js');
+function statusBadgeClass(status) {
+  if (!status) return 'available';
+  const s = status.toLowerCase();
+  if (s.includes('use')) return 'inuse';
+  if (s.includes('lock')) return 'locked';
+  if (s.includes('lost')) return 'lost';
+  return 'available';
+}
 
-    }
+function fmtTime(ts) {
+  if (!ts || ts === 0) return '-';
+  const d = new Date(Number(ts));
+  if (isNaN(d.getTime()) || d.getFullYear() < 2000) return '-';
+  return d.toLocaleString('id-ID');
+}
 
+async function sendCommand(deviceId, action) {
+  try {
+    const res = await fetch(`${DATABASE_URL}/devices/${deviceId}/command.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, executed: false })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    showToast(`Perintah "${action}" terkirim ke ${deviceId}`);
+    fetchAll();
+  } catch (err) {
+    showToast('Gagal kirim perintah: ' + err.message);
+  }
+}
+
+async function forceCheckin(deviceId) {
+  try {
+    await fetch(`${DATABASE_URL}/devices/${deviceId}/status.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ current_status: 'AVAILABLE', current_user: '' })
+    });
+    showToast(`${deviceId} ditandai sudah dikembalikan`);
+    fetchAll();
+  } catch (err) {
+    showToast('Gagal: ' + err.message);
+  }
+}
+
+function renderDevices(devices) {
+  const ids = Object.keys(devices || {});
+  const flaggedDiv = document.getElementById('flagged-list');
+  const listDiv = document.getElementById('device-list');
+
+  if (ids.length === 0) {
+    flaggedDiv.innerHTML = '<div class="empty">Belum ada device.</div>';
+    listDiv.innerHTML = '';
+    return;
+  }
+
+  const flagged = [];
+  const normal = [];
+
+  ids.forEach(id => {
+    const d = devices[id] || {};
+    const status = d.status || {};
+    const command = d.command || {};
+    const isInUse = (status.current_status || '').toUpperCase() === 'IN_USE';
+    const pendingCmd = command.action && command.action !== 'NONE' && command.executed === false;
+
+    const cardHtml = (flaggedStyle) => `
+      <div class="device-card ${flaggedStyle ? 'flag' : ''}">
+        <div class="device-top">
+          <div class="device-id">${id}</div>
+          <span class="badge ${statusBadgeClass(status.current_status)}">${status.current_status || 'UNKNOWN'}</span>
+        </div>
+        <div class="row"><span>Asset</span><b>${(d.info || {}).asset_tag || '-'}</b></div>
+        <div class="row"><span>Model</span><b>${(d.info || {}).model || '-'}</b></div>
+        <div class="row"><span>Battery</span><b>${status.battery_level != null ? status.battery_level + '%' : '-'}</b></div>
+        <div class="row"><span>Last seen</span><b>${fmtTime(status.last_seen)}</b></div>
+        ${isInUse ? `<div class="holder-banner">📌 Sedang dipegang: <b>${status.current_user || 'tidak diketahui'}</b></div>` : ''}
+        ${pendingCmd ? `<div class="pending-tag">⏳ Perintah "${command.action}" menunggu dieksekusi device...</div>` : ''}
+        <div class="actions">
+          <button class="btn-lock" onclick="sendCommand('${id}','LOCK')">🔒 Lock</button>
+          <button class="btn-unlock" onclick="sendCommand('${id}','UNLOCK')">🔓 Unlock</button>
+          ${isInUse ? `<button class="btn-checkin" onclick="forceCheckin('${id}')">↩️ Tandai Kembali</button>` : ''}
+        </div>
+      </div>
+    `;
+
+    if (isInUse) flagged.push(cardHtml(true));
+    normal.push(cardHtml(false));
+  });
+
+  flaggedDiv.innerHTML = flagged.length
+    ? flagged.join('')
+    : '<div class="empty">✅ Semua device sudah dikembalikan.</div>';
+  listDiv.innerHTML = normal.join('');
+}
+
+function renderUsers(users) {
+  const ids = Object.keys(users || {});
+  const div = document.getElementById('user-list');
+  if (ids.length === 0) {
+    div.innerHTML = '<div class="empty">Belum ada staff.</div>';
+    return;
+  }
+  div.innerHTML = ids.map(id => {
+    const u = users[id] || {};
+    return `
+      <div class="user-row">
+        <div>
+          <div class="name">${u.name || id} <span style="color:#8a7f80;font-size:0.75rem;">(${id})</span></div>
+          <div class="device">${u.role || '-'} · ${u.status || '-'}</div>
+        </div>
+        <div class="device">${u.active_device ? '📱 ' + u.active_device : 'Tidak pegang device'}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function approveRequest(deviceId, barcode, name) {
+  try {
+    await fetch(`${DATABASE_URL}/requests/${deviceId}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'approved' })
+    });
+    showToast(`✅ Disetujui: ${name} (${barcode}) untuk ${deviceId}`);
+    fetchAll();
+  } catch (err) {
+    showToast('Gagal: ' + err.message);
+  }
+}
+
+async function rejectRequest(deviceId, name) {
+  try {
+    await fetch(`${DATABASE_URL}/requests/${deviceId}.json`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'rejected' })
+    });
+    showToast(`❌ Ditolak: ${name} untuk ${deviceId}`);
+    fetchAll();
+  } catch (err) {
+    showToast('Gagal: ' + err.message);
+  }
+}
+
+function renderRequests(requests) {
+  const div = document.getElementById('request-list');
+  const ids = Object.keys(requests || {});
+  const pending = ids.filter(id => (requests[id] || {}).status === 'pending');
+
+  if (pending.length === 0) {
+    div.innerHTML = '<div class="empty">Tidak ada permintaan login menunggu.</div>';
+    return;
+  }
+
+  div.innerHTML = pending.map(deviceId => {
+    const r = requests[deviceId];
+    return `
+      <div class="request-card">
+        <div class="request-top">
+          <div class="request-name"><span class="pulse-badge"></span>${r.name || r.barcode}</div>
+        </div>
+        <div class="request-meta">Barcode: ${r.barcode} · Minta akses: <b>${deviceId}</b> · ${fmtTime(r.requested_at)}</div>
+        <div class="request-actions">
+          <button class="btn-approve" onclick="approveRequest('${deviceId}','${r.barcode}','${r.name || r.barcode}')">✅ Setujui</button>
+          <button class="btn-reject" onclick="rejectRequest('${deviceId}','${r.name || r.barcode}')">❌ Tolak</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function fetchAll() {
+  try {
+    const [devRes, userRes, reqRes] = await Promise.all([
+      fetch(`${DATABASE_URL}/devices.json`),
+      fetch(`${DATABASE_URL}/users.json`),
+      fetch(`${DATABASE_URL}/requests.json`)
+    ]);
+    const devices = devRes.ok ? await devRes.json() : {};
+    const users = userRes.ok ? await userRes.json() : {};
+    const requests = reqRes.ok ? await reqRes.json() : {};
+    document.getElementById('last-update').textContent =
+      'Update terakhir: ' + new Date().toLocaleTimeString('id-ID');
+    renderRequests(requests);
+    renderDevices(devices);
+    renderUsers(users);
+  } catch (err) {
+    document.getElementById('last-update').textContent = 'Gagal memuat data: ' + err.message;
+  }
+}
+
+fetchAll();
+setInterval(fetchAll, REFRESH_MS);
 </script>
 
 </body>
