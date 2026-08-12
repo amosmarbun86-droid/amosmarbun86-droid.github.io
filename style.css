@@ -559,8 +559,9 @@ button{
         font-size:11px;
     }
 
+}
 
-  /* =========================
+/* =========================
    WINDOW SYSTEM
 ========================= */
 
@@ -941,7 +942,7 @@ button{
 }
 /* SPEED SLIDER */
 
-#musicWindow input[type=\"range\"]{
+#musicWindow input[type="range"]{
 
     accent-color:#00ff9f;
 
