@@ -1,16 +1,12 @@
-// =======================
+// =========================
 // ☁️ CLOUDINARY CONFIG
-// =======================
-
+// =========================
 const CLOUD_NAME = "dkisbfx29";
-
 const UPLOAD_PRESET = "ml_default";
 
-/* =========================
-   FIREBASE CONFIG 
-========================= */
-
-
+// =========================
+// 🔥 FIREBASE CONFIG
+// =========================
 const decodeSandi = (teksSandi) => atob(teksSandi);
 
 const firebaseConfig = {
@@ -23,12 +19,13 @@ const firebaseConfig = {
   measurementId: decodeSandi("Ry1aMkY3TVhQU0NI")
 };
 
-// INITIALIZE FIREBASE 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 firebase.analytics();
 
-// CONFIG WALLPAPER LENGKAP
+// =========================
+// 🖼️ WALLPAPER
+// =========================
 const wallpapers = [
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776201824/iij3x03m3leuwuca1sem.png",
     "https://res.cloudinary.com/dkisbfx29/image/upload/v1776200829/n4vqmisi9iwz09fnf8mp.png",
@@ -52,9 +49,12 @@ function changeWallpaper() {
 function toggleMatrix() {
     matrixActive = !matrixActive;
     const canvas = document.getElementById("bgCanvas");
-    if(canvas) canvas.style.display = matrixActive ? "block" : "none";
+    if (canvas) canvas.style.display = matrixActive ? "block" : "none";
 }
 
+// =========================
+// 🔐 LOGIN / LOGOUT
+// =========================
 function login() {
     const pin = document.getElementById("pass").value;
     if (pin === "101312") {
@@ -76,28 +76,28 @@ function toggleSidebar() {
 }
 
 function openExternal(url) {
-    if(url && url !== "#") {
+    if (url && url !== "#") {
         window.open(url, "_blank");
     }
 }
 
-// INITIALIZE SYSTEM
+// =========================
+// 🚀 INITIALIZE SYSTEM
+// =========================
 document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("amosLoggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("desktop").style.display = "flex";
     }
-    
-    // Jalankan ganti wallpaper pertama kali
+
+    // Ganti wallpaper pertama kali + auto ganti tiap 10 detik
     changeWallpaper();
-    
-    // SET INTERVAL AUTO WALLPAPER: 10 DETIK (10000 ms)
     setInterval(changeWallpaper, 10000);
-    
-    // Matrix Effect Logic
+
+    // ===== Matrix Effect (Background) =====
     const canvas = document.getElementById("bgCanvas");
     const ctx = canvas.getContext("2d");
-    
+
     function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -107,11 +107,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const letters = "AMOS101312";
     const fontSize = 16;
-    let columns = canvas.width / fontSize;
-    let drops = Array(Math.floor(columns)).fill(1);
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
 
     function draw() {
-        if(!matrixActive) return;
+        if (!matrixActive) return;
         ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = "#00ff9f";
@@ -126,16 +126,17 @@ document.addEventListener("DOMContentLoaded", () => {
     setInterval(draw, 33);
 });
 
-// CLOCK SYSTEM
+// =========================
+// 🕒 CLOCK
+// =========================
 setInterval(() => {
     const clock = document.getElementById("clock");
-    if(clock) clock.innerHTML = new Date().toLocaleTimeString("id-ID");
+    if (clock) clock.innerHTML = new Date().toLocaleTimeString("id-ID");
 }, 1000);
 
-/* =========================
-   AMOS BOOT SYSTEM
-========================= */
-
+// =========================
+// 🖥️ AMOS BOOT SYSTEM
+// =========================
 const bootMessages = [
     "Initializing AMOS Kernel...",
     "Loading AI Engine...",
@@ -149,833 +150,530 @@ const bootMessages = [
 const bootTerminal = document.getElementById("bootTerminal");
 const bootStatus = document.getElementById("bootStatus");
 const bootProgress = document.querySelector(".boot-progress");
-
 const bootSound = document.getElementById("bootSound");
 let progress = 0;
 
-function typeBootLine(element, text){
-
+function typeBootLine(element, text) {
     let i = 0;
-
-    const typing = setInterval(()=>{
-
+    const typing = setInterval(() => {
         element.innerHTML += text.charAt(i);
-
         i++;
-
-        if(i >= text.length){
-            clearInterval(typing);
-        }
-
+        if (i >= text.length) clearInterval(typing);
     }, 40);
-
 }
 
-function addBootLine(text){
-
+function addBootLine(text) {
     const line = document.createElement("div");
-
     line.className = "boot-line";
-
     bootTerminal.appendChild(line);
-
     typeBootLine(line, `[ OK ] ${text}`);
-
     bootTerminal.scrollTop = bootTerminal.scrollHeight;
 }
 
-function runBootSequence(){
-    
-bootSound.volume = 0.7;
+function runBootSequence() {
+    bootSound.volume = 0.7;
 
-const playPromise = bootSound.play();
+    const playPromise = bootSound.play();
+    if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+            console.log("Autoplay blocked:", error);
+        });
+    }
 
-if(playPromise !== undefined){
-
-    playPromise.catch(error => {
-
-        console.log("Autoplay blocked:", error);
-
-    });
-
-}
-   bootMessages.forEach((msg, index)=>{
-   
-        
-
-        setTimeout(()=>{
-
+    bootMessages.forEach((msg, index) => {
+        setTimeout(() => {
             addBootLine(msg);
-
             bootStatus.innerText = msg;
-
             progress += 100 / bootMessages.length;
-
             bootProgress.style.width = progress + "%";
-
         }, index * 2500);
-
     });
 
-    setTimeout(()=>{
-
-        document.getElementById("bootScreen").style.transition = "2s";
-
-        document.getElementById("bootScreen").style.opacity = "0";
-
-        setTimeout(()=>{
-
-            document.getElementById("bootScreen").remove();
-
-        },2000);
-
+    setTimeout(() => {
+        const bootScreen = document.getElementById("bootScreen");
+        bootScreen.style.transition = "2s";
+        bootScreen.style.opacity = "0";
+        setTimeout(() => bootScreen.remove(), 2000);
     }, bootMessages.length * 2500 + 4000);
-
 }
 
 runBootSequence();
 
-/* =========================
-   MATRIX EFFECT
-========================= */
+// =========================
+// 🟩 MATRIX EFFECT (Boot Screen)
+// =========================
+const bootCanvas = document.getElementById("bootMatrix");
+const bootCtx = bootCanvas.getContext("2d");
 
-const canvas = document.getElementById("bootMatrix");
-
-const ctx = canvas.getContext("2d");
-
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+bootCanvas.width = window.innerWidth;
+bootCanvas.height = window.innerHeight;
 
 const chars = "AMOS0123456789SYSTEM";
-const fontSize = 14;
+const bootFontSize = 14;
+let bootColumns = bootCanvas.width / bootFontSize;
+const bootDrops = [];
 
-let columns = canvas.width / fontSize;
-
-const drops = [];
-
-for(let x=0; x<columns; x++){
-    drops[x]=1;
+for (let x = 0; x < bootColumns; x++) {
+    bootDrops[x] = 1;
 }
 
-function drawMatrix(){
+function drawMatrix() {
+    bootCtx.fillStyle = "rgba(0,0,0,0.08)";
+    bootCtx.fillRect(0, 0, bootCanvas.width, bootCanvas.height);
 
-    ctx.fillStyle = "rgba(0,0,0,0.08)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    bootCtx.fillStyle = "#00ff88";
+    bootCtx.font = bootFontSize + "px monospace";
 
-    ctx.fillStyle = "#00ff88";
-    ctx.font = fontSize + "px monospace";
+    for (let i = 0; i < bootDrops.length; i++) {
+        const text = chars[Math.floor(Math.random() * chars.length)];
+        bootCtx.fillText(text, i * bootFontSize, bootDrops[i] * bootFontSize);
 
-    for(let i=0; i<drops.length; i++){
-
-        const text = chars[Math.floor(Math.random()*chars.length)];
-
-        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-
-        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975){
-            drops[i]=0;
+        if (bootDrops[i] * bootFontSize > bootCanvas.height && Math.random() > 0.975) {
+            bootDrops[i] = 0;
         }
-
-        drops[i]++;
+        bootDrops[i]++;
     }
-
 }
 
-setInterval(drawMatrix,25);
+setInterval(drawMatrix, 25);
 
-window.addEventListener("resize",()=>{
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
+window.addEventListener("resize", () => {
+    bootCanvas.width = window.innerWidth;
+    bootCanvas.height = window.innerHeight;
 });
 
-/* =========================
-   WINDOW SYSTEM
-========================= */
-
-function openWindow(id){
-
+// =========================
+// 🪟 WINDOW SYSTEM
+// =========================
+function openWindow(id) {
     const win = document.getElementById(id);
-
-    if(win){
-
-        win.style.display = "flex";
-
-    }
-
+    if (win) win.style.display = "flex";
 }
 
-function closeWindow(id){
-
+function closeWindow(id) {
     const win = document.getElementById(id);
-
-    if(win){
-
-        win.style.display = "none";
-
-    }
-
+    if (win) win.style.display = "none";
 }
-/* =========================
-   MUSIC DATA
-========================= */
 
+// =========================
+// 🎵 MUSIC DATA
+// =========================
 let musicData = [];
-
 let currentIndex = 0;
 
-/* =========================
-   LOAD MUSIC REALTIME
-========================= */
+// Filter aktif saat ini: "all" | "favorites" | "playlist"
+let currentFilter = "all";
 
-function loadMusic(){
+// Daftar ID lagu yang ditambahkan ke playlist (disimpan lokal di perangkat)
+function getPlaylistIds() {
+    try {
+        return JSON.parse(localStorage.getItem("amosPlaylist")) || [];
+    } catch {
+        return [];
+    }
+}
 
-    const musicList =
-    document.getElementById("musicList");
+function savePlaylistIds(ids) {
+    localStorage.setItem("amosPlaylist", JSON.stringify(ids));
+}
 
-    musicList.innerHTML =
-    "Loading Music...";
+// =========================
+// 🔄 LOAD MUSIC REALTIME
+// =========================
+function loadMusic() {
+    const musicList = document.getElementById("musicList");
+    musicList.innerHTML = "Loading Music...";
+
+    db.collection("music").onSnapshot((snapshot) => {
+        musicData = [];
+        snapshot.forEach((doc) => {
+            const song = doc.data();
+            song.id = doc.id; // ID dokumen Firestore
+            musicData.push(song);
+        });
+        applyCurrentFilter();
+    });
+}
+
+// =========================
+// 🔍 FILTER MUSIK (Semua / Favorit / Playlist)
+// =========================
+function applyCurrentFilter() {
+    if (currentFilter === "favorites") {
+        renderMusic(musicData.filter((song) => song.favorite === true));
+    } else if (currentFilter === "playlist") {
+        const ids = getPlaylistIds();
+        renderMusic(musicData.filter((song) => ids.includes(song.id)));
+    } else {
+        renderMusic(musicData);
+    }
+}
+
+function showAllMusic() {
+    currentFilter = "all";
+    applyCurrentFilter();
+}
+
+function showFavorites() {
+    currentFilter = "favorites";
+    applyCurrentFilter();
+}
+
+function showPlaylist() {
+    currentFilter = "playlist";
+    applyCurrentFilter();
+}
+
+// =========================
+// ⭐ FAVORIT / ➕ PLAYLIST
+// =========================
+function toggleFavorite(id) {
+    const song = musicData.find((s) => s.id === id);
+    if (!song) return;
 
     db.collection("music")
-
-    .onSnapshot((snapshot)=>{
-
-        musicData = [];
-
-        snapshot.forEach((doc)=>{
-
-            const song =
-            doc.data();
-
-            // FIREBASE DOCUMENT ID
-
-            song.id = doc.id;
-
-            musicData.push(song);
-
-        });
-
-        renderMusic(musicData);
-
-    });
-
+        .doc(id)
+        .update({ favorite: !song.favorite })
+        .catch((error) => console.log(error));
 }
 
-/* =========================
-   RENDER MUSIC
-========================= */
+function togglePlaylist(id) {
+    const ids = getPlaylistIds();
+    const index = ids.indexOf(id);
 
-function renderMusic(list){
+    if (index === -1) {
+        ids.push(id);
+    } else {
+        ids.splice(index, 1);
+    }
 
-    const musicList =
-    document.getElementById("musicList");
+    savePlaylistIds(ids);
+    if (currentFilter === "playlist") applyCurrentFilter();
+    else renderMusic(getFilteredForRender());
+}
 
+function getFilteredForRender() {
+    if (currentFilter === "favorites") return musicData.filter((s) => s.favorite === true);
+    if (currentFilter === "playlist") {
+        const ids = getPlaylistIds();
+        return musicData.filter((s) => ids.includes(s.id));
+    }
+    return musicData;
+}
+
+// =========================
+// 🎨 RENDER MUSIC
+// =========================
+function renderMusic(list) {
+    const musicList = document.getElementById("musicList");
     musicList.innerHTML = "";
 
-    list.forEach((song,index)=>{
+    if (list.length === 0) {
+        musicList.innerHTML = "<p style='padding:10px;opacity:.6;'>Tidak ada lagu.</p>";
+        return;
+    }
 
-        const div =
-        document.createElement("div");
+    const playlistIds = getPlaylistIds();
 
+    list.forEach((song) => {
+        const realIndex = musicData.findIndex((s) => s.id === song.id);
+        const isFavorite = song.favorite === true;
+        const isInPlaylist = playlistIds.includes(song.id);
+
+        const div = document.createElement("div");
         div.className = "music-item";
-
         div.innerHTML = `
-
-        <div>
-
-            <b>${song.name}</b>
-
-            <br>
-
-            <small>
-
-                ⏱ ${song.duration}
-
-            </small>
-
-        </div>
-
-        <div style="display:flex; gap:5px;">
-
-            <button onclick="playMusic(${index})">
-
-                ▶
-
-            </button>
-
-            <button onclick="deleteMusic('${song.id}')">
-
-                🗑
-
-            </button>
-
-        </div>
-
+            <div>
+                <b>${song.name}</b>
+                <br>
+                <small>⏱ ${song.duration}</small>
+            </div>
+            <div style="display:flex; gap:5px;">
+                <button onclick="playMusic(${realIndex})">▶</button>
+                <button onclick="toggleFavorite('${song.id}')">${isFavorite ? "❤️" : "🤍"}</button>
+                <button onclick="togglePlaylist('${song.id}')">${isInPlaylist ? "✅" : "➕"}</button>
+                <button onclick="deleteMusic('${song.id}')">🗑</button>
+            </div>
         `;
-
         musicList.appendChild(div);
-
     });
-
 }
 
-/* =========================
-   PLAY MUSIC
-========================= */
-
-function playMusic(index){
+// =========================
+// ▶️ PLAY MUSIC
+// =========================
+function playMusic(index) {
+    if (index < 0 || index >= musicData.length) return;
 
     currentIndex = index;
+    const song = musicData[currentIndex];
 
-    const song =
-    musicData[currentIndex];
-
-    const player =
-    document.getElementById("player");
-
-    const floatingPlayer =
-    document.getElementById("floatingPlayer");
-
-    const floatingIcon =
-    document.getElementById("floatingIcon");
-
-    const floatingTitle =
-    document.getElementById("floatingTitle");
+    const player = document.getElementById("player");
+    const floatingPlayer = document.getElementById("floatingPlayer");
+    const floatingIcon = document.getElementById("floatingIcon");
+    const floatingTitle = document.getElementById("floatingTitle");
 
     player.src = song.url;
-
     player.play();
 
     floatingPlayer.style.display = "block";
-
     floatingIcon.innerHTML = "⏸";
-
-    floatingTitle.innerHTML =
-    song.name;
-
+    floatingTitle.innerHTML = song.name;
 }
 
-/* =========================
-   PLAY / PAUSE
-========================= */
+// =========================
+// ⏯️ PLAY / PAUSE
+// =========================
+function togglePlay() {
+    const player = document.getElementById("player");
+    const floatingIcon = document.getElementById("floatingIcon");
 
-function togglePlay(){
-
-    const player =
-    document.getElementById("player");
-
-    const floatingIcon =
-    document.getElementById("floatingIcon");
-
-    if(player.paused){
-
+    if (player.paused) {
         player.play();
-
         floatingIcon.innerHTML = "⏸";
-
-    }else{
-
+    } else {
         player.pause();
-
         floatingIcon.innerHTML = "▶";
-
     }
-
 }
 
-/* =========================
-   NEXT MUSIC
-========================= */
-
-function nextMusic(){
+// =========================
+// ⏭️ NEXT / ⏮️ PREVIOUS
+// =========================
+function nextMusic() {
+    if (musicData.length === 0) return;
 
     currentIndex++;
-
-    if(currentIndex >= musicData.length){
-
-        currentIndex = 0;
-
-    }
+    if (currentIndex >= musicData.length) currentIndex = 0;
 
     playMusic(currentIndex);
-
 }
 
-/* =========================
-   PREVIOUS MUSIC
-========================= */
-
-function prevMusic(){
+function prevMusic() {
+    if (musicData.length === 0) return;
 
     currentIndex--;
-
-    if(currentIndex < 0){
-
-        currentIndex =
-        musicData.length - 1;
-
-    }
+    if (currentIndex < 0) currentIndex = musicData.length - 1;
 
     playMusic(currentIndex);
-
 }
 
-/* =========================
-   SPEED CONTROL
-========================= */
-
-function setSpeed(speed){
-
-    const player =
-    document.getElementById("player");
-
-    const speedLabel =
-    document.getElementById("speedLabel");
+// =========================
+// 🎚️ SPEED CONTROL
+// =========================
+function setSpeed(speed) {
+    const player = document.getElementById("player");
+    const speedLabel = document.getElementById("speedLabel");
 
     player.playbackRate = speed;
-
-    speedLabel.innerHTML =
-    speed + "x";
-
+    speedLabel.innerHTML = speed + "x";
 }
 
-/* =========================
-   SHUFFLE
-========================= */
+// =========================
+// 🔀 SHUFFLE
+// =========================
+function toggleShuffle() {
+    if (musicData.length === 0) return;
 
-function toggleShuffle(){
-
-    if(musicData.length === 0) return;
-
-    const randomIndex =
-    Math.floor(Math.random() * musicData.length);
-
+    const randomIndex = Math.floor(Math.random() * musicData.length);
     playMusic(randomIndex);
-
 }
 
-/* =========================
-   UPLOAD MUSIC
-========================= */
+// =========================
+// ⬆️ UPLOAD MUSIC
+// =========================
+async function uploadMusic() {
+    const file = document.getElementById("songFile").files[0];
+    const songName = document.getElementById("songName").value;
 
-async function uploadMusic(){
-
-    const file =
-    document.getElementById("songFile").files[0];
-
-    const songName =
-    document.getElementById("songName").value;
-
-    if(!file){
-
+    if (!file) {
         alert("Pilih file musik!");
-
         return;
-
     }
 
-    const formData =
-    new FormData();
-
+    const formData = new FormData();
     formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
 
-    formData.append(
-        "upload_preset",
-        UPLOAD_PRESET
-    );
-
-    try{
-
+    try {
         alert("Uploading...");
 
-        const response =
-        await fetch(
-
-        `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
-
-        {
-
-            method:"POST",
-
-            body:formData
-
-        }
-
+        const response = await fetch(
+            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+            { method: "POST", body: formData }
         );
 
-        const data =
-        await response.json();
+        const data = await response.json();
 
-        if(data.secure_url){
+        if (data.secure_url) {
+            const audio = new Audio(data.secure_url);
 
-            const audio =
-            new Audio(data.secure_url);
-
-            audio.addEventListener(
-
-            "loadedmetadata",
-
-            function(){
-
-                const minutes =
-                Math.floor(audio.duration / 60);
-
-                const seconds =
-                Math.floor(audio.duration % 60);
-
-                const duration =
-
-                `${minutes}:${seconds
-                .toString()
-                .padStart(2,'0')}`;
+            audio.addEventListener("loadedmetadata", function () {
+                const minutes = Math.floor(audio.duration / 60);
+                const seconds = Math.floor(audio.duration % 60);
+                const duration = `${minutes}:${seconds.toString().padStart(2, "0")}`;
 
                 const song = {
-
-                    name:
-                    songName || file.name,
-
-                    url:
-                    data.secure_url,
-
-                    duration:
-                    duration,
-
-                    createdAt:
-                    Date.now()
-
+                    name: songName || file.name,
+                    url: data.secure_url,
+                    duration: duration,
+                    favorite: false,
+                    createdAt: Date.now()
                 };
 
                 db.collection("music")
-
-                .add(song)
-
-                .then(()=>{
-
-                    alert("Upload berhasil!");
-
-                });
-
+                    .add(song)
+                    .then(() => alert("Upload berhasil!"));
             });
-
         }
-
-    }catch(error){
-
+    } catch (error) {
         console.log(error);
-
         alert("Upload gagal!");
-
     }
-
 }
 
-/* =========================
-   DELETE MUSIC ONLINE
-========================= */
+// =========================
+// 🗑️ DELETE MUSIC ONLINE
+// =========================
+async function deleteMusic(id) {
+    const confirmDelete = confirm("Hapus lagu ini?");
+    if (!confirmDelete) return;
 
-async function deleteMusic(id){
+    try {
+        await db.collection("music").doc(id).delete();
 
-    const confirmDelete =
-    confirm("Hapus lagu ini?");
-
-    if(!confirmDelete) return;
-
-    try{
-
-        await db.collection("music")
-
-        .doc(id)
-
-        .delete();
+        // Bersihkan juga dari playlist lokal kalau ada
+        const ids = getPlaylistIds().filter((pid) => pid !== id);
+        savePlaylistIds(ids);
 
         alert("Lagu berhasil dihapus!");
-
-    }catch(error){
-
+    } catch (error) {
         console.log(error);
-
         alert("Gagal menghapus lagu!");
-
     }
-
 }
 
-/* =========================
-   AUTO NEXT
-========================= */
-
-document.getElementById("player")
-
-.addEventListener("ended",()=>{
-
+// =========================
+// ⏭️ AUTO NEXT + FLOATING ICON SYNC
+// =========================
+document.getElementById("player").addEventListener("ended", () => {
     nextMusic();
-
-});
-document.getElementById("player")
-
-.addEventListener("pause",()=>{
-
-    document.getElementById("floatingIcon")
-    .innerHTML = "▶";
-
 });
 
-document.getElementById("player")
-
-.addEventListener("play",()=>{
-
-    document.getElementById("floatingIcon")
-    .innerHTML = "⏸";
-
+document.getElementById("player").addEventListener("pause", () => {
+    document.getElementById("floatingIcon").innerHTML = "▶";
 });
-function hideFloatingPlayer(){
 
-    document.getElementById("floatingPlayer")
-    .style.display = "none";
+document.getElementById("player").addEventListener("play", () => {
+    document.getElementById("floatingIcon").innerHTML = "⏸";
+});
 
+function hideFloatingPlayer() {
+    document.getElementById("floatingPlayer").style.display = "none";
 }
 
-/* =========================
-   DRAG DESKTOP ICONS SAVE
-========================= */
-
-const desktopIcons =
-document.querySelectorAll(".desktop-icon");
+// =========================
+// 🖱️ DRAG DESKTOP ICONS (SAVE POSITION)
+// =========================
+const desktopIcons = document.querySelectorAll(".desktop-icon");
 
 let activeIcon = null;
-
 let startX = 0;
 let startY = 0;
-
 let offsetX = 0;
 let offsetY = 0;
-
 let moved = false;
 
-desktopIcons.forEach(icon=>{
-
+desktopIcons.forEach((icon) => {
     const iconId = icon.id;
 
-    // LOAD POSITION
+    // Muat posisi tersimpan
+    const savedX = localStorage.getItem(`${iconId}-x`);
+    const savedY = localStorage.getItem(`${iconId}-y`);
 
-    const savedX =
-    localStorage.getItem(`${iconId}-x`);
-
-    const savedY =
-    localStorage.getItem(`${iconId}-y`);
-
-    if(savedX && savedY){
-
-        icon.style.left =
-        savedX + "px";
-
-        icon.style.top =
-        savedY + "px";
-
+    if (savedX && savedY) {
+        icon.style.left = savedX + "px";
+        icon.style.top = savedY + "px";
     }
 
-    icon.addEventListener(
-
-    "touchstart",
-
-    (e)=>{
-
+    icon.addEventListener("touchstart", (e) => {
         activeIcon = icon;
-
         moved = false;
 
         const touch = e.touches[0];
-
         startX = touch.clientX;
-
         startY = touch.clientY;
 
-        offsetX =
-
-        touch.clientX -
-        icon.offsetLeft;
-
-        offsetY =
-
-        touch.clientY -
-        icon.offsetTop;
-
-    }
-
-    );
-
+        offsetX = touch.clientX - icon.offsetLeft;
+        offsetY = touch.clientY - icon.offsetTop;
+    });
 });
 
-/* GLOBAL MOVE */
-
-document.addEventListener(
-
-"touchmove",
-
-(e)=>{
-
-    if(!activeIcon) return;
+// Pergerakan drag (global)
+document.addEventListener("touchmove", (e) => {
+    if (!activeIcon) return;
 
     const touch = e.touches[0];
+    const dx = Math.abs(touch.clientX - startX);
+    const dy = Math.abs(touch.clientY - startY);
 
-    const dx =
-    Math.abs(touch.clientX - startX);
+    if (dx > 8 || dy > 8) moved = true;
+    if (!moved) return;
 
-    const dy =
-    Math.abs(touch.clientY - startY);
+    const newX = touch.clientX - offsetX;
+    const newY = touch.clientY - offsetY;
 
-    // DRAG THRESHOLD
+    activeIcon.style.left = newX + "px";
+    activeIcon.style.top = newY + "px";
+});
 
-    if(dx > 8 || dy > 8){
+// Akhir drag (simpan posisi)
+document.addEventListener("touchend", () => {
+    if (!activeIcon) return;
 
-        moved = true;
-
-    }
-
-    if(!moved) return;
-
-    const newX =
-    touch.clientX - offsetX;
-
-    const newY =
-    touch.clientY - offsetY;
-
-    activeIcon.style.left =
-    newX + "px";
-
-    activeIcon.style.top =
-    newY + "px";
-
-}
-
-);
-
-/* END DRAG */
-
-document.addEventListener(
-
-"touchend",
-
-()=>{
-
-    if(!activeIcon) return;
-
-    // SAVE POSITION
-
-    localStorage.setItem(
-
-    `${activeIcon.id}-x`,
-
-    parseInt(activeIcon.style.left)
-
-    );
-
-    localStorage.setItem(
-
-    `${activeIcon.id}-y`,
-
-    parseInt(activeIcon.style.top)
-
-    );
+    localStorage.setItem(`${activeIcon.id}-x`, parseInt(activeIcon.style.left) || 0);
+    localStorage.setItem(`${activeIcon.id}-y`, parseInt(activeIcon.style.top) || 0);
 
     activeIcon = null;
+});
 
-}
-
-);
-/* =========================
-   FLOATING PLAYER DRAG
-========================= */
-
-function initFloatingDrag(){
-
-    const floatingPlayer =
-
-    document.getElementById(
-    "floatingPlayer"
-    );
+// =========================
+// 🎧 FLOATING PLAYER DRAG
+// =========================
+function initFloatingDrag() {
+    const floatingPlayer = document.getElementById("floatingPlayer");
 
     let floatingDragging = false;
-
     let floatingOffsetX = 0;
-
     let floatingOffsetY = 0;
 
-    floatingPlayer.addEventListener(
-
-    "touchstart",
-
-    (e)=>{
-
+    floatingPlayer.addEventListener("touchstart", (e) => {
         floatingDragging = true;
 
         const touch = e.touches[0];
+        floatingOffsetX = touch.clientX - floatingPlayer.offsetLeft;
+        floatingOffsetY = touch.clientY - floatingPlayer.offsetTop;
+    });
 
-        floatingOffsetX =
-
-        touch.clientX -
-        floatingPlayer.offsetLeft;
-
-        floatingOffsetY =
-
-        touch.clientY -
-        floatingPlayer.offsetTop;
-
-    }
-
-    );
-
-    document.addEventListener(
-
-    "touchmove",
-
-    (e)=>{
-
-        if(!floatingDragging) return;
+    document.addEventListener("touchmove", (e) => {
+        if (!floatingDragging) return;
 
         const touch = e.touches[0];
+        floatingPlayer.style.left = (touch.clientX - floatingOffsetX) + "px";
+        floatingPlayer.style.top = (touch.clientY - floatingOffsetY) + "px";
+        floatingPlayer.style.right = "auto";
+        floatingPlayer.style.bottom = "auto";
+    });
 
-        floatingPlayer.style.left =
-
-        (touch.clientX - floatingOffsetX)
-        + "px";
-
-        floatingPlayer.style.top =
-
-        (touch.clientY - floatingOffsetY)
-        + "px";
-
-        floatingPlayer.style.right =
-        "auto";
-
-        floatingPlayer.style.bottom =
-        "auto";
-
-    }
-
-    );
-
-    document.addEventListener(
-
-    "touchend",
-
-    ()=>{
-
+    document.addEventListener("touchend", () => {
         floatingDragging = false;
-
-    }
-
-    );
-
+    });
 }
-/* =========================
-   START SYSTEM
-========================= */
 
-window.addEventListener("load",()=>{
-
+// =========================
+// 🚀 START SYSTEM
+// =========================
+window.addEventListener("load", () => {
     loadMusic();
-
     initFloatingDrag();
-
 });
