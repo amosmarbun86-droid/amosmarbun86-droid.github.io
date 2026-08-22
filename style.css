@@ -993,3 +993,161 @@ button{
     }
 
 }
+
+/* =========================
+   LOGIN CARTOON CHARACTER
+   (animasi senang saat login sukses,
+    animasi sedih saat login gagal)
+========================= */
+
+#loginCharacter {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 15px auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.char-face {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #1c2b28, #0a0f0e 70%);
+    border: 3px solid #00ff9f;
+    box-shadow: 0 0 15px rgba(0,255,159,0.6), inset 0 0 10px rgba(0,255,159,0.3);
+    position: relative;
+    animation: charIdle 2.4s ease-in-out infinite;
+}
+
+@keyframes charIdle {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(0deg); }
+}
+
+.char-eyes {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.eye {
+    width: 10px;
+    height: 10px;
+    background: #00ff9f;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #00ff9f;
+    transition: all 0.25s ease;
+}
+
+.char-mouth {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 10px;
+    border: 2px solid #00ff9f;
+    border-top: none;
+    border-radius: 0 0 20px 20px;
+    transition: all 0.25s ease;
+}
+
+.tear {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: #4fd1ff;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 4px #4fd1ff;
+}
+
+.tear-left { top: 42px; left: 24px; }
+.tear-right { top: 42px; right: 24px; }
+
+/* ===== SUCCESS STATE ===== */
+#loginCharacter.success .char-face {
+    animation: charHappyJump 0.6s ease-in-out 2;
+    border-color: #00ff9f;
+    box-shadow: 0 0 25px rgba(0,255,159,0.9);
+}
+
+#loginCharacter.success .eye {
+    height: 4px;
+    border-radius: 4px;
+    top: 4px;
+    position: relative;
+}
+
+#loginCharacter.success .char-mouth {
+    width: 28px;
+    height: 16px;
+    border-radius: 0 0 28px 28px;
+    border-color: #00ff9f;
+}
+
+@keyframes charHappyJump {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-14px) scale(1.05); }
+}
+
+/* ===== FAIL STATE ===== */
+#loginCharacter.fail .char-face {
+    animation: charShake 0.5s ease-in-out;
+    border-color: #ff4d6d;
+    box-shadow: 0 0 20px rgba(255,77,109,0.8);
+}
+
+#loginCharacter.fail .eye {
+    background: #ff8fa3;
+    box-shadow: 0 0 6px #ff8fa3;
+    height: 7px;
+    transform: translateY(2px);
+}
+
+#loginCharacter.fail .char-mouth {
+    width: 20px;
+    height: 10px;
+    border-radius: 20px 20px 0 0;
+    border-top: 2px solid #ff8fa3;
+    border-bottom: none;
+    bottom: 16px;
+    border-color: #ff8fa3;
+}
+
+#loginCharacter.fail .tear {
+    opacity: 1;
+    animation: dropTear 0.9s ease-in forwards;
+}
+
+@keyframes dropTear {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(18px); opacity: 0; }
+}
+
+@keyframes charShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+}
+
+#login-status-text {
+    text-align: center;
+    font-size: 13px;
+    min-height: 18px;
+    margin-top: 6px;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.shake-input {
+    animation: charShake 0.5s ease-in-out;
+}
