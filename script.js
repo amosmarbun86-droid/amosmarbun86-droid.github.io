@@ -53,16 +53,51 @@ function toggleMatrix() {
 }
 
 // =========================
-// 🔐 LOGIN / LOGOUT
+// 🔐 LOGIN / LOGOUT (dengan animasi karakter)
 // =========================
 function login() {
     const pin = document.getElementById("pass").value;
+    const character = document.getElementById("loginCharacter");
+    const statusText = document.getElementById("login-status-text");
+    const loginBtn = document.querySelector("#login button");
+
+    // Reset state animasi sebelumnya
+    character.classList.remove("success", "fail");
+
     if (pin === "101312") {
-        document.getElementById("login").style.display = "none";
-        document.getElementById("desktop").style.display = "flex";
-        localStorage.setItem("amosLoggedIn", "true");
+        // ===== LOGIN BERHASIL =====
+        character.classList.add("success");
+        statusText.innerText = "AKSES DITERIMA ✅";
+        statusText.style.color = "#00ff9f";
+        if (loginBtn) loginBtn.disabled = true;
+
+        // Kasih waktu animasi senang jelas dulu sebelum pindah ke desktop
+        setTimeout(() => {
+            document.getElementById("login").style.display = "none";
+            document.getElementById("desktop").style.display = "flex";
+            localStorage.setItem("amosLoggedIn", "true");
+        }, 1300);
+
     } else {
-        alert("PIN SALAH!");
+        // ===== LOGIN GAGAL =====
+        character.classList.add("fail");
+        statusText.innerText = "PIN SALAH ❌";
+        statusText.style.color = "#ff4d6d";
+
+        // Getarkan input juga biar makin kerasa
+        const passInput = document.getElementById("pass");
+        passInput.style.transition = "transform 0.1s";
+        passInput.classList.add("shake-input");
+
+        // Balikin karakter ke posisi normal setelah animasi sedih selesai
+        setTimeout(() => {
+            character.classList.remove("fail");
+            passInput.classList.remove("shake-input");
+        }, 1000);
+
+        // Bersihkan input biar user coba lagi
+        passInput.value = "";
+        passInput.focus();
     }
 }
 
