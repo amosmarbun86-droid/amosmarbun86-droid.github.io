@@ -1207,3 +1207,67 @@ button{
 @media (max-width: 768px) {
     #aiWindow { width: 90%; height: 70%; }
 }
+
+
+/* =========================
+   AMOS FILE MANAGER WINDOW
+========================= */
+#filesWindow { width: 520px; height: 500px; }
+
+.files-content {
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#filesGateError { color: #ff4d6d; font-size: 12px; min-height: 16px; margin-top: 6px; }
+
+.files-app { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.files-browser, .files-editor { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+
+.files-toolbar { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+.files-btn {
+    background: #00ff9f; color: #000; border: none; border-radius: 8px;
+    padding: 6px 10px; cursor: pointer; font-weight: bold; white-space: nowrap;
+}
+
+.files-path {
+    font-size: 13px; margin-bottom: 8px; padding: 6px 8px;
+    background: #001a12; border: 1px solid #00ff9f55; border-radius: 8px;
+    overflow-x: auto; white-space: nowrap;
+}
+.files-path span { cursor: pointer; }
+.files-path span:hover { text-decoration: underline; }
+
+.files-namebar { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; font-size: 13px; }
+.files-namebar input {
+    flex: 1; min-width: 0; padding: 6px; background: #001a12; color: #00ff9f;
+    border: 1px solid #00ff9f; border-radius: 8px;
+}
+
+.files-list { flex: 1; min-height: 0; overflow-y: auto; }
+.files-empty { opacity: .6; padding: 14px; text-align: center; }
+
+.files-row {
+    display: flex; align-items: center; gap: 8px; padding: 8px;
+    border-bottom: 1px solid #00ff9f22; border-radius: 6px;
+}
+.files-row:hover { background: #062b21; }
+.files-icon { font-size: 18px; }
+.files-name { flex: 1; min-width: 0; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.files-meta { font-size: 11px; opacity: .6; white-space: nowrap; }
+.files-row button { background: none; border: none; cursor: pointer; font-size: 15px; padding: 2px 4px; }
+
+.files-edit-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.files-editor textarea {
+    flex: 1; min-height: 0; resize: none; padding: 8px;
+    background: #001a12; color: #d6ffef; border: 1px solid #00ff9f;
+    border-radius: 8px; font-family: monospace; font-size: 13px;
+}
+
+.files-status { font-size: 12px; min-height: 16px; margin-top: 6px; }
+
+@media (max-width: 768px) {
+    #filesWindow { width: 90%; height: 70%; }
+}
