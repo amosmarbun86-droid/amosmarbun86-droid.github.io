@@ -719,11 +719,56 @@ style="width:100%;height:100%;border:none;">
 
     </div>
 
-    <div class="window-content">
+    <div class="window-content files-content">
 
-        <h2>AMOS File System</h2>
+        <!-- GATE PASSWORD (muncul setiap File Manager dibuka) -->
+        <div id="filesGate" class="ai-gate">
+            <p>🔒 File Manager terkunci</p>
+            <input type="password" id="filesPassInput" placeholder="Password">
+            <button onclick="filesSubmitPassword()">Buka</button>
+            <div id="filesGateError"></div>
+        </div>
 
-        <p>Storage Manager Active</p>
+        <!-- APLIKASI FILE -->
+        <div id="filesApp" class="files-app" style="display:none;">
+
+            <!-- DAFTAR FOLDER / FILE -->
+            <div id="filesBrowser" class="files-browser">
+
+                <div class="files-toolbar">
+                    <button class="files-btn" onclick="filesGoUp()" title="Naik satu folder">⬆</button>
+                    <button class="files-btn" onclick="filesNewFolder()" title="Folder baru">📁＋</button>
+                    <button class="files-btn" onclick="filesNewFile()" title="File baru">📄＋</button>
+                    <button class="files-btn" onclick="filesRefresh()" title="Muat ulang">⟳</button>
+                    <button class="files-btn" onclick="filesLock()" title="Kunci">🔒</button>
+                </div>
+
+                <div id="filesPath" class="files-path"></div>
+
+                <div id="filesNameBar" class="files-namebar" style="display:none;">
+                    <span id="filesNameLabel"></span>
+                    <input type="text" id="filesNameInput" maxlength="80">
+                    <button class="files-btn" onclick="filesConfirmName()">OK</button>
+                    <button class="files-btn" onclick="filesCancelName()">Batal</button>
+                </div>
+
+                <div id="filesList" class="files-list"></div>
+
+            </div>
+
+            <!-- EDITOR FILE -->
+            <div id="filesEditor" class="files-editor" style="display:none;">
+                <div class="files-toolbar">
+                    <button class="files-btn" onclick="filesCloseEditor()">← Kembali</button>
+                    <span id="filesEditTitle" class="files-edit-title"></span>
+                    <button class="files-btn" onclick="filesSaveFile()">💾 Simpan</button>
+                </div>
+                <textarea id="filesEditText" spellcheck="false"></textarea>
+            </div>
+
+            <div id="filesStatus" class="files-status"></div>
+
+        </div>
 
     </div>
 
