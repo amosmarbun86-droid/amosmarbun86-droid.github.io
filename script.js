@@ -712,3 +712,226 @@ window.addEventListener("load", () => {
     loadMusic();
     initFloatingDrag();
 });
+
+
+// =========================
+// 🤖 AMOS AI CHAT (OpenRouter backend di Vercel)
+// =========================
+const AI_API_URL = "https://openrouter-chat-web.vercel.app/api/chat";
+const AI_MAX_HISTORY = 30; // maksimal pesan yang disimpan & dikirim sebagai konteks
+
+let aiPassword = null;
+let aiHistory = []; // [{ role: "user" | "assistant", content: "..." }]
+let aiBusy = false;
+
+function aiInit() {
+    aiPassword = localStorage.getItem("amosAiPassword");
+
+    try {
+        aiHistory = JSON.parse(localStorage.getItem("amosAiHistory")) || [];
+    } catch {
+        aiHistory = [];
+    }
+
+    const savedModel = localStorage.getItem("amosAiModel");
+    if (savedModel) document.getElementById("aiModel").value = savedModel;
+
+    document.getElementById("aiPassInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") aiSubmitPassword();
+    });
+
+    const input = document.getElementById("aiInput");
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            aiSend();
+        }
+    });
+    input.addEventListener("input", () => {
+        input.style.height = "auto";
+        input.style.height = Math.min(input.scrollHeight, 90) + "px";
+    });
+
+    aiRenderAll();
+    aiShowGateOrChat();
+}
+
+function aiShowGateOrChat() {
+    const loggedIn = !!aiPassword;
+    document.getElementById("aiGate").style.display = loggedIn ? "none" : "block";
+    document.getElementById("aiChat").style.display = loggedIn ? "flex" : "none";
+}
+
+function aiSubmitPassword() {
+    const input = document.getElementById("aiPassInput");
+    const val = input.value.trim();
+    if (!val) return;
+
+    aiPassword = val;
+    localStorage.setItem("amosAiPassword", val);
+    input.value = "";
+    document.getElementById("aiGateError").textContent = "";
+    aiShowGateOrChat();
+}
+
+function aiLogout() {
+    aiPassword = null;
+    localStorage.removeItem("amosAiPassword");
+    aiShowGateOrChat();
+}
+
+function aiSaveModel() {
+    localStorage.setItem("amosAiModel", document.getElementById("aiModel").value);
+}
+
+function aiSaveHistory() {
+    aiHistory = aiHistory.slice(-AI_MAX_HISTORY);
+    localStorage.setItem("amosAiHistory", JSON.stringify(aiHistory));
+}
+
+function aiNewChat() {
+    if (aiBusy) return;
+    aiHistory = [];
+    aiSaveHistory();
+    aiRenderAll();
+}
+
+// Semua teks dimasukkan lewat textContent (bukan innerHTML) supaya aman dari XSS
+function aiAddBubble(role, text) {
+    const box = document.getElementById("aiMessages");
+    const div = document.createElement("div");
+    div.className = "ai-msg " + (role === "user" ? "user" : "ai");
+    div.textContent = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+    return div;
+}
+
+function aiRenderAll() {
+    const box = document.getElementById("aiMessages");
+    box.innerHTML = "";
+
+    if (aiHistory.length === 0) {
+        aiAddBubble("assistant", "Halo! Aku AMOS AI. Mau tanya apa hari ini?");
+        return;
+    }
+    aiHistory.forEach((m) => aiAddBubble(m.role, m.content));
+}
+
+async function aiSend() {
+    if (aiBusy) return;
+
+    const input = document.getElementById("aiInput");
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (!aiPassword) {
+        aiShowGateOrChat();
+        return;
+    }
+
+    aiBusy = true;
+    const sendBtn = document.getElementById("aiSendBtn");
+    sendBtn.disabled = true;
+
+    // Kalau masih tampil sapaan awal (belum ada riwayat), bersihkan dulu
+    if (aiHistory.length === 0) document.getElementById("aiMessages").innerHTML = "";
+
+    aiHistory.push({ role: "user", content: text });
+    aiAddBubble("user", text);
+    input.value = "";
+    input.style.height = "auto";
+
+    const bubble = aiAddBubble("assistant", "AI sedang mengetik...");
+    bubble.classList.add("typing");
+    let aiText = "";
+
+    try {
+        const response = await fetch(AI_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                messages: aiHistory.slice(-AI_MAX_HISTORY),
+                model: document.getElementById("aiModel").value,
+                stream: true,
+                password: aiPassword
+            })
+        });
+
+        if (response.status === 401) {
+            aiHistory.pop(); // pesan gagal terkirim, jangan disimpan
+            aiSaveHistory();
+            aiRenderAll();
+            aiLogout();
+            document.getElementById("aiGateError").textContent = "Password salah, coba lagi.";
+            return;
+        }
+
+        if (!response.ok || !response.body) {
+            bubble.classList.remove("typing");
+            bubble.textContent = "Terjadi error saat menghubungi server. Coba lagi beberapa saat.";
+            aiHistory.pop();
+            aiSaveHistory();
+            return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+        let firstChunk = true;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop();
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (!trimmed.startsWith("data:")) continue;
+
+                const payload = trimmed.slice(5).trim();
+                if (payload === "[DONE]") continue;
+
+                try {
+                    const json = JSON.parse(payload);
+                    const delta = json.choices?.[0]?.delta?.content;
+                    if (delta) {
+                        if (firstChunk) {
+                            bubble.classList.remove("typing");
+                            firstChunk = false;
+                        }
+                        aiText += delta;
+                        bubble.textContent = aiText;
+                        const box = document.getElementById("aiMessages");
+                        box.scrollTop = box.scrollHeight;
+                    }
+                } catch (e) { /* baris SSE bukan JSON, lewati */ }
+            }
+        }
+
+        if (!aiText) {
+            bubble.classList.remove("typing");
+            bubble.textContent = "AI tidak memberikan balasan. Coba kirim ulang pesan.";
+            aiHistory.pop();
+        } else {
+            aiHistory.push({ role: "assistant", content: aiText });
+        }
+        aiSaveHistory();
+
+    } catch (err) {
+        bubble.classList.remove("typing");
+        bubble.textContent = err instanceof TypeError
+            ? "Tidak bisa terhubung ke server. Periksa koneksi internet kamu."
+            : "Terjadi kesalahan: " + err.message;
+        aiHistory.pop();
+        aiSaveHistory();
+    } finally {
+        aiBusy = false;
+        sendBtn.disabled = false;
+    }
+}
+
+window.addEventListener("load", aiInit);
