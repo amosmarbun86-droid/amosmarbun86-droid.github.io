@@ -282,12 +282,29 @@ window.addEventListener("resize", () => {
 // =========================
 function openWindow(id) {
     const win = document.getElementById(id);
-    if (win) win.style.display = "flex";
+    if (!win) return;
+
+    // File Manager selalu minta password setiap dibuka (bukan kalau sudah terbuka)
+    if (id === "filesWindow" && win.style.display !== "flex") filesLock();
+
+    win.style.display = "flex";
+
+    if (id === "filesWindow") {
+        const pass = document.getElementById("filesPassInput");
+        if (pass) pass.focus();
+    }
 }
 
 function closeWindow(id) {
     const win = document.getElementById(id);
-    if (win) win.style.display = "none";
+    if (!win) return;
+
+    if (id === "filesWindow") {
+        if (filesDirty && !confirm("Perubahan belum disimpan. Tutup tanpa menyimpan?")) return;
+        filesLock(); // kunci lagi & hapus password dari memori
+    }
+
+    win.style.display = "none";
 }
 
 // =========================
@@ -935,3 +952,377 @@ async function aiSend() {
 }
 
 window.addEventListener("load", aiInit);
+
+
+// =========================
+// 📁 AMOS FILE MANAGER (data di server, password setiap dibuka)
+// =========================
+const FILES_API_URL = "https://openrouter-chat-web.vercel.app/api/files";
+
+let filesPassword = null;   // hanya di memori, hilang saat window ditutup / dikunci
+let filesNodes = [];        // [{ id, type, name, parent, size, updatedAt }]
+let filesCurrent = null;    // id folder yang sedang dibuka (null = root)
+let filesPending = null;    // { kind: "folder" | "file" | "rename", id }
+let filesEditingId = null;
+let filesDirty = false;
+let filesBusy = false;
+
+function filesSetStatus(text, isError) {
+    const el = document.getElementById("filesStatus");
+    el.textContent = text || "";
+    el.style.color = isError ? "#ff4d6d" : "#00ff9f";
+}
+
+function filesLock() {
+    filesPassword = null;
+    filesNodes = [];
+    filesCurrent = null;
+    filesPending = null;
+    filesEditingId = null;
+    filesDirty = false;
+
+    document.getElementById("filesList").innerHTML = "";
+    document.getElementById("filesEditText").value = "";
+    document.getElementById("filesNameBar").style.display = "none";
+    document.getElementById("filesEditor").style.display = "none";
+    document.getElementById("filesBrowser").style.display = "flex";
+    document.getElementById("filesApp").style.display = "none";
+    document.getElementById("filesGate").style.display = "block";
+    document.getElementById("filesPassInput").value = "";
+    filesSetStatus("");
+}
+
+async function filesApi(action, data) {
+    const response = await fetch(FILES_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: action, password: filesPassword, ...(data || {}) })
+    });
+
+    let json = {};
+    try { json = await response.json(); } catch (e) { /* respons bukan JSON */ }
+
+    if (!response.ok) {
+        const err = new Error(json.error || "Terjadi kesalahan di server");
+        err.status = response.status;
+        throw err;
+    }
+    return json;
+}
+
+function filesErrorText(e) {
+    if (e instanceof TypeError) return "Tidak bisa terhubung ke server. Periksa koneksi internet.";
+    return e.message;
+}
+
+// Kalau password ditolak server (401) → kunci lagi. Selain itu tampilkan pesan.
+function filesHandleError(e) {
+    if (e.status === 401) {
+        filesLock();
+        const err = document.getElementById("filesGateError");
+        err.style.color = "#ff4d6d";
+        err.textContent = "Password salah / sesi berakhir.";
+        return;
+    }
+    filesSetStatus(filesErrorText(e), true);
+}
+
+// ----- Buka / kunci -----
+async function filesSubmitPassword() {
+    if (filesBusy) return;
+
+    const input = document.getElementById("filesPassInput");
+    const err = document.getElementById("filesGateError");
+    const val = input.value;
+    if (!val) return;
+
+    filesBusy = true;
+    err.style.color = "#00ff9f";
+    err.textContent = "Memeriksa...";
+    filesPassword = val;
+
+    try {
+        await filesApi("auth");
+        input.value = "";
+        err.textContent = "";
+        document.getElementById("filesGate").style.display = "none";
+        document.getElementById("filesApp").style.display = "flex";
+    } catch (e) {
+        filesPassword = null;
+        err.style.color = "#ff4d6d";
+        err.textContent = e.status === 401 ? "Password salah." : filesErrorText(e);
+        filesBusy = false;
+        return;
+    }
+
+    filesBusy = false;
+    await filesRefresh();
+}
+
+// ----- Muat & tampilkan -----
+async function filesRefresh() {
+    if (!filesPassword) return;
+    try {
+        filesSetStatus("Memuat...");
+        const data = await filesApi("list");
+        filesNodes = data.nodes || [];
+        if (filesCurrent && !filesNodes.some((n) => n.id === filesCurrent)) filesCurrent = null;
+        filesRender();
+        filesSetStatus("");
+    } catch (e) {
+        filesHandleError(e);
+    }
+}
+
+function filesFormatSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    return (bytes / 1024).toFixed(1) + " KB";
+}
+
+function filesRenderPath() {
+    const path = document.getElementById("filesPath");
+    path.innerHTML = "";
+
+    const chain = [];
+    let id = filesCurrent;
+    let guard = 0;
+    while (id && guard++ < 50) {
+        const node = filesNodes.find((n) => n.id === id);
+        if (!node) break;
+        chain.unshift(node);
+        id = node.parent || null;
+    }
+
+    const root = document.createElement("span");
+    root.textContent = "🏠 Root";
+    root.addEventListener("click", () => filesOpenFolder(null));
+    path.appendChild(root);
+
+    chain.forEach((node) => {
+        path.appendChild(document.createTextNode(" / "));
+        const seg = document.createElement("span");
+        seg.textContent = node.name;
+        seg.addEventListener("click", () => filesOpenFolder(node.id));
+        path.appendChild(seg);
+    });
+}
+
+function filesRender() {
+    filesRenderPath();
+
+    const list = document.getElementById("filesList");
+    list.innerHTML = "";
+
+    const items = filesNodes
+        .filter((n) => (n.parent || null) === filesCurrent)
+        .sort((a, b) => {
+            if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
+
+    if (items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "files-empty";
+        empty.textContent = "Folder kosong.";
+        list.appendChild(empty);
+        return;
+    }
+
+    items.forEach((node) => {
+        const row = document.createElement("div");
+        row.className = "files-row";
+
+        const icon = document.createElement("span");
+        icon.className = "files-icon";
+        icon.textContent = node.type === "folder" ? "📁" : "📄";
+
+        const name = document.createElement("span");
+        name.className = "files-name";
+        name.textContent = node.name;
+        name.addEventListener("click", () => {
+            if (node.type === "folder") filesOpenFolder(node.id);
+            else filesOpenFile(node.id);
+        });
+
+        const meta = document.createElement("span");
+        meta.className = "files-meta";
+        meta.textContent = node.type === "file" ? filesFormatSize(node.size || 0) : "";
+
+        const renameBtn = document.createElement("button");
+        renameBtn.textContent = "✏️";
+        renameBtn.title = "Ganti nama";
+        renameBtn.addEventListener("click", () =>
+            filesAsk("rename", node.id, "Nama baru:", node.name)
+        );
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "🗑";
+        delBtn.title = "Hapus";
+        delBtn.addEventListener("click", () => filesDelete(node));
+
+        row.append(icon, name, meta, renameBtn, delBtn);
+        list.appendChild(row);
+    });
+}
+
+// ----- Navigasi -----
+function filesOpenFolder(id) {
+    filesCurrent = id;
+    filesCancelName();
+    filesRender();
+}
+
+function filesGoUp() {
+    if (!filesCurrent) return;
+    const node = filesNodes.find((n) => n.id === filesCurrent);
+    filesOpenFolder(node ? node.parent || null : null);
+}
+
+// ----- Buat folder / file / ganti nama -----
+function filesNewFolder() {
+    filesAsk("folder", null, "Nama folder:", "");
+}
+
+function filesNewFile() {
+    filesAsk("file", null, "Nama file:", "");
+}
+
+function filesAsk(kind, id, label, value) {
+    filesPending = { kind: kind, id: id };
+    document.getElementById("filesNameLabel").textContent = label;
+    const input = document.getElementById("filesNameInput");
+    input.value = value || "";
+    document.getElementById("filesNameBar").style.display = "flex";
+    input.focus();
+    input.select();
+}
+
+function filesCancelName() {
+    filesPending = null;
+    document.getElementById("filesNameBar").style.display = "none";
+    document.getElementById("filesNameInput").value = "";
+}
+
+async function filesConfirmName() {
+    if (!filesPending || filesBusy) return;
+
+    const name = document.getElementById("filesNameInput").value.trim();
+    if (!name) return;
+
+    const pending = filesPending;
+    filesBusy = true;
+
+    try {
+        filesSetStatus("Menyimpan...");
+        if (pending.kind === "rename") {
+            await filesApi("update", { id: pending.id, name: name });
+        } else {
+            await filesApi("create", {
+                type: pending.kind,
+                name: name,
+                parent: filesCurrent,
+                content: ""
+            });
+        }
+        filesCancelName();
+        filesBusy = false;
+        await filesRefresh();
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+// ----- Hapus -----
+async function filesDelete(node) {
+    if (filesBusy) return;
+
+    const msg = node.type === "folder"
+        ? `Hapus folder "${node.name}" beserta SEMUA isinya?`
+        : `Hapus file "${node.name}"?`;
+    if (!confirm(msg)) return;
+
+    filesBusy = true;
+    try {
+        filesSetStatus("Menghapus...");
+        await filesApi("delete", { id: node.id });
+        filesBusy = false;
+        await filesRefresh();
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+// ----- Editor file -----
+async function filesOpenFile(id) {
+    if (filesBusy) return;
+    filesBusy = true;
+
+    try {
+        filesSetStatus("Membuka...");
+        const data = await filesApi("read", { id: id });
+        filesEditingId = id;
+        filesDirty = false;
+        document.getElementById("filesEditTitle").textContent = data.node.name;
+        document.getElementById("filesEditText").value = data.content || "";
+        document.getElementById("filesBrowser").style.display = "none";
+        document.getElementById("filesEditor").style.display = "flex";
+        filesSetStatus("");
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+async function filesSaveFile() {
+    if (!filesEditingId || filesBusy) return;
+    filesBusy = true;
+
+    try {
+        filesSetStatus("Menyimpan...");
+        await filesApi("update", {
+            id: filesEditingId,
+            content: document.getElementById("filesEditText").value
+        });
+        filesDirty = false;
+        filesSetStatus("Tersimpan ✅");
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+async function filesCloseEditor() {
+    if (filesDirty && !confirm("Perubahan belum disimpan. Tutup tanpa menyimpan?")) return;
+
+    filesEditingId = null;
+    filesDirty = false;
+    document.getElementById("filesEditText").value = "";
+    document.getElementById("filesEditor").style.display = "none";
+    document.getElementById("filesBrowser").style.display = "flex";
+    await filesRefresh();
+}
+
+// ----- Init -----
+function filesInit() {
+    document.getElementById("filesPassInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") filesSubmitPassword();
+    });
+
+    const nameInput = document.getElementById("filesNameInput");
+    nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") filesConfirmName();
+        if (e.key === "Escape") filesCancelName();
+    });
+
+    document.getElementById("filesEditText").addEventListener("input", () => {
+        filesDirty = true;
+    });
+}
+
+window.addEventListener("load", filesInit);
