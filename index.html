@@ -536,11 +536,38 @@
 
     </div>
 
-    <div class="window-content">
+    <div class="window-content ai-chat-content">
 
-        <h2>AMOS AI SYSTEM</h2>
+        <!-- GATE PASSWORD -->
+        <div id="aiGate" class="ai-gate">
+            <p>Masukkan password AI</p>
+            <input type="password" id="aiPassInput" placeholder="Password">
+            <button onclick="aiSubmitPassword()">Masuk</button>
+            <div id="aiGateError"></div>
+        </div>
 
-        <p>Welcome to AMOS AI Ecosystem</p>
+        <!-- CHAT -->
+        <div id="aiChat" class="ai-chat" style="display:none;">
+
+            <div class="ai-toolbar">
+                <select id="aiModel" onchange="aiSaveModel()">
+                    <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+                    <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                    <option value="google/gemini-flash-1.5">Gemini Flash 1.5</option>
+                    <option value="meta-llama/llama-3.1-8b-instruct:free">Llama 3.1 8B (free)</option>
+                </select>
+                <button onclick="aiNewChat()" title="Chat baru">＋ Baru</button>
+                <button onclick="aiLogout()" title="Keluar">Keluar</button>
+            </div>
+
+            <div id="aiMessages"></div>
+
+            <div class="ai-input-row">
+                <textarea id="aiInput" rows="1" placeholder="Tulis pesan..."></textarea>
+                <button id="aiSendBtn" onclick="aiSend()">➤</button>
+            </div>
+
+        </div>
 
     </div>
 
