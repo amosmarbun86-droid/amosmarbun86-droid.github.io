@@ -1151,3 +1151,59 @@ button{
 .shake-input {
     animation: charShake 0.5s ease-in-out;
 }
+
+
+/* =========================
+   AMOS AI CHAT WINDOW
+========================= */
+#aiWindow { width: 460px; height: 500px; }
+
+.ai-chat-content {
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-gate { margin: auto; text-align: center; }
+.ai-gate input {
+    display: block; margin: 10px auto; padding: 8px; width: 80%;
+    background: #001a12; color: #00ff9f; border: 1px solid #00ff9f;
+    border-radius: 8px; text-align: center;
+}
+.ai-gate button, .ai-toolbar button, .ai-input-row button {
+    background: #00ff9f; color: #000; border: none; border-radius: 8px;
+    padding: 6px 12px; cursor: pointer; font-weight: bold;
+}
+#aiGateError { color: #ff4d6d; font-size: 12px; min-height: 16px; margin-top: 6px; }
+
+.ai-chat { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.ai-toolbar { display: flex; gap: 6px; margin-bottom: 8px; }
+.ai-toolbar select {
+    flex: 1; min-width: 0; background: #001a12; color: #00ff9f;
+    border: 1px solid #00ff9f; border-radius: 8px; padding: 5px;
+}
+
+#aiMessages {
+    flex: 1; min-height: 0; overflow-y: auto; display: flex;
+    flex-direction: column; gap: 8px; padding: 4px 2px;
+}
+.ai-msg {
+    max-width: 88%; padding: 8px 12px; border-radius: 12px;
+    white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.4;
+}
+.ai-msg.user { align-self: flex-end; background: #00ff9f; color: #000; }
+.ai-msg.ai { align-self: flex-start; background: #062b21; border: 1px solid #00ff9f55; color: #d6ffef; }
+.ai-msg.typing { opacity: .6; font-style: italic; }
+
+.ai-input-row { display: flex; gap: 6px; margin-top: 8px; align-items: flex-end; }
+.ai-input-row textarea {
+    flex: 1; resize: none; max-height: 90px; padding: 8px;
+    background: #001a12; color: #00ff9f; border: 1px solid #00ff9f;
+    border-radius: 8px; font-family: inherit; font-size: 14px;
+}
+.ai-input-row button:disabled { opacity: .5; cursor: not-allowed; }
+
+@media (max-width: 768px) {
+    #aiWindow { width: 90%; height: 70%; }
+}
