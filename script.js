@@ -280,6 +280,8 @@ window.addEventListener("resize", () => {
 // =========================
 // 🪟 WINDOW SYSTEM
 // =========================
+let windowTopZ = 9999; // z-index tertinggi saat ini, naik setiap ada jendela dibuka / disentuh
+
 function openWindow(id) {
     const win = document.getElementById(id);
     if (!win) return;
@@ -288,6 +290,7 @@ function openWindow(id) {
     if (id === "filesWindow" && win.style.display !== "flex") filesLock();
 
     win.style.display = "flex";
+    win.style.zIndex = ++windowTopZ; // tampil di depan jendela lain (mis. di atas Terminal)
 
     if (id === "filesWindow") {
         const pass = document.getElementById("filesPassInput");
@@ -1855,7 +1858,7 @@ const TERM_COMMANDS = {
         const app = found[0];
         if (app.win) {
             openWindow(app.win);
-            termWrite("Membuka " + app.label + "...\n");
+            termWrite("Membuka " + app.label + " di depan Terminal. Tutup dengan ✕ untuk kembali; buka Terminal lagi lewat ikonnya.\n");
             return;
         }
         const opened = window.open(app.url, "_blank");
@@ -2437,3 +2440,11 @@ function termInit() {
 }
 
 window.addEventListener("load", termInit);
+
+
+// Sentuh jendela mana pun → naik ke depan
+window.addEventListener("load", () => {
+    document.querySelectorAll(".app-window").forEach((w) => {
+        w.addEventListener("pointerdown", () => { w.style.zIndex = ++windowTopZ; });
+    });
+});
