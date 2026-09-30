@@ -1283,3 +1283,38 @@ button{
 }
 .files-view-stage img, .files-view-stage video { max-width: 100%; max-height: 100%; }
 .files-view-stage audio { width: 100%; }
+
+
+/* =========================
+   AMOS TERMINAL WINDOW
+========================= */
+#terminalWindow { width: 560px; height: 440px; }
+
+.term-content {
+    padding: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#termHost {
+    flex: 1;
+    min-height: 0;
+    background: #000c08;
+    border: 1px solid #00ff9f55;
+    border-radius: 8px;
+    padding: 4px;
+    overflow: hidden;
+    color: #00ff9f;
+    font-size: 13px;
+}
+
+.term-keys { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.term-key {
+    background: #062b21; color: #00ff9f; border: 1px solid #00ff9f66;
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; font-family: inherit;
+}
+
+@media (max-width: 768px) {
+    #terminalWindow { width: 90%; height: 70%; }
+}
