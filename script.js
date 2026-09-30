@@ -966,6 +966,8 @@ let filesPending = null;    // { kind: "folder" | "file" | "rename", id }
 let filesEditingId = null;
 let filesDirty = false;
 let filesBusy = false;
+let filesViewingNode = null; // file unggahan yang sedang dipratinjau
+let filesViewingUrl = null;
 
 function filesSetStatus(text, isError) {
     const el = document.getElementById("filesStatus");
@@ -985,6 +987,10 @@ function filesLock() {
     document.getElementById("filesEditText").value = "";
     document.getElementById("filesNameBar").style.display = "none";
     document.getElementById("filesEditor").style.display = "none";
+    document.getElementById("filesViewer").style.display = "none";
+    document.getElementById("filesViewStage").innerHTML = "";
+    filesViewingNode = null;
+    filesViewingUrl = null;
     document.getElementById("filesBrowser").style.display = "flex";
     document.getElementById("filesApp").style.display = "none";
     document.getElementById("filesGate").style.display = "block";
@@ -1134,19 +1140,20 @@ function filesRender() {
 
         const icon = document.createElement("span");
         icon.className = "files-icon";
-        icon.textContent = node.type === "folder" ? "📁" : "📄";
+        icon.textContent = filesNodeIcon(node);
 
         const name = document.createElement("span");
         name.className = "files-name";
         name.textContent = node.name;
         name.addEventListener("click", () => {
             if (node.type === "folder") filesOpenFolder(node.id);
+            else if (node.type === "upload") filesOpenUpload(node);
             else filesOpenFile(node.id);
         });
 
         const meta = document.createElement("span");
         meta.className = "files-meta";
-        meta.textContent = node.type === "file" ? filesFormatSize(node.size || 0) : "";
+        meta.textContent = node.type === "folder" ? "" : filesFormatSize(node.size || 0);
 
         const renameBtn = document.createElement("button");
         renameBtn.textContent = "✏️";
@@ -1308,6 +1315,186 @@ async function filesCloseEditor() {
     await filesRefresh();
 }
 
+// ----- Upload foto / musik / file lain (disimpan di Supabase, bucket private) -----
+function filesNodeIcon(node) {
+    if (node.type === "folder") return "📁";
+    if (node.type === "upload") {
+        const mime = node.mime || "";
+        if (mime.startsWith("image/")) return "🖼️";
+        if (mime.startsWith("audio/")) return "🎵";
+        if (mime.startsWith("video/")) return "🎬";
+        return "📎";
+    }
+    return "📄";
+}
+
+function filesTriggerUpload() {
+    if (filesBusy) return;
+    document.getElementById("filesUploadInput").click();
+}
+
+function filesXhrPut(url, body, headers, onProgress) {
+    return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", url);
+        Object.keys(headers || {}).forEach((k) => xhr.setRequestHeader(k, headers[k]));
+        xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable && onProgress) onProgress(Math.round((e.loaded / e.total) * 100));
+        };
+        xhr.onload = () => resolve({ status: xhr.status, text: xhr.responseText });
+        xhr.onerror = () => reject(new TypeError("network"));
+        xhr.send(body);
+    });
+}
+
+// Kirim file langsung ke Supabase lewat link upload sementara dari server
+async function filesPutFile(url, file, onProgress) {
+    const form = new FormData();
+    form.append("cacheControl", "3600");
+    form.append("", file);
+
+    let res = await filesXhrPut(url, form, { "x-upsert": "false" }, onProgress);
+    if (res.status >= 200 && res.status < 300) return;
+
+    // Cadangan: kirim isi file mentah
+    res = await filesXhrPut(
+        url,
+        file,
+        { "Content-Type": file.type || "application/octet-stream", "x-upsert": "true" },
+        onProgress
+    );
+    if (!(res.status >= 200 && res.status < 300)) {
+        throw new Error("Upload ke penyimpanan gagal (kode " + res.status + ")");
+    }
+}
+
+async function filesUploadSelected(fileList) {
+    const files = Array.from(fileList || []);
+    if (files.length === 0 || filesBusy || !filesPassword) return;
+
+    filesBusy = true;
+    const parent = filesCurrent;
+    const failed = [];
+    let done = 0;
+
+    try {
+        for (let i = 0; i < files.length; i++) {
+            if (!filesPassword) break; // window dikunci saat upload berjalan
+            const file = files[i];
+            const label = "Mengunggah " + (i + 1) + "/" + files.length + ": " + file.name;
+
+            try {
+                filesSetStatus(label + " (menyiapkan...)");
+                const mime = file.type || "application/octet-stream";
+                const init = await filesApi("upload-init", {
+                    name: file.name, parent: parent, size: file.size, mime: mime
+                });
+
+                await filesPutFile(init.uploadUrl, file, (pct) => {
+                    filesSetStatus(label + " (" + pct + "%)");
+                });
+
+                filesSetStatus(label + " (menyimpan...)");
+                await filesApi("upload-commit", {
+                    id: init.id, name: file.name, parent: parent, mime: mime, size: file.size
+                });
+                done++;
+            } catch (e) {
+                if (e.status === 401) { filesHandleError(e); return; }
+                failed.push(file.name + " — " + filesErrorText(e));
+            }
+        }
+    } finally {
+        filesBusy = false;
+    }
+
+    if (!filesPassword) return;
+    await filesRefresh();
+    if (failed.length) {
+        filesSetStatus("Berhasil " + done + ", gagal " + failed.length + ": " + failed[0], true);
+    } else {
+        filesSetStatus("Upload selesai ✅ (" + done + " file)");
+    }
+}
+
+// ----- Pratinjau / unduh file unggahan -----
+async function filesOpenUpload(node) {
+    if (filesBusy) return;
+    filesBusy = true;
+
+    try {
+        filesSetStatus("Membuka...");
+        const data = await filesApi("download-url", { id: node.id });
+        filesViewingNode = node;
+        filesViewingUrl = data.url;
+
+        const stage = document.getElementById("filesViewStage");
+        stage.innerHTML = "";
+        const mime = node.mime || "";
+        let el;
+
+        if (mime.startsWith("image/")) {
+            el = document.createElement("img");
+            el.alt = node.name;
+            el.src = data.url;
+        } else if (mime.startsWith("audio/")) {
+            el = document.createElement("audio");
+            el.controls = true;
+            el.src = data.url;
+        } else if (mime.startsWith("video/")) {
+            el = document.createElement("video");
+            el.controls = true;
+            el.playsInline = true;
+            el.src = data.url;
+        } else {
+            el = document.createElement("div");
+            el.className = "files-empty";
+            el.textContent = "Tidak ada pratinjau untuk jenis file ini. Ketuk Unduh untuk membukanya.";
+        }
+        stage.appendChild(el);
+
+        document.getElementById("filesViewTitle").textContent = node.name;
+        document.getElementById("filesBrowser").style.display = "none";
+        document.getElementById("filesViewer").style.display = "flex";
+        filesSetStatus("");
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+async function filesDownloadCurrent() {
+    if (!filesViewingNode || filesBusy) return;
+    filesBusy = true;
+
+    try {
+        filesSetStatus("Menyiapkan unduhan...");
+        const data = await filesApi("download-url", { id: filesViewingNode.id, download: true });
+        const a = document.createElement("a");
+        a.href = data.url;
+        a.target = "_blank";
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        filesSetStatus("");
+    } catch (e) {
+        filesHandleError(e);
+    } finally {
+        filesBusy = false;
+    }
+}
+
+function filesCloseViewer() {
+    document.getElementById("filesViewStage").innerHTML = ""; // hentikan audio/video
+    filesViewingNode = null;
+    filesViewingUrl = null;
+    document.getElementById("filesViewer").style.display = "none";
+    document.getElementById("filesBrowser").style.display = "flex";
+    filesSetStatus("");
+}
+
 // ----- Init -----
 function filesInit() {
     document.getElementById("filesPassInput").addEventListener("keydown", (e) => {
@@ -1322,6 +1509,13 @@ function filesInit() {
 
     document.getElementById("filesEditText").addEventListener("input", () => {
         filesDirty = true;
+    });
+
+    const uploadInput = document.getElementById("filesUploadInput");
+    uploadInput.addEventListener("change", () => {
+        const picked = Array.from(uploadInput.files || []);
+        uploadInput.value = ""; // supaya file yang sama bisa dipilih lagi
+        filesUploadSelected(picked);
     });
 }
 
