@@ -1764,10 +1764,38 @@ async function termCreate(path, type, content) {
     await termReload();
 }
 
+// ----- Peluncur: jendela Amos OS + menu sidebar -----
+const TERM_WINDOWS = [
+    { key: "ai", label: "AI", win: "aiWindow" },
+    { key: "browser", label: "Browser", win: "browserWindow" },
+    { key: "music", label: "Music", win: "musicWindow" },
+    { key: "files", label: "Files", win: "filesWindow" }
+];
+
+function termSlug(text) {
+    return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+// Daftar halaman diambil langsung dari menu sidebar, jadi ikut otomatis kalau menu ditambah
+function termLaunchers() {
+    const list = TERM_WINDOWS.map((w) => ({ key: w.key, label: w.label, win: w.win }));
+    document.querySelectorAll("#sidebar .side-item").forEach((el) => {
+        const m = (el.getAttribute("onclick") || "").match(/openExternal\('([^']+)'\)/);
+        if (!m || m[1] === "#") return;
+        const label = (el.textContent || "").replace(/\s+/g, " ").trim();
+        const key = termSlug(label);
+        if (key && !list.some((x) => x.key === key)) list.push({ key: key, label: label, url: m[1] });
+    });
+    return list;
+}
+
 // ----- Perintah -----
 const TERM_HELP = [
     "Perintah umum:",
     "  help, clear, echo, date, whoami, uname, history, exit",
+    "Buka aplikasi:",
+    "  apps                daftar jendela & halaman menu sidebar",
+    "  open <nama>         buka (mis. open files, open lock)",
     "Akun:",
     "  login / logout      masuk ke File Manager (password server)",
     "  ailogin             simpan password chat AI",
@@ -1802,6 +1830,38 @@ const TERM_COMMANDS = {
     },
 
     exit: async () => { closeWindow("terminalWindow"); },
+
+    apps: async () => {
+        const list = termLaunchers();
+        termWrite(termColor("cyan", "Jendela Amos OS:") + "\n  " + list.filter((x) => x.win).map((x) => x.key).join(", ") + "\n");
+        termWrite(termColor("cyan", "Halaman (tab baru):") + "\n  " + list.filter((x) => x.url).map((x) => x.key).join(", ") + "\n");
+        termWrite(termColor("dim", "Pakai: open <nama>  (nama boleh disingkat, mis. open lock)") + "\n");
+    },
+
+    open: async (args) => {
+        const query = termSlug(args.join(" "));
+        if (!query) { termWrite("pemakaian: open <nama>  (ketik 'apps' untuk daftar)\n"); return; }
+        if (query === "terminal") { termWrite("Terminal sudah terbuka.\n"); return; }
+
+        const list = termLaunchers();
+        let found = list.filter((x) => x.key === query);
+        if (!found.length) found = list.filter((x) => x.key.includes(query));
+        if (!found.length) throw new Error("tidak ada aplikasi '" + args.join(" ") + "'. Ketik 'apps' untuk daftar.");
+        if (found.length > 1) {
+            termWrite("Maksud kamu yang mana? " + found.map((x) => x.key).join(", ") + "\n");
+            return;
+        }
+
+        const app = found[0];
+        if (app.win) {
+            openWindow(app.win);
+            termWrite("Membuka " + app.label + "...\n");
+            return;
+        }
+        const opened = window.open(app.url, "_blank");
+        if (!opened) termWrite(termColor("yellow", "Browser memblokir popup. Izinkan popup untuk situs ini lalu ulangi.\n"));
+        else termWrite("Membuka " + app.label + " di tab baru...\n");
+    },
 
     echo: async (args, redirect) => {
         const text = args.join(" ");
@@ -2152,8 +2212,11 @@ function termComplete() {
     const isFirst = before.slice(0, tokenStart).trim() === "";
 
     let candidates = [];
+    const firstWord = before.trim().split(/\s+/)[0];
     if (isFirst) {
         candidates = Object.keys(TERM_COMMANDS).filter((n) => n.startsWith(token.toLowerCase()));
+    } else if (firstWord === "open") {
+        candidates = termLaunchers().map((x) => x.key).filter((k) => k.startsWith(token.toLowerCase()));
     } else if (termPassword) {
         const slash = token.lastIndexOf("/");
         const dirPart = slash === -1 ? "" : token.slice(0, slash + 1);
