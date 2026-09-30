@@ -293,6 +293,8 @@ function openWindow(id) {
         const pass = document.getElementById("filesPassInput");
         if (pass) pass.focus();
     }
+
+    if (id === "terminalWindow") termOpen();
 }
 
 function closeWindow(id) {
@@ -303,6 +305,8 @@ function closeWindow(id) {
         if (filesDirty && !confirm("Perubahan belum disimpan. Tutup tanpa menyimpan?")) return;
         filesLock(); // kunci lagi & hapus password dari memori
     }
+
+    if (id === "terminalWindow") termClose(); // hapus sesi & password terminal
 
     win.style.display = "none";
 }
@@ -1520,3 +1524,853 @@ function filesInit() {
 }
 
 window.addEventListener("load", filesInit);
+
+
+// =========================
+// 💻 AMOS TERMINAL (xterm.js + shell buatan sendiri, berjalan di browser)
+// =========================
+// Perintah file memakai API File Manager yang sama (data di server, perlu password).
+// Perintah "ai" memakai backend chat AI. Tidak ada eksekusi kode di server.
+
+let termInstance = null;
+let termFitAddon = null;
+let termSession = 0;          // naik setiap terminal dibuka / ditutup
+let termPassword = null;      // password File Manager, hanya di memori
+let termNodes = [];           // cache daftar folder & file dari server
+let termCwd = null;           // id folder aktif (null = root)
+let termLine = "";
+let termCursor = 0;
+let termHistory = [];
+let termHistIdx = 0;
+let termHistDraft = "";
+let termBusy = false;
+let termMode = "shell";       // "shell" | "password"
+let termPassCb = null;
+let termAbort = null;
+let termAiHistory = [];
+
+const TERM_ROOT = { id: null, type: "folder", name: "~" };
+const TERM_C = {
+    reset: "\x1b[0m", red: "\x1b[31m", green: "\x1b[32m", yellow: "\x1b[33m",
+    blue: "\x1b[1;34m", magenta: "\x1b[35m", cyan: "\x1b[36m", dim: "\x1b[90m", boldGreen: "\x1b[1;32m"
+};
+
+function termColor(name, text) {
+    return TERM_C[name] + text + TERM_C.reset;
+}
+
+function termWrite(text) {
+    if (!termInstance) return;
+    termInstance.write(String(text).replace(/\r?\n/g, "\r\n"));
+}
+
+// ----- Path & node -----
+function termPathOf(id) {
+    if (!id) return "~";
+    const parts = [];
+    let cur = id;
+    let guard = 0;
+    while (cur && guard++ < 50) {
+        const n = termNodes.find((x) => x.id === cur);
+        if (!n) break;
+        parts.unshift(n.name);
+        cur = n.parent || null;
+    }
+    return "~/" + parts.join("/");
+}
+
+function termNodeById(id) {
+    if (!id) return TERM_ROOT;
+    return termNodes.find((n) => n.id === id) || null;
+}
+
+function termFindChild(parentId, name) {
+    const lower = name.toLowerCase();
+    return termNodes.find((n) => (n.parent || null) === parentId && n.name.toLowerCase() === lower) || null;
+}
+
+// Kembalikan node (atau TERM_ROOT); null kalau tidak ditemukan
+function termResolve(path) {
+    let cur;
+    if (path.startsWith("/") || path === "~" || path.startsWith("~/")) cur = TERM_ROOT;
+    else cur = termNodeById(termCwd) || TERM_ROOT;
+
+    for (const p of path.split("/")) {
+        if (p === "" || p === "." || p === "~") continue;
+        if (p === "..") {
+            cur = cur.id ? (termNodeById(cur.parent || null) || TERM_ROOT) : TERM_ROOT;
+            continue;
+        }
+        if (cur.type !== "folder") return null;
+        const child = termFindChild(cur.id, p);
+        if (!child) return null;
+        cur = child;
+    }
+    return cur;
+}
+
+function termSplitPath(path) {
+    const idx = path.lastIndexOf("/");
+    if (idx === -1) return { dirPath: ".", base: path };
+    return { dirPath: path.slice(0, idx) || "/", base: path.slice(idx + 1) };
+}
+
+// ----- Prompt & baris input -----
+function termPromptText() {
+    return TERM_C.boldGreen + "amos@os" + TERM_C.reset + ":" + TERM_C.blue + termPathOf(termCwd) + TERM_C.reset + "$ ";
+}
+
+function termShowPrompt() {
+    if (!termInstance) return;
+    termInstance.write(termPromptText());
+}
+
+function termRedraw() {
+    if (!termInstance) return;
+    termInstance.write("\r\x1b[K" + termPromptText() + termLine);
+    const back = termLine.length - termCursor;
+    if (back > 0) termInstance.write("\x1b[" + back + "D");
+}
+
+function termSetLine(text) {
+    termLine = text;
+    termCursor = text.length;
+    termRedraw();
+}
+
+// ----- Parser perintah (kutip, backslash, redirect > dan >>) -----
+function termTokenize(line) {
+    const tokens = [];
+    let cur = "";
+    let inTok = false;
+    let quote = null;
+
+    for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+
+        if (quote) {
+            if (ch === quote) quote = null;
+            else if (ch === "\\" && quote === '"' && i + 1 < line.length) cur += line[++i];
+            else cur += ch;
+            continue;
+        }
+        if (ch === '"' || ch === "'") { quote = ch; inTok = true; continue; }
+        if (ch === "\\" && i + 1 < line.length) { cur += line[++i]; inTok = true; continue; }
+        if (/\s/.test(ch)) {
+            if (inTok) { tokens.push({ t: cur, op: false }); cur = ""; inTok = false; }
+            continue;
+        }
+        if (ch === ">") {
+            if (inTok) { tokens.push({ t: cur, op: false }); cur = ""; inTok = false; }
+            if (line[i + 1] === ">") { tokens.push({ t: ">>", op: true }); i++; }
+            else tokens.push({ t: ">", op: true });
+            continue;
+        }
+        cur += ch;
+        inTok = true;
+    }
+    if (quote) throw new Error("tanda kutip belum ditutup");
+    if (inTok) tokens.push({ t: cur, op: false });
+    return tokens;
+}
+
+function termParse(line) {
+    const tokens = termTokenize(line);
+    const args = [];
+    let redirect = null;
+    for (let i = 0; i < tokens.length; i++) {
+        const tk = tokens[i];
+        if (tk.op) {
+            const target = tokens[i + 1];
+            if (!target || target.op) throw new Error("tujuan redirect kosong");
+            redirect = { append: tk.t === ">>", path: target.t };
+            i++;
+        } else {
+            args.push(tk.t);
+        }
+    }
+    return { args: args, redirect: redirect };
+}
+
+// ----- API File Manager -----
+async function termApi(action, data) {
+    const response = await fetch(FILES_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: action, password: termPassword, ...(data || {}) })
+    });
+    let json = {};
+    try { json = await response.json(); } catch (e) { /* bukan JSON */ }
+    if (!response.ok) {
+        const err = new Error(json.error || "Terjadi kesalahan di server");
+        err.status = response.status;
+        throw err;
+    }
+    return json;
+}
+
+async function termReload() {
+    const data = await termApi("list");
+    termNodes = data.nodes || [];
+    if (termCwd && !termNodes.some((n) => n.id === termCwd)) termCwd = null;
+}
+
+function termFail(e) {
+    if (!termInstance) return;
+    if (e && e.name === "AbortError") return;
+    if (e && e.status === 401) {
+        termPassword = null;
+        termNodes = [];
+        termCwd = null;
+        termWrite(termColor("red", "Password salah atau sesi berakhir. Ketik: login\n"));
+        return;
+    }
+    const msg = e instanceof TypeError
+        ? "Tidak bisa terhubung ke server. Periksa koneksi internet."
+        : (e && e.message) || "Terjadi kesalahan";
+    termWrite(termColor("red", msg + "\n"));
+}
+
+function termRequireLogin() {
+    if (termPassword) return true;
+    termWrite(termColor("yellow", "Belum login. Ketik: login\n"));
+    return false;
+}
+
+function termReadPassword(label) {
+    return new Promise((resolve) => {
+        termMode = "password";
+        termPassCb = resolve;
+        termLine = "";
+        termCursor = 0;
+        termWrite(label);
+    });
+}
+
+function termFmtSize(bytes) {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1024 / 1024).toFixed(1) + " MB";
+}
+
+// Buat folder / file di path tertentu
+async function termCreate(path, type, content) {
+    const { dirPath, base } = termSplitPath(path);
+    const dir = termResolve(dirPath);
+    if (!dir || dir.type !== "folder") throw new Error("folder tujuan tidak ada: " + dirPath);
+    if (!base || base === "." || base === "..") throw new Error("nama tidak valid: " + path);
+    if (termFindChild(dir.id, base)) throw new Error("sudah ada: " + path);
+    await termApi("create", { type: type, name: base, parent: dir.id, content: content || "" });
+    await termReload();
+}
+
+// ----- Perintah -----
+const TERM_HELP = [
+    "Perintah umum:",
+    "  help, clear, echo, date, whoami, uname, history, exit",
+    "Akun:",
+    "  login / logout      masuk ke File Manager (password server)",
+    "  ailogin             simpan password chat AI",
+    "File (setelah login):",
+    "  ls [-l] [folder]    daftar isi",
+    "  cd <folder>         pindah folder (cd .. naik, cd ~ ke root)",
+    "  pwd                 lokasi sekarang",
+    "  mkdir <nama>...     buat folder",
+    "  touch <nama>...     buat file kosong",
+    "  cat <file>          tampilkan isi file teks",
+    "  echo teks > file    tulis ke file (>> untuk menambah)",
+    "  rm [-r] <nama>...   hapus file / folder",
+    "  mv <lama> <baru>    ganti nama",
+    "AI:",
+    "  ai <pertanyaan>     tanya AI (Ctrl+C untuk batal)",
+    "Tab = lengkapi, ↑/↓ = riwayat"
+].join("\n") + "\n";
+
+const TERM_COMMANDS = {
+    help: async () => { termWrite(TERM_HELP); },
+
+    clear: async () => { termWrite("\x1b[2J\x1b[3J\x1b[H"); },
+
+    date: async () => { termWrite(new Date().toLocaleString("id-ID") + "\n"); },
+
+    whoami: async () => { termWrite("amos\n"); },
+
+    uname: async () => { termWrite("AmosOS 1.0 (browser)\n"); },
+
+    history: async () => {
+        termHistory.forEach((h, i) => termWrite(String(i + 1).padStart(4, " ") + "  " + h + "\n"));
+    },
+
+    exit: async () => { closeWindow("terminalWindow"); },
+
+    echo: async (args, redirect) => {
+        const text = args.join(" ");
+        if (!redirect) { termWrite(text + "\n"); return; }
+        if (!termRequireLogin()) return;
+
+        const target = termResolve(redirect.path);
+        if (target && target.type === "folder") throw new Error("'" + redirect.path + "' adalah folder");
+        if (target && target.type === "upload") throw new Error("'" + redirect.path + "' bukan file teks");
+
+        if (!target) {
+            await termCreate(redirect.path, "file", text + "\n");
+            return;
+        }
+        let content = text + "\n";
+        if (redirect.append) {
+            const data = await termApi("read", { id: target.id });
+            const old = data.content || "";
+            content = old + (old && !old.endsWith("\n") ? "\n" : "") + content;
+        }
+        await termApi("update", { id: target.id, content: content });
+        await termReload();
+    },
+
+    login: async () => {
+        const pw = await termReadPassword("Password File Manager: ");
+        if (!pw) return;
+        termPassword = pw;
+        try {
+            await termReload();
+            termWrite(termColor("green", "Login berhasil.\n"));
+        } catch (e) {
+            termPassword = null;
+            termNodes = [];
+            if (e.status === 401) termWrite(termColor("red", "Password salah.\n"));
+            else termFail(e);
+        }
+    },
+
+    logout: async () => {
+        termPassword = null;
+        termNodes = [];
+        termCwd = null;
+        termWrite("Logout. Password dihapus dari memori.\n");
+    },
+
+    ailogin: async () => {
+        const pw = await termReadPassword("Password chat AI: ");
+        if (!pw) return;
+        aiPassword = pw;
+        localStorage.setItem("amosAiPassword", pw);
+        if (typeof aiShowGateOrChat === "function") aiShowGateOrChat();
+        termWrite(termColor("green", "Password AI tersimpan di perangkat ini.\n"));
+    },
+
+    ls: async (args) => {
+        if (!termRequireLogin()) return;
+        let long = false;
+        const paths = [];
+        args.forEach((a) => {
+            if (a.startsWith("-") && a.length > 1) { if (a.includes("l")) long = true; }
+            else paths.push(a);
+        });
+
+        const node = termResolve(paths[0] || ".");
+        if (!node) throw new Error("tidak ada: " + paths[0]);
+
+        const items = node.type === "folder"
+            ? termNodes.filter((n) => (n.parent || null) === node.id)
+            : [node];
+        items.sort((a, b) => {
+            if ((a.type === "folder") !== (b.type === "folder")) return a.type === "folder" ? -1 : 1;
+            return a.name.localeCompare(b.name);
+        });
+
+        if (items.length === 0) return;
+
+        const label = (n) => {
+            if (n.type === "folder") return termColor("blue", n.name + "/");
+            if (n.type === "upload") return termColor("magenta", n.name);
+            return n.name;
+        };
+
+        if (!long) {
+            termWrite(items.map(label).join("  ") + "\n");
+            return;
+        }
+        items.forEach((n) => {
+            const kind = n.type === "folder" ? "d" : (n.type === "upload" ? "u" : "-");
+            const size = n.type === "folder" ? "-" : termFmtSize(n.size || 0);
+            const when = n.updatedAt ? new Date(n.updatedAt).toISOString().slice(0, 16).replace("T", " ") : "";
+            termWrite(kind + "  " + size.padStart(9, " ") + "  " + when + "  " + label(n) + "\n");
+        });
+    },
+
+    cd: async (args) => {
+        if (!termRequireLogin()) return;
+        const node = termResolve(args[0] || "~");
+        if (!node) throw new Error("tidak ada: " + args[0]);
+        if (node.type !== "folder") throw new Error("bukan folder: " + args[0]);
+        termCwd = node.id;
+    },
+
+    pwd: async () => {
+        if (!termRequireLogin()) return;
+        termWrite(termPathOf(termCwd) + "\n");
+    },
+
+    mkdir: async (args) => {
+        if (!termRequireLogin()) return;
+        if (!args.length) { termWrite("pemakaian: mkdir <nama>...\n"); return; }
+        for (const p of args) {
+            try { await termCreate(p, "folder", ""); }
+            catch (e) { if (e.status === 401) throw e; termWrite(termColor("red", "mkdir: " + e.message + "\n")); }
+        }
+    },
+
+    touch: async (args) => {
+        if (!termRequireLogin()) return;
+        if (!args.length) { termWrite("pemakaian: touch <nama>...\n"); return; }
+        for (const p of args) {
+            if (termResolve(p)) continue; // sudah ada
+            try { await termCreate(p, "file", ""); }
+            catch (e) { if (e.status === 401) throw e; termWrite(termColor("red", "touch: " + e.message + "\n")); }
+        }
+    },
+
+    cat: async (args) => {
+        if (!termRequireLogin()) return;
+        if (!args.length) { termWrite("pemakaian: cat <file>...\n"); return; }
+        for (const p of args) {
+            const node = termResolve(p);
+            if (!node) { termWrite(termColor("red", "cat: tidak ada: " + p + "\n")); continue; }
+            if (node.type === "folder") { termWrite(termColor("red", "cat: '" + p + "' adalah folder\n")); continue; }
+            if (node.type === "upload") {
+                termWrite(termColor("red", "cat: '" + p + "' bukan file teks (buka lewat File Manager)\n"));
+                continue;
+            }
+            const data = await termApi("read", { id: node.id });
+            const content = data.content || "";
+            termWrite(content + (content && !content.endsWith("\n") ? "\n" : ""));
+        }
+    },
+
+    rm: async (args) => {
+        if (!termRequireLogin()) return;
+        let recursive = false;
+        const targets = [];
+        args.forEach((a) => {
+            if (a.startsWith("-") && a.length > 1) { if (/[rR]/.test(a)) recursive = true; }
+            else targets.push(a);
+        });
+        if (!targets.length) { termWrite("pemakaian: rm [-r] <nama>...\n"); return; }
+
+        for (const t of targets) {
+            const node = termResolve(t);
+            if (!node) { termWrite(termColor("red", "rm: tidak ada: " + t + "\n")); continue; }
+            if (!node.id) { termWrite(termColor("red", "rm: root tidak bisa dihapus\n")); continue; }
+            if (node.type === "folder" && !recursive) {
+                termWrite(termColor("red", "rm: '" + t + "' adalah folder (pakai rm -r)\n"));
+                continue;
+            }
+            await termApi("delete", { id: node.id });
+            termWrite("dihapus: " + t + "\n");
+            await termReload();
+        }
+    },
+
+    mv: async (args) => {
+        if (!termRequireLogin()) return;
+        if (args.length !== 2) { termWrite("pemakaian: mv <lama> <baru>  (hanya ganti nama)\n"); return; }
+        if (args[1].includes("/")) throw new Error("mv hanya bisa ganti nama, tidak bisa pindah folder");
+        const node = termResolve(args[0]);
+        if (!node || !node.id) throw new Error("tidak ada: " + args[0]);
+        await termApi("update", { id: node.id, name: args[1] });
+        await termReload();
+    },
+
+    ai: async (args) => {
+        const prompt = args.join(" ").trim();
+        if (!prompt) { termWrite("pemakaian: ai <pertanyaan>\n"); return; }
+        if (!aiPassword) { termWrite(termColor("yellow", "Belum ada password AI. Ketik: ailogin\n")); return; }
+
+        termAiHistory.push({ role: "user", content: prompt });
+        termAiHistory = termAiHistory.slice(-10);
+
+        const controller = new AbortController();
+        termAbort = controller;
+        let text = "";
+
+        try {
+            const modelEl = document.getElementById("aiModel");
+            const response = await fetch(AI_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                signal: controller.signal,
+                body: JSON.stringify({
+                    messages: termAiHistory,
+                    model: (modelEl && modelEl.value) || "openai/gpt-4o-mini",
+                    stream: true,
+                    password: aiPassword
+                })
+            });
+
+            if (response.status === 401) {
+                termAiHistory.pop();
+                aiPassword = null;
+                localStorage.removeItem("amosAiPassword");
+                if (typeof aiShowGateOrChat === "function") aiShowGateOrChat();
+                termWrite(termColor("red", "Password AI salah. Ketik: ailogin\n"));
+                return;
+            }
+            if (!response.ok || !response.body) {
+                termAiHistory.pop();
+                termWrite(termColor("red", "Server AI bermasalah. Coba lagi nanti.\n"));
+                return;
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split("\n");
+                buffer = lines.pop();
+
+                for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed.startsWith("data:")) continue;
+                    const payload = trimmed.slice(5).trim();
+                    if (payload === "[DONE]") continue;
+                    try {
+                        const json = JSON.parse(payload);
+                        const delta = json.choices && json.choices[0] && json.choices[0].delta && json.choices[0].delta.content;
+                        if (delta) {
+                            text += delta;
+                            termWrite(delta);
+                        }
+                    } catch (e) { /* bukan JSON, lewati */ }
+                }
+            }
+
+            if (text) {
+                termAiHistory.push({ role: "assistant", content: text });
+                termWrite("\n");
+            } else {
+                termAiHistory.pop();
+                termWrite("(AI tidak memberi balasan)\n");
+            }
+        } catch (e) {
+            if (e.name === "AbortError") {
+                termAiHistory.pop();
+                termWrite(termColor("dim", "\n^C dibatalkan\n"));
+            } else {
+                termAiHistory.pop();
+                throw e;
+            }
+        }
+    }
+};
+
+async function termExecute(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    if (termHistory[termHistory.length - 1] !== trimmed) termHistory.push(trimmed);
+    if (termHistory.length > 100) termHistory.shift();
+
+    let parsed;
+    try {
+        parsed = termParse(trimmed);
+    } catch (e) {
+        termWrite(termColor("red", e.message + "\n"));
+        return;
+    }
+    if (!parsed.args.length) { termWrite(termColor("red", "perintah kosong\n")); return; }
+
+    const name = parsed.args[0].toLowerCase();
+    const fn = Object.prototype.hasOwnProperty.call(TERM_COMMANDS, name) ? TERM_COMMANDS[name] : null;
+    if (!fn) {
+        termWrite(termColor("red", name + ": perintah tidak ditemukan. Ketik 'help'.\n"));
+        return;
+    }
+    if (parsed.redirect && name !== "echo") {
+        termWrite(termColor("red", "redirect (>) hanya bisa dipakai dengan echo\n"));
+        return;
+    }
+
+    try {
+        await fn(parsed.args.slice(1), parsed.redirect);
+    } catch (e) {
+        termFail(e);
+    } finally {
+        termAbort = null;
+    }
+}
+
+async function termSubmit() {
+    const session = termSession;
+    const line = termLine;
+    termLine = "";
+    termCursor = 0;
+    termWrite("\r\n");
+    termBusy = true;
+
+    await termExecute(line);
+
+    if (session !== termSession) return; // terminal ditutup / dibuka ulang saat perintah berjalan
+    termBusy = false;
+    termHistIdx = termHistory.length;
+    termShowPrompt();
+}
+
+// ----- Input keyboard -----
+function termHistoryNav(dir) {
+    if (!termHistory.length) return;
+    if (termHistIdx >= termHistory.length) termHistDraft = termLine;
+
+    if (dir < 0) termHistIdx = Math.max(0, termHistIdx - 1);
+    else termHistIdx = Math.min(termHistory.length, termHistIdx + 1);
+
+    termSetLine(termHistIdx >= termHistory.length ? termHistDraft : termHistory[termHistIdx]);
+}
+
+function termHandleEscape(params, final) {
+    if (final === "A") termHistoryNav(-1);
+    else if (final === "B") termHistoryNav(1);
+    else if (final === "C") { if (termCursor < termLine.length) { termCursor++; termRedraw(); } }
+    else if (final === "D") { if (termCursor > 0) { termCursor--; termRedraw(); } }
+    else if (final === "H" || (final === "~" && (params === "1" || params === "7"))) { termCursor = 0; termRedraw(); }
+    else if (final === "F" || (final === "~" && (params === "4" || params === "8"))) { termCursor = termLine.length; termRedraw(); }
+    else if (final === "~" && params === "3") {
+        if (termCursor < termLine.length) {
+            termLine = termLine.slice(0, termCursor) + termLine.slice(termCursor + 1);
+            termRedraw();
+        }
+    }
+}
+
+function termComplete() {
+    const before = termLine.slice(0, termCursor);
+    const m = before.match(/(?:^|\s)([^\s]*)$/);
+    const token = m ? m[1] : "";
+    const tokenStart = before.length - token.length;
+    const isFirst = before.slice(0, tokenStart).trim() === "";
+
+    let candidates = [];
+    if (isFirst) {
+        candidates = Object.keys(TERM_COMMANDS).filter((n) => n.startsWith(token.toLowerCase()));
+    } else if (termPassword) {
+        const slash = token.lastIndexOf("/");
+        const dirPart = slash === -1 ? "" : token.slice(0, slash + 1);
+        const namePart = token.slice(slash + 1).toLowerCase();
+        const dir = termResolve(dirPart || ".");
+        if (dir && dir.type === "folder") {
+            candidates = termNodes
+                .filter((n) => (n.parent || null) === dir.id && n.name.toLowerCase().startsWith(namePart))
+                .map((n) => dirPart + n.name.replace(/ /g, "\\ ") + (n.type === "folder" ? "/" : ""));
+        }
+    }
+    if (!candidates.length) return;
+
+    let completion;
+    if (candidates.length === 1) {
+        completion = candidates[0] + (isFirst ? " " : "");
+    } else {
+        let prefix = candidates[0];
+        candidates.forEach((c) => {
+            while (!c.startsWith(prefix)) prefix = prefix.slice(0, -1);
+        });
+        if (prefix.length > token.length) {
+            completion = prefix;
+        } else {
+            termWrite("\r\n" + candidates.join("  ") + "\r\n");
+            termRedraw();
+            return;
+        }
+    }
+
+    termLine = termLine.slice(0, tokenStart) + completion + termLine.slice(termCursor);
+    termCursor = tokenStart + completion.length;
+    termRedraw();
+}
+
+function termHandlePasswordInput(data) {
+    let i = 0;
+    while (i < data.length) {
+        const ch = data[i];
+
+        if (ch === "\x1b") { // lewati urutan escape (mis. tombol panah)
+            const m = data.slice(i).match(/^\x1b(?:\[[0-9;]*[A-Za-z~]|O[A-Za-z])/);
+            i += m ? m[0].length : 1;
+            continue;
+        }
+        if (ch === "\r" || ch === "\n") {
+            termWrite("\r\n");
+            const pw = termLine;
+            termLine = "";
+            termCursor = 0;
+            termMode = "shell";
+            const cb = termPassCb;
+            termPassCb = null;
+            if (cb) cb(pw);
+            return;
+        }
+        if (ch === "\x03") {
+            termWrite("^C\r\n");
+            termLine = "";
+            termMode = "shell";
+            const cb = termPassCb;
+            termPassCb = null;
+            if (cb) cb("");
+            return;
+        }
+        if (ch === "\x7f" || ch === "\b") termLine = termLine.slice(0, -1);
+        else if (ch >= " ") termLine += ch;
+        i++;
+    }
+}
+
+function termHandleInput(data) {
+    if (!termInstance) return;
+    if (termMode === "password") { termHandlePasswordInput(data); return; }
+    if (termBusy) {
+        if (data.indexOf("\x03") !== -1 && termAbort) termAbort.abort();
+        return;
+    }
+
+    let i = 0;
+    while (i < data.length) {
+        const ch = data[i];
+
+        if (ch === "\x1b") {
+            const rest = data.slice(i);
+            const m = rest.match(/^\x1b\[([0-9;]*)([A-Za-z~])/) || rest.match(/^\x1bO()([A-Za-z])/);
+            if (m) { termHandleEscape(m[1], m[2]); i += m[0].length; }
+            else i++;
+            continue;
+        }
+        if (ch === "\r" || ch === "\n") { termSubmit(); return; }
+
+        if (ch === "\x7f" || ch === "\b") {
+            if (termCursor > 0) {
+                termLine = termLine.slice(0, termCursor - 1) + termLine.slice(termCursor);
+                termCursor--;
+                termRedraw();
+            }
+        } else if (ch === "\x03") {
+            termWrite("^C\r\n");
+            termLine = "";
+            termCursor = 0;
+            termHistIdx = termHistory.length;
+            termShowPrompt();
+        } else if (ch === "\x0c") {
+            termInstance.write("\x1b[2J\x1b[3J\x1b[H");
+            termRedraw();
+        } else if (ch === "\t") {
+            termComplete();
+        } else if (ch === "\x01") {
+            termCursor = 0;
+            termRedraw();
+        } else if (ch === "\x05") {
+            termCursor = termLine.length;
+            termRedraw();
+        } else if (ch === "\x15") {
+            termLine = termLine.slice(termCursor);
+            termCursor = 0;
+            termRedraw();
+        } else if (ch >= " ") {
+            const atEnd = termCursor === termLine.length;
+            termLine = termLine.slice(0, termCursor) + ch + termLine.slice(termCursor);
+            termCursor++;
+            if (atEnd) termInstance.write(ch);
+            else termRedraw();
+        }
+        i++;
+    }
+}
+
+// ----- Buka / tutup jendela -----
+function termFitNow() {
+    try { if (termFitAddon) termFitAddon.fit(); } catch (e) { /* jendela belum terlihat */ }
+}
+
+function termOpen() {
+    const host = document.getElementById("termHost");
+    if (!host) return;
+
+    if (termInstance) {
+        termFitNow();
+        termInstance.focus();
+        return;
+    }
+    if (typeof Terminal === "undefined" || typeof FitAddon === "undefined") {
+        host.textContent = "Library terminal (xterm.js) gagal dimuat. Periksa koneksi internet lalu buka ulang.";
+        return;
+    }
+
+    termSession++;
+    termPassword = null;
+    termNodes = [];
+    termCwd = null;
+    termLine = "";
+    termCursor = 0;
+    termHistIdx = termHistory.length;
+    termBusy = false;
+    termMode = "shell";
+    termPassCb = null;
+    termAbort = null;
+    termAiHistory = [];
+
+    host.textContent = "";
+    termInstance = new Terminal({
+        cursorBlink: true,
+        fontSize: 14,
+        fontFamily: '"Courier New", monospace',
+        theme: { background: "#000c08", foreground: "#00ff9f", cursor: "#00ff9f" }
+    });
+    termFitAddon = new FitAddon.FitAddon();
+    termInstance.loadAddon(termFitAddon);
+    termInstance.open(host);
+    termFitNow();
+    termInstance.onData(termHandleInput);
+
+    termWrite(termColor("boldGreen", "AMOS TERMINAL") + "\n");
+    termWrite("Ketik 'help' untuk daftar perintah. Untuk file, ketik 'login'.\n");
+    termShowPrompt();
+    termInstance.focus();
+}
+
+function termClose() {
+    termSession++;
+    if (termAbort) termAbort.abort();
+    if (termPassCb) {
+        const cb = termPassCb;
+        termPassCb = null;
+        cb("");
+    }
+    termPassword = null;
+    termNodes = [];
+    termCwd = null;
+    termLine = "";
+    termCursor = 0;
+    termBusy = false;
+    termMode = "shell";
+    termAiHistory = [];
+
+    if (termInstance) {
+        termInstance.dispose();
+        termInstance = null;
+        termFitAddon = null;
+    }
+    const host = document.getElementById("termHost");
+    if (host) host.textContent = "";
+}
+
+function termInit() {
+    const keys = { tab: "\t", up: "\x1b[A", down: "\x1b[B", left: "\x1b[D", right: "\x1b[C", ctrlc: "\x03", clear: "\x0c" };
+    document.querySelectorAll(".term-key").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const seq = keys[btn.dataset.seq];
+            if (seq) termHandleInput(seq);
+            if (termInstance) termInstance.focus();
+        });
+    });
+    window.addEventListener("resize", () => { if (termInstance) termFitNow(); });
+}
+
+window.addEventListener("load", termInit);
