@@ -14,6 +14,7 @@
     <meta name="theme-color" content="#00ff9f">
 
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
 
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -801,15 +802,19 @@ style="width:100%;height:100%;border:none;">
 
     </div>
 
-    <div class="window-content">
+    <div class="window-content term-content">
 
-<pre>
-AMOS TERMINAL v14
+        <div id="termHost"></div>
 
-root@amos-os:~#
-
-system ready...
-</pre>
+        <div class="term-keys">
+            <button class="term-key" data-seq="tab">Tab</button>
+            <button class="term-key" data-seq="up">↑</button>
+            <button class="term-key" data-seq="down">↓</button>
+            <button class="term-key" data-seq="left">←</button>
+            <button class="term-key" data-seq="right">→</button>
+            <button class="term-key" data-seq="ctrlc">Ctrl+C</button>
+            <button class="term-key" data-seq="clear">Clear</button>
+        </div>
 
     </div>
 
@@ -878,6 +883,10 @@ system ready...
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-analytics.js"></script>
 
 <!-- MAIN SCRIPT -->
+
+<script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
 
 <script src="script.js"></script>
 
