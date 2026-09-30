@@ -1271,3 +1271,15 @@ button{
 @media (max-width: 768px) {
     #filesWindow { width: 90%; height: 70%; }
 }
+
+
+/* --- File Manager: upload & pratinjau --- */
+.files-toolbar { flex-wrap: wrap; }
+.files-viewer { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.files-view-stage {
+    flex: 1; min-height: 0; overflow: auto; display: flex;
+    align-items: center; justify-content: center; padding: 8px;
+    background: #001a12; border: 1px solid #00ff9f55; border-radius: 8px;
+}
+.files-view-stage img, .files-view-stage video { max-width: 100%; max-height: 100%; }
+.files-view-stage audio { width: 100%; }
