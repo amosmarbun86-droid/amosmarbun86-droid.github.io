@@ -52,50 +52,43 @@ function toggleMatrix() {
     if (canvas) canvas.style.display = matrixActive ? "block" : "none";
 }
 
-// =========================
-// 🔐 LOGIN / LOGOUT (dengan animasi karakter)
-// =========================
 function login() {
     const pin = document.getElementById("pass").value;
     const character = document.getElementById("loginCharacter");
     const statusText = document.getElementById("login-status-text");
     const loginBtn = document.querySelector("#login button");
 
-    // Reset state animasi sebelumnya
     character.classList.remove("success", "fail");
 
     if (pin === "101312") {
-        // ===== LOGIN BERHASIL =====
         character.classList.add("success");
         statusText.innerText = "AKSES DITERIMA ✅";
         statusText.style.color = "#00ff9f";
         if (loginBtn) loginBtn.disabled = true;
 
-        // Kasih waktu animasi senang jelas dulu sebelum pindah ke desktop
+        showToast("Login berhasil", "success");
+
         setTimeout(() => {
             document.getElementById("login").style.display = "none";
             document.getElementById("desktop").style.display = "flex";
             localStorage.setItem("amosLoggedIn", "true");
         }, 1300);
-
     } else {
-        // ===== LOGIN GAGAL =====
         character.classList.add("fail");
         statusText.innerText = "PIN SALAH ❌";
         statusText.style.color = "#ff4d6d";
 
-        // Getarkan input juga biar makin kerasa
         const passInput = document.getElementById("pass");
         passInput.style.transition = "transform 0.1s";
         passInput.classList.add("shake-input");
 
-        // Balikin karakter ke posisi normal setelah animasi sedih selesai
+        showToast("PIN salah", "error");
+
         setTimeout(() => {
             character.classList.remove("fail");
             passInput.classList.remove("shake-input");
         }, 1000);
 
-        // Bersihkan input biar user coba lagi
         passInput.value = "";
         passInput.focus();
     }
@@ -116,20 +109,219 @@ function openExternal(url) {
     }
 }
 
-// =========================
-// 🚀 INITIALIZE SYSTEM
-// =========================
+function loadTheme() {
+    const savedTheme = localStorage.getItem("amosThemeMode") || "dark";
+    document.body.setAttribute("data-theme", savedTheme);
+    const select = document.getElementById("themeMode");
+    if (select) select.value = savedTheme;
+    const toggle = document.getElementById("notificationsEnabled");
+    if (toggle) toggle.checked = localStorage.getItem("amosNotificationsEnabled") !== "false";
+    const soundToggle = document.getElementById("soundEnabled");
+    if (soundToggle) soundToggle.checked = localStorage.getItem("amosSoundEnabled") !== "false";
+}
+
+function applyTheme(theme) {
+    const nextTheme = theme || localStorage.getItem("amosThemeMode") || "dark";
+    localStorage.setItem("amosThemeMode", nextTheme);
+    document.body.setAttribute("data-theme", nextTheme);
+    const select = document.getElementById("themeMode");
+    if (select) select.value = nextTheme;
+}
+
+function toggleTheme() {
+    const current = document.body.getAttribute("data-theme") === "light" ? "light" : "dark";
+    const next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+    showToast(`Tema diubah ke ${next === "light" ? "Light" : "Dark"}`, "info");
+}
+
+function saveSettings() {
+    const themeMode = document.getElementById("themeMode")?.value || "dark";
+    const notificationsEnabled = document.getElementById("notificationsEnabled")?.checked !== false;
+    const soundEnabled = document.getElementById("soundEnabled")?.checked !== false;
+
+    localStorage.setItem("amosThemeMode", themeMode);
+    localStorage.setItem("amosNotificationsEnabled", String(notificationsEnabled));
+    localStorage.setItem("amosSoundEnabled", String(soundEnabled));
+    applyTheme(themeMode);
+    showToast("Pengaturan tersimpan", "success");
+}
+
+function showToast(message, type = "info") {
+    const enabled = localStorage.getItem("amosNotificationsEnabled") !== "false";
+    if (!enabled) return;
+
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 2800);
+}
+
+function addNotification(title, message, type = "info") {
+    const list = document.getElementById("notificationList");
+    if (!list) return;
+
+    const item = document.createElement("div");
+    item.className = `notification-item ${type}`;
+    item.innerHTML = `<strong>${title}</strong><span>${message}</span>`;
+    list.prepend(item);
+
+    const maxItems = 12;
+    while (list.children.length > maxItems) {
+        list.removeChild(list.lastChild);
+    }
+}
+
+function toggleNotificationCenter() {
+    const panel = document.getElementById("notificationCenter");
+    if (!panel) return;
+    panel.classList.toggle("active");
+}
+
+function renderNotificationCenter() {
+    const list = document.getElementById("notificationList");
+    if (!list) return;
+    list.innerHTML = "";
+    const items = [
+        { title: "System", message: "AMOS OS siap dipakai", type: "success" },
+        { title: "Theme", message: "Mode sekarang mengikuti preferensi pengguna", type: "info" },
+        { title: "Notes", message: "Catatan bisa disimpan di perangkat ini", type: "info" }
+    ];
+
+    items.forEach((item) => {
+        const el = document.createElement("div");
+        el.className = `notification-item ${item.type}`;
+        el.innerHTML = `<strong>${item.title}</strong><span>${item.message}</span>`;
+        list.appendChild(el);
+    });
+}
+
+function createNotesDefault() {
+    const defaultNotes = [
+        { id: Date.now(), title: "Goals", text: "- Launch portfolio update\n- Finish AI assistant polish\n- Review UI improvements" },
+        { id: Date.now() + 1, title: "Quick ideas", text: "- Add custom theme\n- Improve file manager\n- Add more shortcuts" }
+    ];
+    const saved = localStorage.getItem("amosNotes");
+    if (!saved) localStorage.setItem("amosNotes", JSON.stringify(defaultNotes));
+}
+
+function getNotes() {
+    try {
+        return JSON.parse(localStorage.getItem("amosNotes")) || [];
+    } catch {
+        return [];
+    }
+}
+
+function saveNotes(notes) {
+    localStorage.setItem("amosNotes", JSON.stringify(notes));
+}
+
+function addNote() {
+    const notes = getNotes();
+    const nextNote = {
+        id: Date.now() + Math.random(),
+        title: `Catatan ${notes.length + 1}`,
+        text: ""
+    };
+    notes.unshift(nextNote);
+    saveNotes(notes);
+    renderNotes();
+    showToast("Catatan baru dibuat", "success");
+}
+
+function updateNote(id, field, value) {
+    const notes = getNotes();
+    const idx = notes.findIndex((note) => note.id === id);
+    if (idx !== -1) {
+        notes[idx][field] = value;
+        saveNotes(notes);
+    }
+}
+
+function deleteNote(id) {
+    const notes = getNotes().filter((note) => note.id !== id);
+    saveNotes(notes);
+    renderNotes();
+    showToast("Catatan dihapus", "info");
+}
+
+function renderNotes() {
+    const list = document.getElementById("notesList");
+    if (!list) return;
+
+    const notes = getNotes();
+    list.innerHTML = "";
+
+    if (!notes.length) {
+        list.innerHTML = '<div class="notes-empty">Belum ada catatan. Klik tombol di atas untuk membuat baru.</div>';
+        return;
+    }
+
+    notes.forEach((note) => {
+        const card = document.createElement("div");
+        card.className = "note-card";
+
+        const titleInput = document.createElement("input");
+        titleInput.type = "text";
+        titleInput.value = note.title || "Untitled";
+        titleInput.addEventListener("input", (event) => {
+            updateNote(note.id, "title", event.target.value || "Untitled");
+        });
+
+        const textArea = document.createElement("textarea");
+        textArea.value = note.text || "";
+        textArea.placeholder = "Tulis isi catatan...";
+        textArea.addEventListener("input", (event) => {
+            updateNote(note.id, "text", event.target.value);
+        });
+
+        const actions = document.createElement("div");
+        actions.className = "note-actions";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.textContent = "Save";
+        saveBtn.onclick = () => {
+            updateNote(note.id, "title", titleInput.value || "Untitled");
+            updateNote(note.id, "text", textArea.value);
+            showToast("Catatan disimpan", "success");
+        };
+
+        const delBtn = document.createElement("button");
+        delBtn.textContent = "Delete";
+        delBtn.onclick = () => deleteNote(note.id);
+
+        actions.appendChild(saveBtn);
+        actions.appendChild(delBtn);
+
+        card.appendChild(titleInput);
+        card.appendChild(textArea);
+        card.appendChild(actions);
+        list.appendChild(card);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     if (localStorage.getItem("amosLoggedIn") === "true") {
         document.getElementById("login").style.display = "none";
         document.getElementById("desktop").style.display = "flex";
     }
 
-    // Ganti wallpaper pertama kali + auto ganti tiap 10 detik
+    loadTheme();
+    createNotesDefault();
+    renderNotes();
+    renderNotificationCenter();
+
     changeWallpaper();
     setInterval(changeWallpaper, 10000);
 
-    // ===== Matrix Effect (Background) =====
     const canvas = document.getElementById("bgCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -159,19 +351,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     setInterval(draw, 33);
+
+    const themeSelect = document.getElementById("themeMode");
+    if (themeSelect) {
+        themeSelect.value = localStorage.getItem("amosThemeMode") || "dark";
+    }
+
+    const notifToggle = document.getElementById("notificationsEnabled");
+    if (notifToggle) {
+        notifToggle.checked = localStorage.getItem("amosNotificationsEnabled") !== "false";
+    }
+
+    const soundToggle = document.getElementById("soundEnabled");
+    if (soundToggle) {
+        soundToggle.checked = localStorage.getItem("amosSoundEnabled") !== "false";
+    }
+
+    const themeState = localStorage.getItem("amosThemeMode") || "dark";
+    document.body.setAttribute("data-theme", themeState);
+    showToast("AMOS OS siap digunakan", "success");
+    addNotification("System", "Versi fase 1 aktif", "success");
 });
 
-// =========================
-// 🕒 CLOCK
-// =========================
 setInterval(() => {
     const clock = document.getElementById("clock");
     if (clock) clock.innerHTML = new Date().toLocaleTimeString("id-ID");
 }, 1000);
 
-// =========================
-// 🖥️ AMOS BOOT SYSTEM
-// =========================
 const bootMessages = [
     "Initializing AMOS Kernel...",
     "Loading AI Engine...",
@@ -206,13 +412,14 @@ function addBootLine(text) {
 }
 
 function runBootSequence() {
-    bootSound.volume = 0.7;
-
-    const playPromise = bootSound.play();
-    if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-            console.log("Autoplay blocked:", error);
-        });
+    if (bootSound) {
+        bootSound.volume = 0.7;
+        const playPromise = bootSound.play();
+        if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+                console.log("Autoplay blocked:", error);
+            });
+        }
     }
 
     bootMessages.forEach((msg, index) => {
@@ -234,12 +441,8 @@ function runBootSequence() {
 
 runBootSequence();
 
-// =========================
-// 🟩 MATRIX EFFECT (Boot Screen)
-// =========================
 const bootCanvas = document.getElementById("bootMatrix");
 const bootCtx = bootCanvas.getContext("2d");
-
 bootCanvas.width = window.innerWidth;
 bootCanvas.height = window.innerHeight;
 
@@ -255,7 +458,6 @@ for (let x = 0; x < bootColumns; x++) {
 function drawMatrix() {
     bootCtx.fillStyle = "rgba(0,0,0,0.08)";
     bootCtx.fillRect(0, 0, bootCanvas.width, bootCanvas.height);
-
     bootCtx.fillStyle = "#00ff88";
     bootCtx.font = bootFontSize + "px monospace";
 
@@ -277,20 +479,15 @@ window.addEventListener("resize", () => {
     bootCanvas.height = window.innerHeight;
 });
 
-// =========================
-// 🪟 WINDOW SYSTEM
-// =========================
-let windowTopZ = 9999; // z-index tertinggi saat ini, naik setiap ada jendela dibuka / disentuh
+let windowTopZ = 9999;
 
 function openWindow(id) {
     const win = document.getElementById(id);
     if (!win) return;
 
-    // File Manager selalu minta password setiap dibuka (bukan kalau sudah terbuka)
     if (id === "filesWindow" && win.style.display !== "flex") filesLock();
-
     win.style.display = "flex";
-    win.style.zIndex = ++windowTopZ; // tampil di depan jendela lain (mis. di atas Terminal)
+    win.style.zIndex = ++windowTopZ;
 
     if (id === "filesWindow") {
         const pass = document.getElementById("filesPassInput");
@@ -306,24 +503,17 @@ function closeWindow(id) {
 
     if (id === "filesWindow") {
         if (filesDirty && !confirm("Perubahan belum disimpan. Tutup tanpa menyimpan?")) return;
-        filesLock(); // kunci lagi & hapus password dari memori
+        filesLock();
     }
 
-    if (id === "terminalWindow") termClose(); // hapus sesi & password terminal
-
+    if (id === "terminalWindow") termClose();
     win.style.display = "none";
 }
 
-// =========================
-// 🎵 MUSIC DATA
-// =========================
 let musicData = [];
 let currentIndex = 0;
-
-// Filter aktif saat ini: "all" | "favorites" | "playlist"
 let currentFilter = "all";
 
-// Daftar ID lagu yang ditambahkan ke playlist (disimpan lokal di perangkat)
 function getPlaylistIds() {
     try {
         return JSON.parse(localStorage.getItem("amosPlaylist")) || [];
@@ -336,9 +526,6 @@ function savePlaylistIds(ids) {
     localStorage.setItem("amosPlaylist", JSON.stringify(ids));
 }
 
-// =========================
-// 🔄 LOAD MUSIC REALTIME
-// =========================
 function loadMusic() {
     const musicList = document.getElementById("musicList");
     musicList.innerHTML = "Loading Music...";
@@ -347,16 +534,13 @@ function loadMusic() {
         musicData = [];
         snapshot.forEach((doc) => {
             const song = doc.data();
-            song.id = doc.id; // ID dokumen Firestore
+            song.id = doc.id;
             musicData.push(song);
         });
         applyCurrentFilter();
     });
 }
 
-// =========================
-// 🔍 FILTER MUSIK (Semua / Favorit / Playlist)
-// =========================
 function applyCurrentFilter() {
     if (currentFilter === "favorites") {
         renderMusic(musicData.filter((song) => song.favorite === true));
@@ -383,9 +567,6 @@ function showPlaylist() {
     applyCurrentFilter();
 }
 
-// =========================
-// ⭐ FAVORIT / ➕ PLAYLIST
-// =========================
 function toggleFavorite(id) {
     const song = musicData.find((s) => s.id === id);
     if (!song) return;
@@ -420,9 +601,6 @@ function getFilteredForRender() {
     return musicData;
 }
 
-// =========================
-// 🎨 RENDER MUSIC
-// =========================
 function renderMusic(list) {
     const musicList = document.getElementById("musicList");
     musicList.innerHTML = "";
@@ -458,9 +636,6 @@ function renderMusic(list) {
     });
 }
 
-// =========================
-// ▶️ PLAY MUSIC
-// =========================
 function playMusic(index) {
     if (index < 0 || index >= musicData.length) return;
 
@@ -480,9 +655,6 @@ function playMusic(index) {
     floatingTitle.innerHTML = song.name;
 }
 
-// =========================
-// ⏯️ PLAY / PAUSE
-// =========================
 function togglePlay() {
     const player = document.getElementById("player");
     const floatingIcon = document.getElementById("floatingIcon");
@@ -496,15 +668,11 @@ function togglePlay() {
     }
 }
 
-// =========================
-// ⏭️ NEXT / ⏮️ PREVIOUS
-// =========================
 function nextMusic() {
     if (musicData.length === 0) return;
 
     currentIndex++;
     if (currentIndex >= musicData.length) currentIndex = 0;
-
     playMusic(currentIndex);
 }
 
@@ -513,13 +681,9 @@ function prevMusic() {
 
     currentIndex--;
     if (currentIndex < 0) currentIndex = musicData.length - 1;
-
     playMusic(currentIndex);
 }
 
-// =========================
-// 🎚️ SPEED CONTROL
-// =========================
 function setSpeed(speed) {
     const player = document.getElementById("player");
     const speedLabel = document.getElementById("speedLabel");
@@ -528,19 +692,12 @@ function setSpeed(speed) {
     speedLabel.innerHTML = speed + "x";
 }
 
-// =========================
-// 🔀 SHUFFLE
-// =========================
 function toggleShuffle() {
     if (musicData.length === 0) return;
-
     const randomIndex = Math.floor(Math.random() * musicData.length);
     playMusic(randomIndex);
 }
 
-// =========================
-// ⬆️ UPLOAD MUSIC
-// =========================
 async function uploadMusic() {
     const file = document.getElementById("songFile").files[0];
     const songName = document.getElementById("songName").value;
@@ -591,20 +748,14 @@ async function uploadMusic() {
     }
 }
 
-// =========================
-// 🗑️ DELETE MUSIC ONLINE
-// =========================
 async function deleteMusic(id) {
     const confirmDelete = confirm("Hapus lagu ini?");
     if (!confirmDelete) return;
 
     try {
         await db.collection("music").doc(id).delete();
-
-        // Bersihkan juga dari playlist lokal kalau ada
         const ids = getPlaylistIds().filter((pid) => pid !== id);
         savePlaylistIds(ids);
-
         alert("Lagu berhasil dihapus!");
     } catch (error) {
         console.log(error);
@@ -612,9 +763,6 @@ async function deleteMusic(id) {
     }
 }
 
-// =========================
-// ⏭️ AUTO NEXT + FLOATING ICON SYNC
-// =========================
 document.getElementById("player").addEventListener("ended", () => {
     nextMusic();
 });
@@ -631,11 +779,7 @@ function hideFloatingPlayer() {
     document.getElementById("floatingPlayer").style.display = "none";
 }
 
-// =========================
-// 🖱️ DRAG DESKTOP ICONS (SAVE POSITION)
-// =========================
 const desktopIcons = document.querySelectorAll(".desktop-icon");
-
 let activeIcon = null;
 let startX = 0;
 let startY = 0;
@@ -645,8 +789,6 @@ let moved = false;
 
 desktopIcons.forEach((icon) => {
     const iconId = icon.id;
-
-    // Muat posisi tersimpan
     const savedX = localStorage.getItem(`${iconId}-x`);
     const savedY = localStorage.getItem(`${iconId}-y`);
 
@@ -668,7 +810,6 @@ desktopIcons.forEach((icon) => {
     });
 });
 
-// Pergerakan drag (global)
 document.addEventListener("touchmove", (e) => {
     if (!activeIcon) return;
 
@@ -686,7 +827,6 @@ document.addEventListener("touchmove", (e) => {
     activeIcon.style.top = newY + "px";
 });
 
-// Akhir drag (simpan posisi)
 document.addEventListener("touchend", () => {
     if (!activeIcon) return;
 
@@ -696,9 +836,6 @@ document.addEventListener("touchend", () => {
     activeIcon = null;
 });
 
-// =========================
-// 🎧 FLOATING PLAYER DRAG
-// =========================
 function initFloatingDrag() {
     const floatingPlayer = document.getElementById("floatingPlayer");
 
@@ -729,23 +866,20 @@ function initFloatingDrag() {
     });
 }
 
-// =========================
-// 🚀 START SYSTEM
-// =========================
 window.addEventListener("load", () => {
     loadMusic();
     initFloatingDrag();
+    loadTheme();
+    renderNotes();
+    renderNotificationCenter();
+    createNotesDefault();
 });
 
-
-// =========================
-// 🤖 AMOS AI CHAT (OpenRouter backend di Vercel)
-// =========================
 const AI_API_URL = "https://openrouter-chat-web.vercel.app/api/chat";
-const AI_MAX_HISTORY = 30; // maksimal pesan yang disimpan & dikirim sebagai konteks
+const AI_MAX_HISTORY = 30;
 
 let aiPassword = null;
-let aiHistory = []; // [{ role: "user" | "assistant", content: "..." }]
+let aiHistory = [];
 let aiBusy = false;
 
 function aiInit() {
@@ -820,7 +954,6 @@ function aiNewChat() {
     aiRenderAll();
 }
 
-// Semua teks dimasukkan lewat textContent (bukan innerHTML) supaya aman dari XSS
 function aiAddBubble(role, text) {
     const box = document.getElementById("aiMessages");
     const div = document.createElement("div");
@@ -858,7 +991,6 @@ async function aiSend() {
     const sendBtn = document.getElementById("aiSendBtn");
     sendBtn.disabled = true;
 
-    // Kalau masih tampil sapaan awal (belum ada riwayat), bersihkan dulu
     if (aiHistory.length === 0) document.getElementById("aiMessages").innerHTML = "";
 
     aiHistory.push({ role: "user", content: text });
@@ -883,7 +1015,7 @@ async function aiSend() {
         });
 
         if (response.status === 401) {
-            aiHistory.pop(); // pesan gagal terkirim, jangan disimpan
+            aiHistory.pop();
             aiSaveHistory();
             aiRenderAll();
             aiLogout();
@@ -932,7 +1064,7 @@ async function aiSend() {
                         const box = document.getElementById("aiMessages");
                         box.scrollTop = box.scrollHeight;
                     }
-                } catch (e) { /* baris SSE bukan JSON, lewati */ }
+                } catch (e) { }
             }
         }
 
@@ -960,20 +1092,16 @@ async function aiSend() {
 
 window.addEventListener("load", aiInit);
 
-
-// =========================
-// 📁 AMOS FILE MANAGER (data di server, password setiap dibuka)
-// =========================
 const FILES_API_URL = "https://openrouter-chat-web.vercel.app/api/files";
 
-let filesPassword = null;   // hanya di memori, hilang saat window ditutup / dikunci
-let filesNodes = [];        // [{ id, type, name, parent, size, updatedAt }]
-let filesCurrent = null;    // id folder yang sedang dibuka (null = root)
-let filesPending = null;    // { kind: "folder" | "file" | "rename", id }
+let filesPassword = null;
+let filesNodes = [];
+let filesCurrent = null;
+let filesPending = null;
 let filesEditingId = null;
 let filesDirty = false;
 let filesBusy = false;
-let filesViewingNode = null; // file unggahan yang sedang dipratinjau
+let filesViewingNode = null;
 let filesViewingUrl = null;
 
 function filesSetStatus(text, isError) {
@@ -1013,7 +1141,7 @@ async function filesApi(action, data) {
     });
 
     let json = {};
-    try { json = await response.json(); } catch (e) { /* respons bukan JSON */ }
+    try { json = await response.json(); } catch (e) { }
 
     if (!response.ok) {
         const err = new Error(json.error || "Terjadi kesalahan di server");
@@ -1028,7 +1156,6 @@ function filesErrorText(e) {
     return e.message;
 }
 
-// Kalau password ditolak server (401) → kunci lagi. Selain itu tampilkan pesan.
 function filesHandleError(e) {
     if (e.status === 401) {
         filesLock();
@@ -1040,7 +1167,6 @@ function filesHandleError(e) {
     filesSetStatus(filesErrorText(e), true);
 }
 
-// ----- Buka / kunci -----
 async function filesSubmitPassword() {
     if (filesBusy) return;
 
@@ -1072,7 +1198,6 @@ async function filesSubmitPassword() {
     await filesRefresh();
 }
 
-// ----- Muat & tampilkan -----
 async function filesRefresh() {
     if (!filesPassword) return;
     try {
@@ -1165,9 +1290,7 @@ function filesRender() {
         const renameBtn = document.createElement("button");
         renameBtn.textContent = "✏️";
         renameBtn.title = "Ganti nama";
-        renameBtn.addEventListener("click", () =>
-            filesAsk("rename", node.id, "Nama baru:", node.name)
-        );
+        renameBtn.addEventListener("click", () => filesAsk("rename", node.id, "Nama baru:", node.name));
 
         const delBtn = document.createElement("button");
         delBtn.textContent = "🗑";
@@ -1179,7 +1302,6 @@ function filesRender() {
     });
 }
 
-// ----- Navigasi -----
 function filesOpenFolder(id) {
     filesCurrent = id;
     filesCancelName();
@@ -1192,7 +1314,6 @@ function filesGoUp() {
     filesOpenFolder(node ? node.parent || null : null);
 }
 
-// ----- Buat folder / file / ganti nama -----
 function filesNewFolder() {
     filesAsk("folder", null, "Nama folder:", "");
 }
@@ -1248,7 +1369,6 @@ async function filesConfirmName() {
     }
 }
 
-// ----- Hapus -----
 async function filesDelete(node) {
     if (filesBusy) return;
 
@@ -1270,7 +1390,6 @@ async function filesDelete(node) {
     }
 }
 
-// ----- Editor file -----
 async function filesOpenFile(id) {
     if (filesBusy) return;
     filesBusy = true;
@@ -1322,7 +1441,6 @@ async function filesCloseEditor() {
     await filesRefresh();
 }
 
-// ----- Upload foto / musik / file lain (disimpan di Supabase, bucket private) -----
 function filesNodeIcon(node) {
     if (node.type === "folder") return "📁";
     if (node.type === "upload") {
@@ -1354,7 +1472,6 @@ function filesXhrPut(url, body, headers, onProgress) {
     });
 }
 
-// Kirim file langsung ke Supabase lewat link upload sementara dari server
 async function filesPutFile(url, file, onProgress) {
     const form = new FormData();
     form.append("cacheControl", "3600");
@@ -1363,7 +1480,6 @@ async function filesPutFile(url, file, onProgress) {
     let res = await filesXhrPut(url, form, { "x-upsert": "false" }, onProgress);
     if (res.status >= 200 && res.status < 300) return;
 
-    // Cadangan: kirim isi file mentah
     res = await filesXhrPut(
         url,
         file,
@@ -1386,7 +1502,7 @@ async function filesUploadSelected(fileList) {
 
     try {
         for (let i = 0; i < files.length; i++) {
-            if (!filesPassword) break; // window dikunci saat upload berjalan
+            if (!filesPassword) break;
             const file = files[i];
             const label = "Mengunggah " + (i + 1) + "/" + files.length + ": " + file.name;
 
@@ -1424,85 +1540,6 @@ async function filesUploadSelected(fileList) {
     }
 }
 
-// ----- Pratinjau / unduh file unggahan -----
-async function filesOpenUpload(node) {
-    if (filesBusy) return;
-    filesBusy = true;
-
-    try {
-        filesSetStatus("Membuka...");
-        const data = await filesApi("download-url", { id: node.id });
-        filesViewingNode = node;
-        filesViewingUrl = data.url;
-
-        const stage = document.getElementById("filesViewStage");
-        stage.innerHTML = "";
-        const mime = node.mime || "";
-        let el;
-
-        if (mime.startsWith("image/")) {
-            el = document.createElement("img");
-            el.alt = node.name;
-            el.src = data.url;
-        } else if (mime.startsWith("audio/")) {
-            el = document.createElement("audio");
-            el.controls = true;
-            el.src = data.url;
-        } else if (mime.startsWith("video/")) {
-            el = document.createElement("video");
-            el.controls = true;
-            el.playsInline = true;
-            el.src = data.url;
-        } else {
-            el = document.createElement("div");
-            el.className = "files-empty";
-            el.textContent = "Tidak ada pratinjau untuk jenis file ini. Ketuk Unduh untuk membukanya.";
-        }
-        stage.appendChild(el);
-
-        document.getElementById("filesViewTitle").textContent = node.name;
-        document.getElementById("filesBrowser").style.display = "none";
-        document.getElementById("filesViewer").style.display = "flex";
-        filesSetStatus("");
-    } catch (e) {
-        filesHandleError(e);
-    } finally {
-        filesBusy = false;
-    }
-}
-
-async function filesDownloadCurrent() {
-    if (!filesViewingNode || filesBusy) return;
-    filesBusy = true;
-
-    try {
-        filesSetStatus("Menyiapkan unduhan...");
-        const data = await filesApi("download-url", { id: filesViewingNode.id, download: true });
-        const a = document.createElement("a");
-        a.href = data.url;
-        a.target = "_blank";
-        a.rel = "noopener";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        filesSetStatus("");
-    } catch (e) {
-        filesHandleError(e);
-    } finally {
-        filesBusy = false;
-    }
-}
-
-function filesCloseViewer() {
-    document.getElementById("filesViewStage").innerHTML = ""; // hentikan audio/video
-    filesViewingNode = null;
-    filesViewingUrl = null;
-    document.getElementById("filesViewer").style.display = "none";
-    document.getElementById("filesBrowser").style.display = "flex";
-    filesSetStatus("");
-}
-
-// ----- Init -----
 function filesInit() {
     document.getElementById("filesPassInput").addEventListener("keydown", (e) => {
         if (e.key === "Enter") filesSubmitPassword();
@@ -1521,33 +1558,26 @@ function filesInit() {
     const uploadInput = document.getElementById("filesUploadInput");
     uploadInput.addEventListener("change", () => {
         const picked = Array.from(uploadInput.files || []);
-        uploadInput.value = ""; // supaya file yang sama bisa dipilih lagi
+        uploadInput.value = "";
         filesUploadSelected(picked);
     });
 }
 
 window.addEventListener("load", filesInit);
 
-
-// =========================
-// 💻 AMOS TERMINAL (xterm.js + shell buatan sendiri, berjalan di browser)
-// =========================
-// Perintah file memakai API File Manager yang sama (data di server, perlu password).
-// Perintah "ai" memakai backend chat AI. Tidak ada eksekusi kode di server.
-
 let termInstance = null;
 let termFitAddon = null;
-let termSession = 0;          // naik setiap terminal dibuka / ditutup
-let termPassword = null;      // password File Manager, hanya di memori
-let termNodes = [];           // cache daftar folder & file dari server
-let termCwd = null;           // id folder aktif (null = root)
+let termSession = 0;
+let termPassword = null;
+let termNodes = [];
+let termCwd = null;
 let termLine = "";
 let termCursor = 0;
 let termHistory = [];
 let termHistIdx = 0;
 let termHistDraft = "";
 let termBusy = false;
-let termMode = "shell";       // "shell" | "password"
+let termMode = "shell";
 let termPassCb = null;
 let termAbort = null;
 let termAiHistory = [];
@@ -1567,7 +1597,6 @@ function termWrite(text) {
     termInstance.write(String(text).replace(/\r?\n/g, "\r\n"));
 }
 
-// ----- Path & node -----
 function termPathOf(id) {
     if (!id) return "~";
     const parts = [];
@@ -1592,7 +1621,6 @@ function termFindChild(parentId, name) {
     return termNodes.find((n) => (n.parent || null) === parentId && n.name.toLowerCase() === lower) || null;
 }
 
-// Kembalikan node (atau TERM_ROOT); null kalau tidak ditemukan
 function termResolve(path) {
     let cur;
     if (path.startsWith("/") || path === "~" || path.startsWith("~/")) cur = TERM_ROOT;
@@ -1618,7 +1646,6 @@ function termSplitPath(path) {
     return { dirPath: path.slice(0, idx) || "/", base: path.slice(idx + 1) };
 }
 
-// ----- Prompt & baris input -----
 function termPromptText() {
     return TERM_C.boldGreen + "amos@os" + TERM_C.reset + ":" + TERM_C.blue + termPathOf(termCwd) + TERM_C.reset + "$ ";
 }
@@ -1641,7 +1668,6 @@ function termSetLine(text) {
     termRedraw();
 }
 
-// ----- Parser perintah (kutip, backslash, redirect > dan >>) -----
 function termTokenize(line) {
     const tokens = [];
     let cur = "";
@@ -1695,7 +1721,6 @@ function termParse(line) {
     return { args: args, redirect: redirect };
 }
 
-// ----- API File Manager -----
 async function termApi(action, data) {
     const response = await fetch(FILES_API_URL, {
         method: "POST",
@@ -1703,7 +1728,7 @@ async function termApi(action, data) {
         body: JSON.stringify({ action: action, password: termPassword, ...(data || {}) })
     });
     let json = {};
-    try { json = await response.json(); } catch (e) { /* bukan JSON */ }
+    try { json = await response.json(); } catch (e) { }
     if (!response.ok) {
         const err = new Error(json.error || "Terjadi kesalahan di server");
         err.status = response.status;
@@ -1756,7 +1781,6 @@ function termFmtSize(bytes) {
     return (bytes / 1024 / 1024).toFixed(1) + " MB";
 }
 
-// Buat folder / file di path tertentu
 async function termCreate(path, type, content) {
     const { dirPath, base } = termSplitPath(path);
     const dir = termResolve(dirPath);
@@ -1767,19 +1791,18 @@ async function termCreate(path, type, content) {
     await termReload();
 }
 
-// ----- Peluncur: jendela Amos OS + menu sidebar -----
 const TERM_WINDOWS = [
     { key: "ai", label: "AI", win: "aiWindow" },
     { key: "browser", label: "Browser", win: "browserWindow" },
     { key: "music", label: "Music", win: "musicWindow" },
-    { key: "files", label: "Files", win: "filesWindow" }
+    { key: "files", label: "Files", win: "filesWindow" },
+    { key: "notes", label: "Notes", win: "notesWindow" }
 ];
 
 function termSlug(text) {
     return String(text).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-// Daftar halaman diambil langsung dari menu sidebar, jadi ikut otomatis kalau menu ditambah
 function termLaunchers() {
     const list = TERM_WINDOWS.map((w) => ({ key: w.key, label: w.label, win: w.win }));
     document.querySelectorAll("#sidebar .side-item").forEach((el) => {
@@ -1792,7 +1815,6 @@ function termLaunchers() {
     return list;
 }
 
-// ----- Perintah -----
 const TERM_HELP = [
     "Perintah umum:",
     "  help, clear, echo, date, whoami, uname, history, exit",
@@ -1819,28 +1841,20 @@ const TERM_HELP = [
 
 const TERM_COMMANDS = {
     help: async () => { termWrite(TERM_HELP); },
-
     clear: async () => { termWrite("\x1b[2J\x1b[3J\x1b[H"); },
-
     date: async () => { termWrite(new Date().toLocaleString("id-ID") + "\n"); },
-
     whoami: async () => { termWrite("amos\n"); },
-
     uname: async () => { termWrite("AmosOS 1.0 (browser)\n"); },
-
     history: async () => {
         termHistory.forEach((h, i) => termWrite(String(i + 1).padStart(4, " ") + "  " + h + "\n"));
     },
-
     exit: async () => { closeWindow("terminalWindow"); },
-
     apps: async () => {
         const list = termLaunchers();
         termWrite(termColor("cyan", "Jendela Amos OS:") + "\n  " + list.filter((x) => x.win).map((x) => x.key).join(", ") + "\n");
         termWrite(termColor("cyan", "Halaman (tab baru):") + "\n  " + list.filter((x) => x.url).map((x) => x.key).join(", ") + "\n");
         termWrite(termColor("dim", "Pakai: open <nama>  (nama boleh disingkat, mis. open lock)") + "\n");
     },
-
     open: async (args) => {
         const query = termSlug(args.join(" "));
         if (!query) { termWrite("pemakaian: open <nama>  (ketik 'apps' untuk daftar)\n"); return; }
@@ -1865,7 +1879,6 @@ const TERM_COMMANDS = {
         if (!opened) termWrite(termColor("yellow", "Browser memblokir popup. Izinkan popup untuk situs ini lalu ulangi.\n"));
         else termWrite("Membuka " + app.label + " di tab baru...\n");
     },
-
     echo: async (args, redirect) => {
         const text = args.join(" ");
         if (!redirect) { termWrite(text + "\n"); return; }
@@ -1888,7 +1901,6 @@ const TERM_COMMANDS = {
         await termApi("update", { id: target.id, content: content });
         await termReload();
     },
-
     login: async () => {
         const pw = await termReadPassword("Password File Manager: ");
         if (!pw) return;
@@ -1903,14 +1915,12 @@ const TERM_COMMANDS = {
             else termFail(e);
         }
     },
-
     logout: async () => {
         termPassword = null;
         termNodes = [];
         termCwd = null;
         termWrite("Logout. Password dihapus dari memori.\n");
     },
-
     ailogin: async () => {
         const pw = await termReadPassword("Password chat AI: ");
         if (!pw) return;
@@ -1919,7 +1929,6 @@ const TERM_COMMANDS = {
         if (typeof aiShowGateOrChat === "function") aiShowGateOrChat();
         termWrite(termColor("green", "Password AI tersimpan di perangkat ini.\n"));
     },
-
     ls: async (args) => {
         if (!termRequireLogin()) return;
         let long = false;
@@ -1959,7 +1968,6 @@ const TERM_COMMANDS = {
             termWrite(kind + "  " + size.padStart(9, " ") + "  " + when + "  " + label(n) + "\n");
         });
     },
-
     cd: async (args) => {
         if (!termRequireLogin()) return;
         const node = termResolve(args[0] || "~");
@@ -1967,12 +1975,10 @@ const TERM_COMMANDS = {
         if (node.type !== "folder") throw new Error("bukan folder: " + args[0]);
         termCwd = node.id;
     },
-
     pwd: async () => {
         if (!termRequireLogin()) return;
         termWrite(termPathOf(termCwd) + "\n");
     },
-
     mkdir: async (args) => {
         if (!termRequireLogin()) return;
         if (!args.length) { termWrite("pemakaian: mkdir <nama>...\n"); return; }
@@ -1981,17 +1987,15 @@ const TERM_COMMANDS = {
             catch (e) { if (e.status === 401) throw e; termWrite(termColor("red", "mkdir: " + e.message + "\n")); }
         }
     },
-
     touch: async (args) => {
         if (!termRequireLogin()) return;
         if (!args.length) { termWrite("pemakaian: touch <nama>...\n"); return; }
         for (const p of args) {
-            if (termResolve(p)) continue; // sudah ada
+            if (termResolve(p)) continue;
             try { await termCreate(p, "file", ""); }
             catch (e) { if (e.status === 401) throw e; termWrite(termColor("red", "touch: " + e.message + "\n")); }
         }
     },
-
     cat: async (args) => {
         if (!termRequireLogin()) return;
         if (!args.length) { termWrite("pemakaian: cat <file>...\n"); return; }
@@ -2008,7 +2012,6 @@ const TERM_COMMANDS = {
             termWrite(content + (content && !content.endsWith("\n") ? "\n" : ""));
         }
     },
-
     rm: async (args) => {
         if (!termRequireLogin()) return;
         let recursive = false;
@@ -2032,7 +2035,6 @@ const TERM_COMMANDS = {
             await termReload();
         }
     },
-
     mv: async (args) => {
         if (!termRequireLogin()) return;
         if (args.length !== 2) { termWrite("pemakaian: mv <lama> <baru>  (hanya ganti nama)\n"); return; }
@@ -2042,7 +2044,6 @@ const TERM_COMMANDS = {
         await termApi("update", { id: node.id, name: args[1] });
         await termReload();
     },
-
     ai: async (args) => {
         const prompt = args.join(" ").trim();
         if (!prompt) { termWrite("pemakaian: ai <pertanyaan>\n"); return; }
@@ -2106,7 +2107,7 @@ const TERM_COMMANDS = {
                             text += delta;
                             termWrite(delta);
                         }
-                    } catch (e) { /* bukan JSON, lewati */ }
+                    } catch (e) { }
                 }
             }
 
@@ -2175,13 +2176,12 @@ async function termSubmit() {
 
     await termExecute(line);
 
-    if (session !== termSession) return; // terminal ditutup / dibuka ulang saat perintah berjalan
+    if (session !== termSession) return;
     termBusy = false;
     termHistIdx = termHistory.length;
     termShowPrompt();
 }
 
-// ----- Input keyboard -----
 function termHistoryNav(dir) {
     if (!termHistory.length) return;
     if (termHistIdx >= termHistory.length) termHistDraft = termLine;
@@ -2260,7 +2260,7 @@ function termHandlePasswordInput(data) {
     while (i < data.length) {
         const ch = data[i];
 
-        if (ch === "\x1b") { // lewati urutan escape (mis. tombol panah)
+        if (ch === "\x1b") {
             const m = data.slice(i).match(/^\x1b(?:\[[0-9;]*[A-Za-z~]|O[A-Za-z])/);
             i += m ? m[0].length : 1;
             continue;
@@ -2305,7 +2305,7 @@ function termHandleInput(data) {
 
         if (ch === "\x1b") {
             const rest = data.slice(i);
-            const m = rest.match(/^\x1b\[([0-9;]*)([A-Za-z~])/) || rest.match(/^\x1bO()([A-Za-z])/);
+            const m = rest.match(/^\x1b\[([0-9;]*)([A-Za-z~])/ ) || rest.match(/^\x1bO()([A-Za-z])/);
             if (m) { termHandleEscape(m[1], m[2]); i += m[0].length; }
             else i++;
             continue;
@@ -2350,9 +2350,8 @@ function termHandleInput(data) {
     }
 }
 
-// ----- Buka / tutup jendela -----
 function termFitNow() {
-    try { if (termFitAddon) termFitAddon.fit(); } catch (e) { /* jendela belum terlihat */ }
+    try { if (termFitAddon) termFitAddon.fit(); } catch (e) { }
 }
 
 function termOpen() {
@@ -2441,10 +2440,52 @@ function termInit() {
 
 window.addEventListener("load", termInit);
 
-
-// Sentuh jendela mana pun → naik ke depan
 window.addEventListener("load", () => {
     document.querySelectorAll(".app-window").forEach((w) => {
         w.addEventListener("pointerdown", () => { w.style.zIndex = ++windowTopZ; });
     });
 });
+
+window.addEventListener("load", () => {
+    document.querySelectorAll("#sidebar .side-item").forEach((item) => {
+        item.setAttribute("data-role", "sidebar-item");
+    });
+});
+
+if (typeof window !== "undefined") {
+    window.addEventListener("DOMContentLoaded", () => {
+        const theme = localStorage.getItem("amosThemeMode") || "dark";
+        document.body.setAttribute("data-theme", theme);
+        renderNotes();
+        renderNotificationCenter();
+    });
+}
+
+const _origShowToast = typeof showToast === "function" ? showToast : null;
+if (_origShowToast) {
+    const _safeToast = (message, type = "info") => {
+        const enabled = localStorage.getItem("amosNotificationsEnabled") !== "false";
+        if (!enabled) return;
+        _origShowToast(message, type);
+    };
+    window.showToast = _safeToast;
+}
+
+window.addNotification = addNotification;
+window.toggleNotificationCenter = toggleNotificationCenter;
+window.toggleTheme = toggleTheme;
+window.saveSettings = saveSettings;
+window.addNote = addNote;
+window.renderNotes = renderNotes;
+window.deleteNote = deleteNote;
+window.updateNote = updateNote;
+
+if (typeof window !== "undefined") {
+    window.addEventListener("load", () => {
+        if (document.getElementById("notificationCenter")) {
+            renderNotificationCenter();
+        }
+    });
+}
+
+if (typeof module !== "undefined") module.exports = {}
