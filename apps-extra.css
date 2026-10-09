@@ -1,0 +1,155 @@
+/* ===== WEATHER / GAMES / GITHUB ===== */
+.weather-content, .games-content, .github-content {
+    padding: 12px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #0a0f0e;
+    color: #c8ffe8;
+}
+.weather-city-row {
+    display: flex;
+    gap: 8px;
+}
+.weather-city-row input {
+    flex: 1;
+    background: #111;
+    border: 1px solid #00ff9f55;
+    color: #00ff9f;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+.weather-body { text-align: center; }
+.weather-icon-big { font-size: 48px; line-height: 1; }
+.weather-temp { font-size: 42px; font-weight: bold; color: #00ff9f; }
+.weather-desc { opacity: 0.85; margin-top: 4px; }
+.weather-loc { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+.weather-meta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 13px;
+    margin-top: 8px;
+}
+.weather-daily {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.weather-day {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #111a18;
+    border-radius: 6px;
+    border: 1px solid #00ff9f22;
+    font-size: 13px;
+}
+.weather-loading, .weather-error { padding: 20px; opacity: 0.8; }
+
+.games-menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.game-card {
+    background: #111a18;
+    border: 1px solid #00ff9f44;
+    color: #00ff9f;
+    border-radius: 10px;
+    padding: 18px 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+.game-card:hover { background: #0d2a22; border-color: #00ff9f; }
+.game-emoji { font-size: 28px; }
+.games-play { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.games-play-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#gameArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+#snakeCanvas {
+    border: 1px solid #00ff9f55;
+    border-radius: 6px;
+    touch-action: none;
+    max-width: 100%;
+}
+.game-hint { font-size: 12px; opacity: 0.7; text-align: center; }
+.ttt-board {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    gap: 6px;
+}
+.ttt-cell {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+    background: #111a18;
+    border: 1px solid #00ff9f55;
+    color: #00ff9f;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.github-stats {
+    display: flex;
+    gap: 10px;
+    justify-content: space-around;
+}
+.gh-stat {
+    text-align: center;
+    background: #111a18;
+    border: 1px solid #00ff9f33;
+    border-radius: 8px;
+    padding: 10px 14px;
+    min-width: 70px;
+}
+.gh-stat b {
+    display: block;
+    font-size: 20px;
+    color: #00ff9f;
+}
+.gh-stat span { font-size: 11px; opacity: 0.7; }
+.github-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 320px;
+    overflow: auto;
+}
+.gh-item {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 10px 12px;
+    background: #111a18;
+    border: 1px solid #00ff9f22;
+    border-radius: 8px;
+}
+.gh-item:hover { border-color: #00ff9f88; background: #0d2a22; }
+.gh-name { font-weight: 600; color: #00ff9f; font-size: 13px; }
+.gh-meta { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+.gh-lang {
+    background: #00ff9f22;
+    padding: 1px 6px;
+    border-radius: 4px;
+}
+.github-footer {
+    text-align: center;
+    font-size: 12px;
+    padding-top: 6px;
+}
+.github-footer a { color: #00ff9f; }
