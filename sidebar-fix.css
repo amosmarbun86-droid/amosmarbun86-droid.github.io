@@ -1,0 +1,75 @@
+/* SIDEBAR FIX — load after apps-extra.css */
+@media (max-width: 768px) {
+  #sidebar {
+    width: min(300px, 88vw) !important;
+    max-width: 300px !important;
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(105%) !important;
+    border-radius: 16px 0 0 16px !important;
+    background: rgba(28, 28, 28, 0.94) !important;
+    backdrop-filter: blur(40px) saturate(1.5) !important;
+    -webkit-backdrop-filter: blur(40px) saturate(1.5) !important;
+    box-shadow: -8px 0 32px rgba(0,0,0,0.5) !important;
+    z-index: 5000 !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    padding-bottom: env(safe-area-inset-bottom, 12px) !important;
+  }
+  #sidebar.active {
+    transform: translateX(0) !important;
+  }
+}
+@media (min-width: 769px) {
+  #sidebar {
+    transform: none !important;
+    right: 0 !important;
+  }
+}
+#sidebar {
+  background: rgba(28, 28, 28, 0.92) !important;
+  backdrop-filter: blur(40px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(1.5) !important;
+  border-left: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: -8px 0 32px rgba(0,0,0,0.5) !important;
+  z-index: 5000 !important;
+}
+.sidebar-header {
+  position: sticky !important;
+  top: 0 !important;
+  background: rgba(28,28,28,0.95) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08) !important;
+  padding: 16px !important;
+  z-index: 2 !important;
+}
+.sidebar-title { color: #f0f0f0 !important; font-weight: 600 !important; }
+.sidebar-label { color: #8a8a8a !important; }
+.side-item {
+  margin: 1px 10px !important;
+  padding: 11px 12px !important;
+  border-radius: 8px !important;
+  color: #e4e4e4 !important;
+}
+.side-item:hover, .side-item:active {
+  background: rgba(255,255,255,0.1) !important;
+  padding-left: 12px !important;
+}
+.logout-btn {
+  margin: 12px 10px 16px !important;
+  border-radius: 8px !important;
+  background: rgba(232,17,35,0.08) !important;
+  color: #ff7b7b !important;
+  border-top: none !important;
+}
+#sidebarBackdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 4990;
+  backdrop-filter: blur(2px);
+}
+#sidebarBackdrop.show { display: block; }
+#mobileMenuBtn {
+  border-radius: 10px !important;
+  z-index: 50 !important;
+}
